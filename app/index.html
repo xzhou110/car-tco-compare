@@ -8,6 +8,20 @@
     <meta name="description" content="Compare total cost of ownership across up to 6 cars — new vs. used, EV vs. gas." />
     <link rel="manifest" href="manifest.webmanifest" />
     <title>Car TCO Compare</title>
+    <script>
+      // Set the theme before first paint to avoid a flash of the wrong theme.
+      (function () {
+        try {
+          var t = localStorage.getItem('carTcoTheme');
+          if (t !== 'light' && t !== 'dark') {
+            t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          }
+          document.documentElement.dataset.theme = t;
+        } catch (e) {
+          document.documentElement.dataset.theme = 'light';
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

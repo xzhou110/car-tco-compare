@@ -67,13 +67,6 @@ comparison update.
 - **How every dollar is computed:** [`docs/design/tco-model.md`](docs/design/tco-model.md)
 - **Run the prototype:** [`prototype/README.md`](prototype/README.md)
 
-## Deploy
-
-The app (`app/`) is a static single-page app (`app/` → `app/dist`, no server needed).
-Recommended for a commercial product: keep the **repo private** and deploy via **Vercel**
-or **Cloudflare Pages** (both deploy from private repos, with HTTPS + custom domains).
-Full steps: [`docs/deploy/`](docs/deploy/README.md).
-
 ## License
 
 **© 2026 xzhou110. All rights reserved. Proprietary — see [LICENSE](LICENSE).**

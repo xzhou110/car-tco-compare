@@ -2,6 +2,13 @@ import type { TcoResult, Vehicle } from '../types';
 import type { SlotColor } from '../data/presets';
 import { cpm, pct, usd } from '../lib/format';
 
+// Translucent tint of a slot color — blends over whatever theme surface is behind it,
+// so the winner banner reads well in both light and dark mode.
+const tint = (hex: string, a: number): string => {
+  const n = parseInt(hex.slice(1), 16);
+  return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
+};
+
 export interface ResultItem {
   vehicle: Vehicle;
   result: TcoResult;
@@ -47,7 +54,7 @@ export function ResultsSummary({ items, holdingYears, financingEnabled }: Props)
           </div>
         ))}
       </div>
-      <div className="winner" style={{ borderColor: best.color.c + '33', background: best.color.soft + '55' }}>
+      <div className="winner" style={{ borderColor: tint(best.color.c, 0.4), background: tint(best.color.c, 0.1) }}>
         <div className="trophy">🏆</div>
         <div>
           <div className="win-head">

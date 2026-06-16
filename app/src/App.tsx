@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useComparison } from './state/useComparison';
 import { computeTco, seedResaleValue } from './lib/tco';
 import { MAX_CARS, MIN_CARS, PRESETS, slotColor } from './data/presets';
@@ -13,6 +13,18 @@ export default function App() {
   const cmp = useComparison();
   const { state } = cmp;
   const [copied, setCopied] = useState(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>(() =>
+    typeof document !== 'undefined' && document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light',
+  );
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    try {
+      localStorage.setItem('carTcoTheme', theme);
+    } catch {
+      /* ignore */
+    }
+  }, [theme]);
 
   const items: ResultItem[] = useMemo(() => {
     const results = state.vehicles.map((v) => computeTco(v, state.assumptions));
@@ -52,6 +64,14 @@ export default function App() {
           </div>
         </div>
         <div className="actions">
+          <button
+            className="btn ghost theme-toggle"
+            aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+            title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+            onClick={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
+          >
+            {theme === 'dark' ? '☀️' : '🌙'}
+          </button>
           <button className="btn ghost" onClick={share} title="Copy a shareable link to this comparison">
             {copied ? 'Link copied ✓' : '🔗 Share'}
           </button>
