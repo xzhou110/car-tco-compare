@@ -100,7 +100,7 @@ Incentives = EV credit / rebate / etc.    (subtracted; FLAG as live data to veri
 ```
 CostPerYear = TotalTCO / Y
 CostPerMile = TotalTCO / (Y · M)
-Winner      = lowest TotalTCO ; delta vs the priciest car is highlighted
+Winner      = lowest TotalTCO (named in the banner with its total)
 ```
 
 ## Cumulative cost over time (chart)

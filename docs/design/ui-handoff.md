@@ -33,7 +33,7 @@ Type: system stack; **tabular numerals** on all monetary figures; hero total ~27
 
 - **Vehicle card** — colored top-border (slot color), header with rank/load/save/remove, then **progressive disclosure**: `Car` + `Energy` always visible; `Depreciation` and `Running costs` are collapsed `<details>` by default (chevron rotates on open). *Note for React:* keep the collapse purely visual — the values must stay mounted and feed the calc even when collapsed (the prototype relies on this).
 - **Summary card** — rank chip (#1–#6 in slot color), name, hero total, pill chips for `$/yr` and `¢/mi`, resale/down footnote. Cheapest gets a green ring + "🏆 cheapest" ribbon.
-- **Winner banner** — tinted with the winner's slot color; verdict + delta vs. priciest.
+- **Winner banner** — placed **above** the summary cards; tinted with the winner's slot color; names the cheapest car + its total over the holding period. (No per-car "X less than Y" comparison — it got noisy with many cars.)
 - **Cost breakdown** — one **vertical stacked column per car** (taller = costs more), column height ∝ total spend (scaled to the max), segments = the 7 cost components in `CATEGORY_ORDER` colored by `CATEGORY_COLORS`, stacked **bottom-to-top** in the same order in every column. Total above each column; car name + slot-color dot below; per-segment hover tooltips; **category legend at the bottom** (consistent with the cumulative chart). The column row scrolls horizontally within the panel when many cars don't fit a narrow width.
 - **Cumulative chart** — inline SVG, per-slot gradient area fill under each line, white-cored data points, dashed gridlines.
 

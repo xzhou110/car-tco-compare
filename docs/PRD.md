@@ -42,7 +42,7 @@ A transparent, editable, side-by-side TCO calculator where the user can:
 - Set **shared ownership assumptions** (holding period, annual miles, tax rate, fuel/energy prices, financing).
 - Override **every cost input** per vehicle — nothing is a hidden black box.
 - **Save cars** and reload them later (browser storage).
-- See a clear **winner, the dollar delta, cost/year, and cost/mile**, plus a **category breakdown** and a **per-year cumulative cost** view.
+- See a clear **winner (cheapest), per-car total, cost/year, and cost/mile**, plus a **cost breakdown** and a **per-year cumulative cost** view.
 
 ### Non-goals (v1)
 
@@ -97,7 +97,7 @@ A transparent, editable, side-by-side TCO calculator where the user can:
 ### 5.3 Outputs
 - **Total TCO** for each vehicle over the holding period
 - **Cost per year** and **cost per mile**
-- **Winner badge** + dollar delta and % difference
+- **Winner banner** (above the cards) naming the cheapest car + its total
 - **Cost breakdown** (depreciation, financing, fuel/energy, insurance, maintenance, repairs, taxes & fees) as a **vertical stacked column per car** — taller = costs more, components stacked bottom-to-top in a fixed order/color, category legend at the bottom
 - **Cumulative cost over time** (per-year line/area), so the user sees crossover points
 - Net price drivers called out (e.g., "Depreciation is 47% of the gap")

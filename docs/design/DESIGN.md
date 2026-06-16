@@ -193,7 +193,7 @@ The prototype mirrors this structure informally:
 
 1. User edits any input → debounced `recompute()`.
 2. For each vehicle: `computeTco(vehicle, assumptions)` → `TcoResult`.
-3. Diff the results → winner, delta vs. priciest.
+3. Find the cheapest (lowest TotalTCO) → winner banner names it + its total.
 4. Render: summary metrics, vertical stacked-column breakdown (one per car), cumulative lines.
 5. Resale auto-seed: if the user hasn't manually overridden `resaleValue`, recompute the
    default from the depreciation curve whenever price/age/miles change; once edited, respect the override.
