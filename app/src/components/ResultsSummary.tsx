@@ -31,7 +31,7 @@ export function ResultsSummary({ items, holdingYears, financingEnabled }: Props)
       <div className="winner" style={{ borderColor: tint(best.color.c, 0.4), background: tint(best.color.c, 0.1) }}>
         <div className="trophy">🏆</div>
         <div className="win-head">
-          {best.vehicle.name || 'This car'} is cheapest to own — {usd(best.result.total)} over {holdingYears} yrs
+          {best.vehicle.name || 'This car'} is the cheapest to own — {usd(best.result.total)} over {holdingYears} yrs
         </div>
       </div>
       <div className="summary">
