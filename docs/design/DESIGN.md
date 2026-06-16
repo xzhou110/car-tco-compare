@@ -129,10 +129,11 @@ keeps "math" and "pixels" cleanly separated.
 │  │ 64.1¢ / mile  │   │ 57.1¢ / mile  │                                │
 │  └───────────────┘   └───────────────┘                               │
 │                                                                       │
-│  COST BREAKDOWN (one stacked bar per car; segments = components)     │
-│  Depreciation  ████████████  vs  ███████                             │
-│  Fuel/Energy   ████          vs  ███                                  │
-│  Maintenance   ██            vs  ████  ...                            │
+│  COST BREAKDOWN — one VERTICAL stacked column per car (taller=more)  │
+│    $44.5k   $37.7k                                                   │
+│    ▓▓ ▓▓    ← taxes / repairs / maint / insurance / energy (upward)  │
+│    ██ ██    ← depreciation (bottom)                                  │
+│    [ legend of components at the bottom ]                            │
 │                                                                       │
 │  CUMULATIVE COST OVER TIME (two lines, shows crossover year)         │
 │  $ ▁▂▃▅▆▇  A                                                          │
@@ -141,11 +142,15 @@ keeps "math" and "pixels" cleanly separated.
 ```
 
 ### Layout rules
-- **Shared assumptions** pinned at top — they drive *both* cars, so they live above them.
-- **Two input columns** stack vertically on mobile.
-- **Results full-width** below inputs; recompute live on every keystroke.
-- Inputs grouped into labeled sections (Purchase / Energy / Ownership / Fees) to reduce overwhelm.
-- Powertrain selector toggles the efficiency field (MPG ⇄ mi/kWh) and energy price used.
+- **Answer-first ordering:** Results (summary + winner + charts) sit at the **top**, then
+  Shared assumptions, then the car inputs, then "How it works". The verdict is the product,
+  and defaults/persisted state mean there's always a result to show on load.
+- **Shared assumptions** sit above the car inputs (they drive every car).
+- **Car inputs** are a responsive grid of 2–6 cards; fields collapse to one column when narrow.
+- **Cost breakdown** = vertical stacked columns (taller = costs more), components stacked
+  bottom-to-top in a fixed order/color; **category legend at the bottom**, consistent with
+  the cumulative chart. Scrolls horizontally within its panel when many cars don't fit.
+- Recompute live on every change. Powertrain selector toggles the efficiency field (MPG ⇄ mi/kWh).
 
 ### Visual language
 - Neutral, finance-tool aesthetic; white/light surface, one accent color per vehicle
@@ -174,7 +179,7 @@ src/
     LoadMenu.tsx          load preset/saved car + inline delete of saved
     Field.tsx             labeled inputs
     ResultsSummary.tsx    headline metrics + winner badge
-    CategoryBreakdown.tsx stacked bar per car (segments = cost components)
+    CategoryBreakdown.tsx vertical stacked columns per car (legend at bottom)
     CumulativeChart.tsx   crossover line chart
     HowItWorks.tsx        plain-language methodology
 ```
@@ -189,7 +194,7 @@ The prototype mirrors this structure informally:
 1. User edits any input → debounced `recompute()`.
 2. For each vehicle: `computeTco(vehicle, assumptions)` → `TcoResult`.
 3. Diff the results → winner, delta vs. priciest.
-4. Render: summary metrics, stacked breakdown bars (one per car), cumulative lines.
+4. Render: summary metrics, vertical stacked-column breakdown (one per car), cumulative lines.
 5. Resale auto-seed: if the user hasn't manually overridden `resaleValue`, recompute the
    default from the depreciation curve whenever price/age/miles change; once edited, respect the override.
 

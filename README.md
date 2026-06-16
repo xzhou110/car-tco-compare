@@ -22,7 +22,8 @@ as the design reference.
 - **Shared assumptions** (holding years, annual miles, tax, fuel/electricity price, financing) for an apples-to-apples comparison — and **save your own defaults**.
 - **Per-condition financing** — separate New vs Used down-payment %, APR, and term.
 - **Presets + saved cars** — load a built-in preset or a car you saved; **delete saved cars inline** from the Load menu.
-- **Results** — ranked summary (total, $/yr, ¢/mi), a **stacked cost-breakdown bar per car** (segments = cost components, same order/color in every bar), and a cumulative-cost-over-time chart.
+- **Results-first layout** — the verdict (ranked summary with total, $/yr, ¢/mi, and the winner) sits at the top, above the inputs.
+- **Cost breakdown** — a **vertical stacked column per car** (taller = costs more; components stacked in the same order/color), with the category legend at the bottom — plus a cumulative-cost-over-time chart.
 - **Light / dark theme** — remembers your choice, follows your system setting by default.
 - **Auto-save** to your browser + a **shareable URL** that encodes the whole comparison.
 - **In-app "How it works"** explaining the methodology in plain language.

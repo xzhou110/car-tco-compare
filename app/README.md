@@ -21,7 +21,8 @@ npm run preview  # serve the production build
 - **Per-condition financing** (separate new vs. used brackets; down payment as % of price).
 - **Auto-save** to `localStorage` + **shareable URL** (state encoded in the hash) — close it and pick up later, or send a link.
 - Per-car **presets** and **saved cars** (delete saved cars inline from the Load menu).
-- **Stacked cost-breakdown** — one bar per car, segments in a fixed order/color — plus a cumulative-cost chart (starts at purchase price, recovers resale at sale).
+- **Results-first layout** — verdict (summary + winner + charts) at the top, inputs below.
+- **Vertical stacked-column breakdown** — one column per car (taller = costs more), components in a fixed order/color, category legend at the bottom — plus a cumulative-cost chart (starts at purchase price, recovers resale at sale).
 - **Light / dark theme** (remembers choice, follows system), progressive disclosure, responsive layout, reduced-motion support, PWA manifest.
 
 ## Architecture

@@ -34,7 +34,7 @@ Type: system stack; **tabular numerals** on all monetary figures; hero total ~27
 - **Vehicle card** — colored top-border (slot color), header with rank/load/save/remove, then **progressive disclosure**: `Car` + `Energy` always visible; `Depreciation` and `Running costs` are collapsed `<details>` by default (chevron rotates on open). *Note for React:* keep the collapse purely visual — the values must stay mounted and feed the calc even when collapsed (the prototype relies on this).
 - **Summary card** — rank chip (#1–#6 in slot color), name, hero total, pill chips for `$/yr` and `¢/mi`, resale/down footnote. Cheapest gets a green ring + "🏆 cheapest" ribbon.
 - **Winner banner** — tinted with the winner's slot color; verdict + delta vs. priciest.
-- **Cost breakdown** — one **stacked horizontal bar per car** (rows = cars), bar length ∝ total spend (scaled to the max), segments = the 7 cost components in `CATEGORY_ORDER` colored by `CATEGORY_COLORS` (same order/color in every bar). Row label carries the car's slot-color dot; per-segment hover tooltips; total at the bar end. Collapses to one column under 460px.
+- **Cost breakdown** — one **vertical stacked column per car** (taller = costs more), column height ∝ total spend (scaled to the max), segments = the 7 cost components in `CATEGORY_ORDER` colored by `CATEGORY_COLORS`, stacked **bottom-to-top** in the same order in every column. Total above each column; car name + slot-color dot below; per-segment hover tooltips; **category legend at the bottom** (consistent with the cumulative chart). The column row scrolls horizontally within the panel when many cars don't fit a narrow width.
 - **Cumulative chart** — inline SVG, per-slot gradient area fill under each line, white-cored data points, dashed gridlines.
 
 ## Critique pass — what changed (v0.3)
@@ -49,7 +49,7 @@ Type: system stack; **tabular numerals** on all monetary figures; hero total ~27
 
 ## Deferred to the React build (recommended)
 
-1. **Results-first / sticky summary** — pin a condensed verdict bar so the answer stays visible while editing inputs (prototype keeps the linear scroll).
+1. ~~Results-first~~ ✅ **done** — the results section is now at the top (answer-first). A *sticky* condensed verdict bar (so the answer stays visible while editing inputs below) is still a possible future enhancement.
 2. **True bar-grow animation** from 0 on mount (needs mount lifecycle; CSS-only can't).
 3. **Full responsive QA** at 320 / 768 / 1024 / 1440, plus real touch testing.
 4. **Focus-visible audit** and keyboard nav order across the dynamic card list.
