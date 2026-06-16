@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Car TCO Compare — Prototype</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">🚗</span>
+      <div>
+        <h1>Car TCO Compare <span class="badge">prototype</span></h1>
+        <p class="tagline">Total cost of ownership, side by side — compare up to 6 cars: new vs. used, EV vs. gas, any A vs. B vs. C.</p>
+      </div>
+    </div>
+    <div class="actions">
+      <button id="resetAll" class="btn" title="Reset to defaults">Reset</button>
+    </div>
+  </header>
+
+  <section class="card assume">
+    <h2>Shared assumptions</h2>
+    <p class="hint-line">These apply to <strong>every</strong> car, so the comparison is apples-to-apples.</p>
+    <div id="assumptions"><!-- generated --></div>
+  </section>
+
+  <section class="vehicles-section">
+    <div class="vehicles" id="vehicles"><!-- generated cards --></div>
+    <button id="addVehicle" class="btn ghost add-btn">+ Add car</button>
+  </section>
+
+  <section class="card results-card">
+    <h2>Results</h2>
+    <div id="results"><!-- generated --></div>
+  </section>
+
+  <footer class="foot">
+    Prototype · no-build · your inputs auto-save in this browser and reload next visit · methodology in
+    <code>docs/design/tco-model.md</code>. All numbers illustrative — verify live data before buying.
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/tco.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

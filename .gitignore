@@ -1,0 +1,19 @@
+# dependencies (production app, added later)
+node_modules/
+dist/
+.vite/
+
+# env / local
+.env
+.env.local
+*.local
+
+# editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# logs
+*.log
+npm-debug.log*
