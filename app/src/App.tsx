@@ -1,13 +1,14 @@
 import { useMemo, useState } from 'react';
 import { useComparison } from './state/useComparison';
 import { computeTco, seedResaleValue } from './lib/tco';
-import { MAX_CARS, PRESETS, slotColor } from './data/presets';
+import { MAX_CARS, MIN_CARS, PRESETS, slotColor } from './data/presets';
 import { AssumptionsBar } from './components/AssumptionsBar';
 import { VehicleCard } from './components/VehicleCard';
 import { ResultsSummary, type ResultItem } from './components/ResultsSummary';
 import { CategoryBreakdown } from './components/CategoryBreakdown';
 import { CumulativeChart } from './components/CumulativeChart';
 import { HowItWorks } from './components/HowItWorks';
+import { SavedCarsManager } from './components/SavedCarsManager';
 
 export default function App() {
   const cmp = useComparison();
@@ -76,7 +77,7 @@ export default function App() {
               index={i}
               vehicle={v}
               color={slotColor(i)}
-              removable={state.vehicles.length > 2}
+              removable={state.vehicles.length > MIN_CARS}
               presets={PRESETS}
               profiles={cmp.profiles}
               resaleSeed={seedResaleValue(v, state.assumptions)}
@@ -90,6 +91,7 @@ export default function App() {
         <button className="btn ghost add-btn" disabled={atMax} onClick={cmp.addVehicle}>
           {atMax ? `Max ${MAX_CARS} cars` : '+ Add car'}
         </button>
+        <SavedCarsManager profiles={cmp.profiles} onDelete={cmp.deleteProfile} />
       </section>
 
       <section className="card results-card">

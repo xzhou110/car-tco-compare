@@ -24,7 +24,12 @@ export function NumField({ label, hint, pre, suf, value, placeholder, step, onCh
           step={step ?? 'any'}
           value={value ?? ''}
           placeholder={placeholder}
-          onChange={(e) => onChange(e.target.value === '' ? null : Number(e.target.value))}
+          onChange={(e) => {
+            const raw = e.target.value;
+            if (raw === '') return onChange(null);
+            const n = Number(raw);
+            onChange(Number.isFinite(n) ? n : null);
+          }}
         />
         {suf && <span className="adorn suf">{suf}</span>}
       </span>

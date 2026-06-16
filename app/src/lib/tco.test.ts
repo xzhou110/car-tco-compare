@@ -102,3 +102,27 @@ describe('seedResaleValue', () => {
     expect(seedResaleValue({ ...v, annualDepRate: 0.3 }, a)).toBeLessThan(s);
   });
 });
+
+describe('computeTco — overrides & derived metrics', () => {
+  it('respects an explicit resale value override', () => {
+    const a = A();
+    const v: Vehicle = { ...preset('rav4h-new'), resaleValue: 20000 };
+    const r = computeTco(v, a);
+    expect(r.resaleUsed).toBe(20000);
+    expect(r.byCategory.depreciation).toBeCloseTo(v.purchasePrice - 20000, 6);
+  });
+
+  it('incentives reduce the total dollar-for-dollar', () => {
+    const a = A();
+    const base = preset('model3-new');
+    const credited = { ...base, incentives: 7500 };
+    expect(computeTco(base, a).total - computeTco(credited, a).total).toBeCloseTo(7500, 6);
+  });
+
+  it('perYear and perMile are consistent with the total', () => {
+    const a = A();
+    const r = computeTco(preset('crv-new'), a);
+    expect(r.perYear).toBeCloseTo(r.total / a.holdingYears, 6);
+    expect(r.perMile).toBeCloseTo(r.total / (a.holdingYears * a.annualMiles), 6);
+  });
+});

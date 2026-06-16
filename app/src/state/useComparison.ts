@@ -157,6 +157,17 @@ export function useComparison() {
     setProfiles(next);
   };
 
+  const deleteProfile = (name: string) => {
+    const next = { ...loadProfiles() };
+    delete next[name];
+    try {
+      localStorage.setItem(PROFILE_KEY, JSON.stringify(next));
+    } catch {
+      /* ignore */
+    }
+    setProfiles(next);
+  };
+
   const shareUrl = () => window.location.origin + window.location.pathname + '#' + encode(state);
 
   // Save the current shared assumptions as the user's defaults (used for Reset + new sessions).
@@ -185,6 +196,7 @@ export function useComparison() {
     loadVehicle,
     reset,
     saveProfile,
+    deleteProfile,
     shareUrl,
     saveAssumptionDefaults,
     clearAssumptionDefaults,

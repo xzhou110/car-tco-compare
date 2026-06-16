@@ -48,6 +48,13 @@ small { color: var(--muted); font-weight: 400; }
 .btn:disabled { opacity: 0.5; cursor: default; }
 .btn.tiny { padding: 7px 11px; font-size: 12px; border-radius: 7px; min-height: 30px; }
 
+/* keyboard focus visibility (a11y) */
+button:focus-visible, summary:focus-visible, .saved-chip-del:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
 /* cards */
 .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px; margin-bottom: 16px; }
 .hint-line { margin: 0 0 12px; color: var(--muted); font-size: 12.5px; }
@@ -70,13 +77,29 @@ small { color: var(--muted); font-weight: 400; }
 .vehicles-section { margin-bottom: 16px; }
 .vehicles { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
 .add-btn { margin-top: 12px; width: 100%; padding: 11px; }
+
+/* saved-cars manager */
+.saved-manager { margin-top: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow-sm); overflow: hidden; }
+.saved-manager > summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; font-size: 12.5px; font-weight: 700; color: var(--muted); user-select: none; }
+.saved-manager > summary::-webkit-details-marker { display: none; }
+.saved-manager > summary:hover { color: var(--accent); }
+.saved-manager .chev { font-size: 16px; transition: transform 0.18s ease; line-height: 1; }
+.saved-manager[open] .chev { transform: rotate(90deg); }
+.saved-list { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 14px 4px; }
+.saved-chip { display: inline-flex; align-items: center; gap: 6px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; padding: 4px 6px 4px 11px; font-size: 12px; max-width: 220px; }
+.saved-chip-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.saved-chip-del { border: 0; background: #eef1f5; color: var(--muted); width: 20px; height: 20px; border-radius: 999px; cursor: pointer; font-size: 11px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
+.saved-chip-del:hover { background: #f6d6d6; color: #b3261e; }
+.saved-manager .hint-line { padding: 6px 14px 12px; margin: 0; }
 .vcard { margin-bottom: 0; transition: box-shadow 0.15s ease, transform 0.15s ease; }
 .vcard:hover { box-shadow: 0 2px 8px rgba(20, 30, 45, 0.07), 0 18px 38px rgba(20, 30, 45, 0.1); }
 
 .veh-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 13px; gap: 8px; }
+.veh-head-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .veh-tag { font-weight: 700; font-size: 12px; padding: 5px 11px; border-radius: 999px; white-space: nowrap; }
+.veh-sub { font-size: 10px; font-weight: 700; letter-spacing: 0.04em; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .veh-head-actions { display: flex; gap: 6px; align-items: center; }
-.load-select { max-width: 128px; font-size: 12px; padding: 6px 7px; }
+.load-select { max-width: 116px; font-size: 12px; padding: 6px 7px; }
 
 fieldset { border: 1px solid var(--line); border-radius: 11px; margin: 0 0 11px; padding: 10px 12px 12px; background: var(--surface-2); }
 legend { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--faint); padding: 0 7px; font-weight: 800; }

@@ -33,9 +33,12 @@ export function VehicleCard({ index, vehicle: v, color, removable, presets, prof
   return (
     <div className="card vcard" style={{ borderTop: `3px solid ${color.c}` }}>
       <div className="veh-head">
-        <span className="veh-tag" style={{ background: color.soft, color: color.ink }}>Car {index + 1}</span>
+        <div className="veh-head-left">
+          <span className="veh-tag" style={{ background: color.soft, color: color.ink }}>Car {index + 1}</span>
+          <span className="veh-sub">{v.condition.toUpperCase()} · {v.powertrain.toUpperCase()}</span>
+        </div>
         <div className="veh-head-actions">
-          <select className="load-select" value="" onChange={(e) => handleLoad(e.target.value)} title="Load a preset or saved car">
+          <select className="load-select" value="" onChange={(e) => handleLoad(e.target.value)} aria-label="Load a preset or saved car" title="Load a preset or saved car">
             <option value="">Load…</option>
             <optgroup label="Presets">
               {presets.map((p) => (
@@ -50,9 +53,9 @@ export function VehicleCard({ index, vehicle: v, color, removable, presets, prof
               </optgroup>
             )}
           </select>
-          <button className="btn tiny" title="Save this car to your browser" onClick={onSave}>💾</button>
+          <button className="btn tiny" aria-label="Save this car to your browser" title="Save this car to your browser" onClick={onSave}>💾</button>
           {removable && (
-            <button className="btn tiny ghost" title="Remove" onClick={onRemove}>✕</button>
+            <button className="btn tiny ghost" aria-label="Remove this car from the comparison" title="Remove" onClick={onRemove}>✕</button>
           )}
         </div>
       </div>
