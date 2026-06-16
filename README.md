@@ -15,6 +15,18 @@ period and mileage, and see the real cost of ownership — not just the sticker 
 unit-tested calculation engine. The original no-build [`prototype/`](prototype/) remains
 as the design reference.
 
+## Features
+
+- **Compare 2–6 cars** side by side — add/remove cars, each with its own name and color.
+- **Edmunds-style 7-line TCO**: depreciation, financing, fuel/energy, insurance, maintenance, repairs, taxes & fees (minus incentives).
+- **Shared assumptions** (holding years, annual miles, tax, fuel/electricity price, financing) for an apples-to-apples comparison — and **save your own defaults**.
+- **Per-condition financing** — separate New vs Used down-payment %, APR, and term.
+- **Presets + saved cars** — load a built-in preset or a car you saved; **delete saved cars inline** from the Load menu.
+- **Results** — ranked summary (total, $/yr, ¢/mi), category breakdown bars, and a cumulative-cost-over-time chart.
+- **Light / dark theme** — remembers your choice, follows your system setting by default.
+- **Auto-save** to your browser + a **shareable URL** that encodes the whole comparison.
+- **In-app "How it works"** explaining the methodology in plain language.
+
 ## Repo structure
 
 ```
@@ -33,7 +45,7 @@ car-tco-compare/
 └── app/                       ← PRODUCTION app (Vite + React + TS)
     ├── src/
     │   ├── lib/tco.ts         ← pure, typed calculation engine
-    │   ├── lib/tco.test.ts    ← Vitest unit suite (12 tests)
+    │   ├── lib/tco.test.ts    ← Vitest unit suite (15 tests)
     │   ├── data/presets.ts    ← sample vehicles + defaults
     │   ├── state/useComparison.ts  ← state + localStorage + URL-share
     │   ├── components/        ← AssumptionsBar, VehicleCard, results, charts

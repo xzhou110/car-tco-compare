@@ -32,7 +32,7 @@ export function LoadMenu({ presets, profiles, onLoad, onDeleteProfile }: Props) 
 
   return (
     <details className="load-menu" ref={ref}>
-      <summary className="load-trigger" aria-label="Load a preset or saved car">Load…</summary>
+      <summary className="load-trigger" aria-label="Load a preset or saved car">Load</summary>
       <div className="load-pop" role="menu">
         <div className="load-group-label">Presets</div>
         {presets.map((p) => (

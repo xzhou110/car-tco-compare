@@ -87,7 +87,7 @@ button:focus-visible, summary:focus-visible, .saved-chip-del:focus-visible {
 /* shared assumptions */
 .assume-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
 .assume-head .btn.tiny { white-space: nowrap; }
-.assume-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px 16px; }
+.assume-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr)); gap: 12px 16px; }
 .fin-block { margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--line); }
 .switch { display: inline-flex; align-items: center; gap: 9px; cursor: pointer; font-size: 13px; font-weight: 600; user-select: none; }
 .switch input { width: auto; accent-color: var(--accent); transform: scale(1.15); }
@@ -100,16 +100,15 @@ button:focus-visible, summary:focus-visible, .saved-chip-del:focus-visible {
 
 /* vehicles — wrap up to 6 */
 .vehicles-section { margin-bottom: 16px; }
-.vehicles { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+.vehicles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 14px; }
 .add-btn { margin-top: 12px; width: 100%; padding: 11px; }
 .vcard { margin-bottom: 0; transition: box-shadow 0.15s ease, transform 0.15s ease; }
 .vcard:hover { box-shadow: 0 2px 8px rgba(20, 30, 45, 0.07), 0 18px 38px rgba(20, 30, 45, 0.1); }
 
-.veh-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 13px; gap: 8px; }
-.veh-head-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.veh-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 8px; }
 .veh-tag { font-weight: 700; font-size: 12px; padding: 5px 11px; border-radius: 999px; white-space: nowrap; }
-.veh-sub { font-size: 10px; font-weight: 700; letter-spacing: 0.04em; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.veh-head-actions { display: flex; gap: 6px; align-items: center; }
+.veh-name { font-size: 14px; font-weight: 700; color: var(--ink); margin: 0 0 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.veh-head-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
 
 /* custom Load… menu (load presets/saved cars + inline delete of saved) */
 .load-menu { position: relative; }
@@ -129,7 +128,7 @@ button:focus-visible, summary:focus-visible, .saved-chip-del:focus-visible {
 
 fieldset { border: 1px solid var(--line); border-radius: 11px; margin: 0 0 11px; padding: 10px 12px 12px; background: var(--surface-2); }
 legend { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--faint); padding: 0 7px; font-weight: 800; }
-.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px 12px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(130px, 100%), 1fr)); gap: 9px 12px; }
 
 /* collapsible advanced groups */
 .fgroup { border: 1px solid var(--line); border-radius: 11px; margin: 0 0 11px; background: var(--surface-2); overflow: hidden; }
@@ -159,7 +158,7 @@ input[type='number']::-webkit-inner-spin-button, input[type='number']::-webkit-o
 .adorn:not(.suf) { border-right: 1px solid var(--line); }
 
 /* results summary */
-.summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(186px, 1fr)); gap: 13px; margin-bottom: 14px; }
+.summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(186px, 100%), 1fr)); gap: 13px; margin-bottom: 14px; }
 .result-card { position: relative; background: linear-gradient(180deg, var(--surface), var(--surface-2)); border: 1px solid var(--line); border-radius: 12px; padding: 15px; border-top: 4px solid; transition: transform 0.12s ease, box-shadow 0.12s ease; }
 .result-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
 .result-card.best { box-shadow: 0 0 0 2px var(--good), var(--shadow); }
@@ -180,7 +179,7 @@ input[type='number']::-webkit-inner-spin-button, input[type='number']::-webkit-o
 /* panels */
 .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 @media (max-width: 880px) { .panels { grid-template-columns: 1fr; } }
-.panel { border: 1px solid var(--line); border-radius: 12px; padding: 16px; background: var(--surface); }
+.panel { border: 1px solid var(--line); border-radius: 12px; padding: 16px; background: var(--surface); min-width: 0; }
 
 /* legend */
 .legend { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin-bottom: 12px; }

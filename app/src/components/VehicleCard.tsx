@@ -24,18 +24,16 @@ export function VehicleCard({ index, vehicle: v, color, removable, presets, prof
   return (
     <div className="card vcard" style={{ borderTop: `3px solid ${color.c}` }}>
       <div className="veh-head">
-        <div className="veh-head-left">
-          <span className="veh-tag" style={{ background: color.soft, color: color.ink }}>Car {index + 1}</span>
-          <span className="veh-sub">{v.condition.toUpperCase()} · {v.powertrain.toUpperCase()}</span>
-        </div>
+        <span className="veh-tag" style={{ background: color.soft, color: color.ink }}>Car {index + 1}</span>
         <div className="veh-head-actions">
           <LoadMenu presets={presets} profiles={profiles} onLoad={onLoad} onDeleteProfile={onDeleteProfile} />
-          <button className="btn tiny" aria-label="Save this car to your browser" title="Save this car to your browser" onClick={onSave}>💾</button>
+          <button className="btn tiny" title="Save this car to your browser" onClick={onSave}>Save</button>
           {removable && (
             <button className="btn tiny ghost" aria-label="Remove this car from the comparison" title="Remove" onClick={onRemove}>✕</button>
           )}
         </div>
       </div>
+      <div className="veh-name" title={v.name}>{v.name || 'Unnamed car'}</div>
 
       <fieldset>
         <legend>Car</legend>
