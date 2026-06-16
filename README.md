@@ -82,8 +82,16 @@ comparison update.
 
 ## License
 
-**© 2026 xzhou110. All rights reserved. Proprietary — see [LICENSE](LICENSE).**
+**© 2026 xzhou110 — [PolyForm Noncommercial License 1.0.0](LICENSE).**
 
-This is a **commercial product in development**, kept source-visible for now — it is **not**
-open source. No permission is granted to use, copy, modify, deploy, or distribute it. The
-owner retains all rights, including the right to commercialize. Contact the owner for licensing inquiries.
+This project is **source-available for noncommercial use**. You're welcome to view, run,
+study, modify, and share it for any **noncommercial** purpose (personal projects, research,
+education, evaluation) — please keep the copyright notice intact.
+
+**Commercial use is reserved.** The copyright holder retains all commercial rights, including
+the right to build and sell a commercial product based on this work. If you'd like to use it
+commercially, contact the owner for a commercial license.
+
+> Note: because it restricts commercial use, this is technically a *source-available*
+> license rather than an OSI-approved *open source* one — the trade-off that lets the code
+> stay public while commercialization stays with the owner.
