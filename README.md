@@ -11,7 +11,9 @@ period and mileage, and see the real cost of ownership — not just the sticker 
 
 ## Status
 
-Pre-build: **PRD + design approved-pending-review**, plus a **clickable prototype** for feedback.
+**Production app built** (Vite + React + TypeScript) in [`app/`](app/), with a typed,
+unit-tested calculation engine. The original no-build [`prototype/`](prototype/) remains
+as the design reference.
 
 ## Repo structure
 
@@ -22,24 +24,41 @@ car-tco-compare/
 │   ├── PRD.md                 ← product requirements (problem, scope, roadmap)
 │   └── design/
 │       ├── DESIGN.md          ← architecture, data model, UX, component plan
-│       └── tco-model.md       ← exact calculation methodology (every formula)
-└── prototype/                 ← no-build clickable sample (vanilla HTML/CSS/JS)
-    ├── index.html             ← double-click to open
-    ├── css/styles.css
-    └── js/{data,tco,app}.js
+│       ├── tco-model.md       ← exact calculation methodology (every formula)
+│       └── ui-handoff.md      ← design tokens + engineering handoff notes
+├── prototype/                 ← no-build clickable sample (vanilla HTML/CSS/JS)
+│   ├── index.html             ← double-click to open
+│   ├── css/styles.css
+│   └── js/{data,tco,app}.js
+└── app/                       ← PRODUCTION app (Vite + React + TS)
+    ├── src/
+    │   ├── lib/tco.ts         ← pure, typed calculation engine
+    │   ├── lib/tco.test.ts    ← Vitest unit suite (12 tests)
+    │   ├── data/presets.ts    ← sample vehicles + defaults
+    │   ├── state/useComparison.ts  ← state + localStorage + URL-share
+    │   ├── components/        ← AssumptionsBar, VehicleCard, results, charts
+    │   └── App.tsx
+    └── package.json
 ```
-
-The production app (Vite + React + TypeScript) will live in `src/` once the design is
-signed off — see the roadmap in [`docs/PRD.md`](docs/PRD.md).
 
 ## Quick start
 
+**Production app** (needs Node 18+):
 ```powershell
-# open the prototype
+cd app
+npm install
+npm run dev      # start the dev server
+npm test         # run the engine unit tests
+npm run build    # type-check + production bundle
+```
+
+**Prototype** (no build — just open it):
+```powershell
 start prototype\index.html
 ```
 
-Then load presets, edit numbers, flip the holding period, and watch the comparison update.
+Either way: load presets, edit numbers, flip the holding period, add cars, and watch the
+comparison update.
 
 ## Read next
 

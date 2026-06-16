@@ -1,0 +1,11 @@
+{
+  "name": "Car TCO Compare",
+  "short_name": "TCO Compare",
+  "description": "Compare total cost of ownership across up to 6 cars.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#eef2f7",
+  "theme_color": "#2f6fed",
+  "icons": []
+}

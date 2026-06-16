@@ -8,9 +8,10 @@ dist/
 .env.local
 *.local
 
-# editor / OS
+# editor / OS / local tooling
 .vscode/
 .idea/
+.claude/
 .DS_Store
 Thumbs.db
 

@@ -7,6 +7,11 @@
 > vehicles are now an **array of 2–6** (not fixed A/B); **save/load profiles** via
 > `localStorage`; **financing has New/Used brackets** with **down-payment %**; cumulative
 > chart starts at purchase price. Data model and UX below updated accordingly.
+>
+> **v0.3 (built):** the production app is implemented in [`../../app/`](../../app/)
+> (Vite + React + TS). The engine lives at `app/src/lib/tco.ts` with a Vitest suite;
+> state (localStorage + shareable URL hash) in `app/src/state/useComparison.ts`.
+> Where this doc says `src/`, read `app/src/`.
 
 Companion to [`../PRD.md`](../PRD.md) and [`tco-model.md`](tco-model.md). Covers
 architecture, data model, UX layout, and the path from prototype → production.
