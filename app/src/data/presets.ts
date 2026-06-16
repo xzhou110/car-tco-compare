@@ -2,7 +2,7 @@
 // All numbers ILLUSTRATIVE — verify live before relying on a result.
 import type { Assumptions, CategoryKey, Vehicle } from '../types';
 
-export const MIN_CARS = 2;
+export const MIN_CARS = 1;
 export const MAX_CARS = 6;
 
 export const DEFAULT_ASSUMPTIONS: Assumptions = {

@@ -146,7 +146,7 @@ keeps "math" and "pixels" cleanly separated.
   Shared assumptions, then the car inputs, then "How it works". The verdict is the product,
   and defaults/persisted state mean there's always a result to show on load.
 - **Shared assumptions** sit above the car inputs (they drive every car).
-- **Car inputs** are a responsive grid of 2–6 cards; fields collapse to one column when narrow.
+- **Car inputs** are a responsive grid of 1–6 cards; fields collapse to one column when narrow.
 - **Cost breakdown** = vertical stacked columns (taller = costs more), components stacked
   bottom-to-top in a fixed order/color; **category legend at the bottom**, consistent with
   the cumulative chart. Scrolls horizontally within its panel when many cars don't fit.
@@ -175,7 +175,7 @@ src/
     presets.ts           curated sample vehicles
   components/
     AssumptionsBar.tsx
-    VehicleCard.tsx       (rendered per car, 2–6)
+    VehicleCard.tsx       (rendered per car, 1–6)
     LoadMenu.tsx          load preset/saved car + inline delete of saved
     Field.tsx             labeled inputs
     ResultsSummary.tsx    headline metrics + winner badge

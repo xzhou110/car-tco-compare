@@ -25,21 +25,24 @@ interface Props {
 
 export function ResultsSummary({ items, holdingYears, financingEnabled }: Props) {
   const best = items.find((it) => it.isBest) ?? items[0];
+  const single = items.length === 1;
 
   return (
     <>
       <div className="winner" style={{ borderColor: tint(best.color.c, 0.4), background: tint(best.color.c, 0.1) }}>
-        <div className="trophy">🏆</div>
+        <div className="trophy">{single ? '💰' : '🏆'}</div>
         <div className="win-head">
-          {best.vehicle.name || 'This car'} is the cheapest to own — {usd(best.result.total)} over {holdingYears} yrs
+          {single
+            ? `${best.vehicle.name || 'This car'} — ${usd(best.result.total)} to own over ${holdingYears} yrs`
+            : `${best.vehicle.name || 'This car'} is the cheapest to own — ${usd(best.result.total)} over ${holdingYears} yrs`}
         </div>
       </div>
       <div className="summary">
         {items.map((it) => (
-          <div className={`result-card${it.isBest ? ' best' : ''}`} key={it.vehicle.id} style={{ borderTopColor: it.color.c }}>
-            {it.isBest && <span className="best-flag">🏆 cheapest</span>}
+          <div className={`result-card${it.isBest && !single ? ' best' : ''}`} key={it.vehicle.id} style={{ borderTopColor: it.color.c }}>
+            {it.isBest && !single && <span className="best-flag">🏆 cheapest</span>}
             <div className="rc-head">
-              <span className="rank" style={{ background: it.color.c }}>#{it.rank}</span>
+              {!single && <span className="rank" style={{ background: it.color.c }}>#{it.rank}</span>}
               <span className="rc-name">{it.vehicle.name}</span>
             </div>
             <div className="rc-total">{usd(it.result.total)}</div>

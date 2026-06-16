@@ -38,7 +38,7 @@ don't let you put two arbitrary vehicles side by side with **your own assumption
 
 A transparent, editable, side-by-side TCO calculator where the user can:
 
-- Compare **2 to 6 vehicles** at once (any mix of new/used, gas/hybrid/EV).
+- Compare **1 to 6 vehicles** at once (any mix of new/used, gas/hybrid/EV) — a single car works for a standalone TCO.
 - Set **shared ownership assumptions** (holding period, annual miles, tax rate, fuel/energy prices, financing).
 - Override **every cost input** per vehicle — nothing is a hidden black box.
 - **Save cars** and reload them later (browser storage).

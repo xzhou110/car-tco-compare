@@ -15,7 +15,7 @@ npm run preview  # serve the production build
 
 ## Features
 
-- Compare **2–6 cars** — add/remove, each with its own slot color.
+- Compare **1–6 cars** — start with one, add/remove, each with its own slot color.
 - **7-line Edmunds-style TCO**: depreciation, financing, fuel/energy, insurance, maintenance, repairs, taxes & fees (minus incentives).
 - **Warranty-aware repairs** — repairs are $0 while a car is within its age *and* mileage warranty, then kick in.
 - **Per-condition financing** (separate new vs. used brackets; down payment as % of price).
