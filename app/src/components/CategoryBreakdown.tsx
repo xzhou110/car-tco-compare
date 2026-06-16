@@ -1,7 +1,8 @@
 import type { ResultItem } from './ResultsSummary';
-import { CATEGORY_LABELS, CATEGORY_ORDER } from '../data/presets';
+import { CATEGORY_COLORS, CATEGORY_LABELS, CATEGORY_ORDER } from '../data/presets';
 import { usd } from '../lib/format';
 
+// Car legend (slot colors) — reused by the cumulative chart.
 export function Legend({ items }: { items: ResultItem[] }) {
   return (
     <div className="legend">
@@ -20,36 +21,58 @@ interface Props {
   holdingYears: number;
 }
 
+// Stacked horizontal bar per car: one bar each, segments = cost components in a
+// fixed order/color, bar length ∝ total spend so cars are directly comparable.
 export function CategoryBreakdown({ items, holdingYears }: Props) {
-  const maxCat = Math.max(1, ...CATEGORY_ORDER.flatMap((c) => items.map((it) => it.result.byCategory[c])));
+  const grossOf = (it: ResultItem) => CATEGORY_ORDER.reduce((s, c) => s + it.result.byCategory[c], 0);
+  const maxGross = Math.max(1, ...items.map(grossOf));
+
   return (
     <div className="panel">
       <h3>
-        Where the money goes <small>({holdingYears}-yr totals)</small>
+        Cost breakdown <small>({holdingYears}-yr totals)</small>
       </h3>
-      <Legend items={items} />
-      <div className="cat-table">
+      <div className="legend">
         {CATEGORY_ORDER.map((c) => (
-          <div className="cat-row" key={c}>
-            <div className="cat-name">{CATEGORY_LABELS[c]}</div>
-            <div className="cat-bars">
-              {items.map((it) => {
-                const val = it.result.byCategory[c];
-                return (
-                  <div className="bar" key={it.vehicle.id}>
-                    <span className="track">
-                      <span
-                        className="fill"
-                        style={{ width: `${(val / maxCat) * 100}%`, background: `linear-gradient(90deg, ${it.color.c}cc, ${it.color.c})` }}
-                      />
-                    </span>
-                    <b>{usd(val)}</b>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+          <span className="lg" key={c}>
+            <span className="dot" style={{ background: CATEGORY_COLORS[c] }} />
+            {CATEGORY_LABELS[c]}
+          </span>
         ))}
+      </div>
+      <div className="stack-table">
+        {items.map((it) => {
+          const gross = grossOf(it);
+          const incentives = it.vehicle.incentives || 0;
+          return (
+            <div className="stack-row" key={it.vehicle.id}>
+              <div className="stack-label">
+                <span className="dot" style={{ background: it.color.c }} />
+                <span className="stack-name" title={it.vehicle.name}>{it.vehicle.name || 'Unnamed car'}</span>
+              </div>
+              <div className="stack-bar">
+                <div className="stack-track" style={{ width: `${(gross / maxGross) * 100}%` }}>
+                  {CATEGORY_ORDER.map((c) => {
+                    const val = it.result.byCategory[c];
+                    if (val <= 0) return null;
+                    return (
+                      <span
+                        key={c}
+                        className="seg"
+                        style={{ width: `${(val / gross) * 100}%`, background: CATEGORY_COLORS[c] }}
+                        title={`${CATEGORY_LABELS[c]}: ${usd(val)}`}
+                      />
+                    );
+                  })}
+                </div>
+                <b className="stack-total">
+                  {usd(it.result.total)}
+                  {incentives > 0 && <small className="stack-credit"> incl. −{usd(incentives)} credit</small>}
+                </b>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

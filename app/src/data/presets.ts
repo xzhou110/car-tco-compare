@@ -46,6 +46,18 @@ export const CATEGORY_ORDER: CategoryKey[] = [
   'taxesAndFees',
 ];
 
+// One color per cost component — used for the stacked breakdown segments.
+// Same order/colors across every car's bar. Mid-tone, works on light + dark.
+export const CATEGORY_COLORS: Record<CategoryKey, string> = {
+  depreciation: '#4f6bed',
+  financingInterest: '#e0851e',
+  energy: '#16a34a',
+  insurance: '#d6457f',
+  maintenance: '#0f9b8e',
+  repairs: '#8b5cf6',
+  taxesAndFees: '#64748b',
+};
+
 export interface SlotColor {
   c: string;
   soft: string;
