@@ -1,6 +1,6 @@
 import type { TcoResult, Vehicle } from '../types';
 import type { SlotColor } from '../data/presets';
-import { cpm, pct, usd } from '../lib/format';
+import { cpm, usd } from '../lib/format';
 
 // Translucent tint of a slot color — blends over whatever theme surface is behind it,
 // so the winner banner reads well in both light and dark mode.
@@ -24,13 +24,16 @@ interface Props {
 }
 
 export function ResultsSummary({ items, holdingYears, financingEnabled }: Props) {
-  const sorted = [...items].sort((a, b) => a.result.total - b.result.total);
-  const best = sorted[0];
-  const worst = sorted[sorted.length - 1];
-  const delta = worst.result.total - best.result.total;
+  const best = items.find((it) => it.isBest) ?? items[0];
 
   return (
     <>
+      <div className="winner" style={{ borderColor: tint(best.color.c, 0.4), background: tint(best.color.c, 0.1) }}>
+        <div className="trophy">🏆</div>
+        <div className="win-head">
+          {best.vehicle.name || 'This car'} is cheapest to own — {usd(best.result.total)} over {holdingYears} yrs
+        </div>
+      </div>
       <div className="summary">
         {items.map((it) => (
           <div className={`result-card${it.isBest ? ' best' : ''}`} key={it.vehicle.id} style={{ borderTopColor: it.color.c }}>
@@ -53,17 +56,6 @@ export function ResultsSummary({ items, holdingYears, financingEnabled }: Props)
             </div>
           </div>
         ))}
-      </div>
-      <div className="winner" style={{ borderColor: tint(best.color.c, 0.4), background: tint(best.color.c, 0.1) }}>
-        <div className="trophy">🏆</div>
-        <div>
-          <div className="win-head">
-            {best.vehicle.name} is cheapest to own — {usd(best.result.total)} over {holdingYears} yrs
-          </div>
-          <div className="win-delta">
-            {usd(delta)} less <small>({pct(delta / (worst.result.total || 1))})</small> than {worst.vehicle.name} · {usd(delta / holdingYears)}/yr
-          </div>
-        </div>
       </div>
     </>
   );

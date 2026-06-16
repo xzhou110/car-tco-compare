@@ -3,12 +3,12 @@ import { Legend } from './CategoryBreakdown';
 import { usdK } from '../lib/format';
 
 const W = 640;
-const H = 300;
-const padL = 56;
+const H = 380;
+const padL = 64;
 const padR = 18;
-const padT = 18;
-const padB = 36;
-const STEPS = 4;
+const padT = 22;
+const padB = 46;
+const STEPS = 5;
 
 export function CumulativeChart({ items }: { items: ResultItem[] }) {
   const Y = items[0].result.cumulative.length - 1;
@@ -56,9 +56,9 @@ export function CumulativeChart({ items }: { items: ResultItem[] }) {
         {items.map((it, i) => (
           <g key={it.vehicle.id}>
             <path d={areaPath(it.result.cumulative)} fill={`url(#grad${i})`} stroke="none" />
-            <path d={linePath(it.result.cumulative)} fill="none" stroke={it.color.c} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
+            <path d={linePath(it.result.cumulative)} fill="none" stroke={it.color.c} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
             {it.result.cumulative.map((v, k) => (
-              <circle key={k} cx={x(k)} cy={y(v)} r={3.2} fill="#fff" stroke={it.color.c} strokeWidth={2} />
+              <circle key={k} cx={x(k)} cy={y(v)} r={4} fill="#fff" stroke={it.color.c} strokeWidth={2.25} />
             ))}
           </g>
         ))}

@@ -53,8 +53,9 @@ body {
   background-attachment: fixed;
 }
 h1 { font-size: 21px; margin: 0; letter-spacing: -0.01em; }
-h2 { font-size: 12px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--faint); font-weight: 700; }
-h3 { font-size: 14px; margin: 0 0 12px; }
+h2 { font-size: 13px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink); font-weight: 800; display: flex; align-items: center; gap: 8px; }
+h2::before { content: ''; width: 4px; height: 15px; background: var(--accent); border-radius: 2px; }
+h3 { font-size: 15px; margin: 0 0 12px; font-weight: 700; color: var(--ink); }
 small { color: var(--muted); font-weight: 400; }
 
 /* topbar */
@@ -189,8 +190,8 @@ input[type='number']::-webkit-inner-spin-button, input[type='number']::-webkit-o
 /* vertical stacked columns (one per car; taller = costs more) */
 .vstack { display: flex; align-items: flex-end; gap: 8px; padding-top: 4px; overflow-x: auto; }
 .vcol { flex: 1 0 46px; min-width: 46px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
-.vcol-total { font-size: 10.5px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); white-space: nowrap; }
-.vcol-plot { height: 200px; width: 100%; display: flex; align-items: flex-end; justify-content: center; }
+.vcol-total { font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); white-space: nowrap; }
+.vcol-plot { height: 260px; width: 100%; display: flex; align-items: flex-end; justify-content: center; }
 .vcol-bar { width: 100%; max-width: 56px; display: flex; flex-direction: column-reverse; border-radius: 5px 5px 0 0; overflow: hidden; min-height: 2px; box-shadow: var(--shadow-sm); }
 .vseg { width: 100%; min-height: 1px; transition: height 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
 .vcol-label { display: flex; align-items: center; gap: 4px; max-width: 100%; min-width: 0; font-size: 11px; color: var(--muted); }
@@ -200,7 +201,7 @@ input[type='number']::-webkit-inner-spin-button, input[type='number']::-webkit-o
 /* line chart */
 .linechart { width: 100%; height: auto; display: block; }
 .linechart .grid { stroke: var(--line); stroke-width: 1; }
-.linechart .ax { fill: var(--faint); font-size: 10px; }
+.linechart .ax { fill: var(--muted); font-size: 15px; }
 
 /* entrance motion */
 @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
