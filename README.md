@@ -86,6 +86,4 @@ comparison update.
 
 This is a **commercial product in development**, kept source-visible for now — it is **not**
 open source. No permission is granted to use, copy, modify, deploy, or distribute it. The
-owner retains all rights, including the right to commercialize. (Proprietary is the right
-choice here: an open-source license would let others use your code; you can always relax to
-a permissive license later, but not the reverse.) Contact the owner for licensing inquiries.
+owner retains all rights, including the right to commercialize. Contact the owner for licensing inquiries.
