@@ -1,6 +1,7 @@
 import type { Vehicle } from '../types';
 import type { SlotColor } from '../data/presets';
 import { NumField, SelectField, TextField } from './Field';
+import { LoadMenu } from './LoadMenu';
 
 interface Props {
   index: number;
@@ -14,21 +15,11 @@ interface Props {
   onLoad: (v: Vehicle) => void;
   onRemove: () => void;
   onSave: () => void;
+  onDeleteProfile: (name: string) => void;
 }
 
-export function VehicleCard({ index, vehicle: v, color, removable, presets, profiles, resaleSeed, update, onLoad, onRemove, onSave }: Props) {
+export function VehicleCard({ index, vehicle: v, color, removable, presets, profiles, resaleSeed, update, onLoad, onRemove, onSave, onDeleteProfile }: Props) {
   const isEv = v.powertrain === 'ev';
-  const savedNames = Object.keys(profiles);
-
-  const handleLoad = (val: string) => {
-    if (val.startsWith('preset:')) {
-      const p = presets.find((x) => x.id === val.slice(7));
-      if (p) onLoad(p);
-    } else if (val.startsWith('saved:')) {
-      const p = profiles[val.slice(6)];
-      if (p) onLoad(p);
-    }
-  };
 
   return (
     <div className="card vcard" style={{ borderTop: `3px solid ${color.c}` }}>
@@ -38,21 +29,7 @@ export function VehicleCard({ index, vehicle: v, color, removable, presets, prof
           <span className="veh-sub">{v.condition.toUpperCase()} · {v.powertrain.toUpperCase()}</span>
         </div>
         <div className="veh-head-actions">
-          <select className="load-select" value="" onChange={(e) => handleLoad(e.target.value)} aria-label="Load a preset or saved car" title="Load a preset or saved car">
-            <option value="">Load…</option>
-            <optgroup label="Presets">
-              {presets.map((p) => (
-                <option key={p.id} value={`preset:${p.id}`}>{p.name}</option>
-              ))}
-            </optgroup>
-            {savedNames.length > 0 && (
-              <optgroup label="Saved">
-                {savedNames.map((n) => (
-                  <option key={n} value={`saved:${n}`}>{n}</option>
-                ))}
-              </optgroup>
-            )}
-          </select>
+          <LoadMenu presets={presets} profiles={profiles} onLoad={onLoad} onDeleteProfile={onDeleteProfile} />
           <button className="btn tiny" aria-label="Save this car to your browser" title="Save this car to your browser" onClick={onSave}>💾</button>
           {removable && (
             <button className="btn tiny ghost" aria-label="Remove this car from the comparison" title="Remove" onClick={onRemove}>✕</button>

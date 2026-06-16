@@ -8,7 +8,6 @@ import { ResultsSummary, type ResultItem } from './components/ResultsSummary';
 import { CategoryBreakdown } from './components/CategoryBreakdown';
 import { CumulativeChart } from './components/CumulativeChart';
 import { HowItWorks } from './components/HowItWorks';
-import { SavedCarsManager } from './components/SavedCarsManager';
 
 export default function App() {
   const cmp = useComparison();
@@ -85,13 +84,13 @@ export default function App() {
               onLoad={(nv) => cmp.loadVehicle(i, nv)}
               onRemove={() => cmp.removeVehicle(i)}
               onSave={() => cmp.saveProfile(v)}
+              onDeleteProfile={cmp.deleteProfile}
             />
           ))}
         </div>
         <button className="btn ghost add-btn" disabled={atMax} onClick={cmp.addVehicle}>
           {atMax ? `Max ${MAX_CARS} cars` : '+ Add car'}
         </button>
-        <SavedCarsManager profiles={cmp.profiles} onDelete={cmp.deleteProfile} />
       </section>
 
       <section className="card results-card">

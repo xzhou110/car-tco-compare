@@ -77,20 +77,6 @@ button:focus-visible, summary:focus-visible, .saved-chip-del:focus-visible {
 .vehicles-section { margin-bottom: 16px; }
 .vehicles { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
 .add-btn { margin-top: 12px; width: 100%; padding: 11px; }
-
-/* saved-cars manager */
-.saved-manager { margin-top: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow-sm); overflow: hidden; }
-.saved-manager > summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; font-size: 12.5px; font-weight: 700; color: var(--muted); user-select: none; }
-.saved-manager > summary::-webkit-details-marker { display: none; }
-.saved-manager > summary:hover { color: var(--accent); }
-.saved-manager .chev { font-size: 16px; transition: transform 0.18s ease; line-height: 1; }
-.saved-manager[open] .chev { transform: rotate(90deg); }
-.saved-list { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 14px 4px; }
-.saved-chip { display: inline-flex; align-items: center; gap: 6px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; padding: 4px 6px 4px 11px; font-size: 12px; max-width: 220px; }
-.saved-chip-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.saved-chip-del { border: 0; background: #eef1f5; color: var(--muted); width: 20px; height: 20px; border-radius: 999px; cursor: pointer; font-size: 11px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
-.saved-chip-del:hover { background: #f6d6d6; color: #b3261e; }
-.saved-manager .hint-line { padding: 6px 14px 12px; margin: 0; }
 .vcard { margin-bottom: 0; transition: box-shadow 0.15s ease, transform 0.15s ease; }
 .vcard:hover { box-shadow: 0 2px 8px rgba(20, 30, 45, 0.07), 0 18px 38px rgba(20, 30, 45, 0.1); }
 
@@ -99,7 +85,22 @@ button:focus-visible, summary:focus-visible, .saved-chip-del:focus-visible {
 .veh-tag { font-weight: 700; font-size: 12px; padding: 5px 11px; border-radius: 999px; white-space: nowrap; }
 .veh-sub { font-size: 10px; font-weight: 700; letter-spacing: 0.04em; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .veh-head-actions { display: flex; gap: 6px; align-items: center; }
-.load-select { max-width: 116px; font-size: 12px; padding: 6px 7px; }
+
+/* custom Load… menu (load presets/saved cars + inline delete of saved) */
+.load-menu { position: relative; }
+.load-menu > summary { list-style: none; cursor: pointer; font-size: 12px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 7px; background: #fff; color: var(--ink); white-space: nowrap; user-select: none; box-shadow: var(--shadow-sm); }
+.load-menu > summary::-webkit-details-marker { display: none; }
+.load-menu > summary::after { content: ' ▾'; color: var(--faint); font-size: 10px; }
+.load-menu[open] > summary { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(47, 111, 237, 0.15); }
+.load-pop { position: absolute; right: 0; top: calc(100% + 5px); z-index: 30; background: #fff; border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); padding: 6px; min-width: 210px; max-height: 300px; overflow: auto; }
+.load-group-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--faint); font-weight: 800; padding: 7px 8px 3px; }
+.load-item { display: block; width: 100%; text-align: left; background: none; border: 0; border-radius: 6px; padding: 7px 9px; font-size: 12.5px; color: var(--ink); cursor: pointer; }
+.load-item:hover { background: var(--surface-2); }
+.load-item-row { display: flex; align-items: center; gap: 4px; }
+.load-item-row .load-item { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.load-del { border: 0; background: none; color: var(--faint); width: 26px; height: 26px; border-radius: 6px; cursor: pointer; font-size: 11px; flex: 0 0 auto; }
+.load-del:hover { background: #f6d6d6; color: #b3261e; }
+.load-empty { padding: 8px 9px; font-size: 11.5px; color: var(--faint); }
 
 fieldset { border: 1px solid var(--line); border-radius: 11px; margin: 0 0 11px; padding: 10px 12px 12px; background: var(--surface-2); }
 legend { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--faint); padding: 0 7px; font-weight: 800; }

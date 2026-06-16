@@ -4,6 +4,8 @@
   "version": "0.1.0",
   "type": "module",
   "description": "Production web app for comparing total cost of ownership across 2–6 cars.",
+  "license": "UNLICENSED",
+  "author": "xzhou110",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",

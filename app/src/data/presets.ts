@@ -19,14 +19,11 @@ export const DEFAULT_ASSUMPTIONS: Assumptions = {
   },
 };
 
+// Kept intentionally short (2) — the classic new-vs-used pair. Users edit freely
+// and save their own cars (which appear, and are deletable, in each card's Load… menu).
 export const PRESETS: Vehicle[] = [
   { id: 'rav4h-new', name: 'RAV4 Hybrid (New)', condition: 'new', purchasePrice: 38000, powertrain: 'hybrid', mpg: 39, miPerKWh: 0, ageAtPurchase: 0, odometerAtPurchase: 0, resaleValue: null, annualDepRate: 0.16, insuranceAnnual: 1600, maintenanceAnnual: 700, repairAnnual: 500, warrantyYears: 3, warrantyMiles: 36000, incentives: 0 },
   { id: 'rav4h-used', name: 'RAV4 Hybrid (Used 3yr)', condition: 'used', purchasePrice: 28000, powertrain: 'hybrid', mpg: 39, miPerKWh: 0, ageAtPurchase: 3, odometerAtPurchase: 36000, resaleValue: null, annualDepRate: 0.12, insuranceAnnual: 1450, maintenanceAnnual: 900, repairAnnual: 800, warrantyYears: 3, warrantyMiles: 36000, incentives: 0 },
-  { id: 'crv-new', name: 'CR-V (New, gas)', condition: 'new', purchasePrice: 36000, powertrain: 'gas', mpg: 30, miPerKWh: 0, ageAtPurchase: 0, odometerAtPurchase: 0, resaleValue: null, annualDepRate: 0.16, insuranceAnnual: 1550, maintenanceAnnual: 700, repairAnnual: 500, warrantyYears: 3, warrantyMiles: 36000, incentives: 0 },
-  { id: 'model3-new', name: 'Model 3 (New, EV)', condition: 'new', purchasePrice: 42000, powertrain: 'ev', mpg: 0, miPerKWh: 3.6, ageAtPurchase: 0, odometerAtPurchase: 0, resaleValue: null, annualDepRate: 0.18, insuranceAnnual: 2100, maintenanceAnnual: 500, repairAnnual: 500, warrantyYears: 4, warrantyMiles: 50000, incentives: 0 },
-  { id: 'model3-used', name: 'Model 3 (Used 3yr EV)', condition: 'used', purchasePrice: 27000, powertrain: 'ev', mpg: 0, miPerKWh: 3.6, ageAtPurchase: 3, odometerAtPurchase: 36000, resaleValue: null, annualDepRate: 0.13, insuranceAnnual: 1950, maintenanceAnnual: 650, repairAnnual: 700, warrantyYears: 4, warrantyMiles: 50000, incentives: 0 },
-  { id: 'corolla-new', name: 'Corolla (New, economy)', condition: 'new', purchasePrice: 24000, powertrain: 'gas', mpg: 35, miPerKWh: 0, ageAtPurchase: 0, odometerAtPurchase: 0, resaleValue: null, annualDepRate: 0.15, insuranceAnnual: 1400, maintenanceAnnual: 550, repairAnnual: 400, warrantyYears: 3, warrantyMiles: 36000, incentives: 0 },
-  { id: 'bmw330-used', name: 'BMW 330i (Used 3yr)', condition: 'used', purchasePrice: 30000, powertrain: 'gas', mpg: 28, miPerKWh: 0, ageAtPurchase: 3, odometerAtPurchase: 36000, resaleValue: null, annualDepRate: 0.14, insuranceAnnual: 1900, maintenanceAnnual: 1600, repairAnnual: 1200, warrantyYears: 4, warrantyMiles: 50000, incentives: 0 },
 ];
 
 export const CATEGORY_LABELS: Record<CategoryKey, string> = {

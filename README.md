@@ -66,3 +66,11 @@ comparison update.
 - **How it's built:** [`docs/design/DESIGN.md`](docs/design/DESIGN.md)
 - **How every dollar is computed:** [`docs/design/tco-model.md`](docs/design/tco-model.md)
 - **Run the prototype:** [`prototype/README.md`](prototype/README.md)
+
+## License
+
+**© 2026 xzhou110. All rights reserved. Proprietary — see [LICENSE](LICENSE).**
+
+This is **not** open-source software. The code is source-visible for reference only; no
+permission is granted to use, copy, modify, deploy, or distribute it. Contact the owner
+for permission.

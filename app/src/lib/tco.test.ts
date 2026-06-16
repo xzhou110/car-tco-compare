@@ -65,9 +65,10 @@ describe('computeTco', () => {
 
   it('EV uses electricity price and efficiency', () => {
     const a = A();
-    const ev = computeTco(preset('model3-new'), a).byCategory.energy;
+    const ev: Vehicle = { ...preset('rav4h-new'), powertrain: 'ev', miPerKWh: 3.6 };
+    const energy = computeTco(ev, a).byCategory.energy;
     const expected = ((a.holdingYears * a.annualMiles) / 3.6) * a.electricityPricePerKWh;
-    expect(ev).toBeCloseTo(expected, 6);
+    expect(energy).toBeCloseTo(expected, 6);
   });
 
   it('used RAV4 is cheaper to own than new in the default scenario', () => {
@@ -76,7 +77,7 @@ describe('computeTco', () => {
   });
 
   it('more annual miles => more energy (monotonic)', () => {
-    const v = preset('crv-new');
+    const v = preset('rav4h-new');
     const less = computeTco(v, A()).byCategory.energy;
     const more = computeTco(v, { ...A(), annualMiles: 24000 }).byCategory.energy;
     expect(more).toBeGreaterThan(less);
@@ -114,14 +115,14 @@ describe('computeTco — overrides & derived metrics', () => {
 
   it('incentives reduce the total dollar-for-dollar', () => {
     const a = A();
-    const base = preset('model3-new');
+    const base = preset('rav4h-new');
     const credited = { ...base, incentives: 7500 };
     expect(computeTco(base, a).total - computeTco(credited, a).total).toBeCloseTo(7500, 6);
   });
 
   it('perYear and perMile are consistent with the total', () => {
     const a = A();
-    const r = computeTco(preset('crv-new'), a);
+    const r = computeTco(preset('rav4h-new'), a);
     expect(r.perYear).toBeCloseTo(r.total / a.holdingYears, 6);
     expect(r.perMile).toBeCloseTo(r.total / (a.holdingYears * a.annualMiles), 6);
   });
