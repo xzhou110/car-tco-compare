@@ -105,7 +105,7 @@ button:focus-visible, summary:focus-visible, .saved-chip-del:focus-visible {
 .vcard { margin-bottom: 0; transition: box-shadow 0.15s ease, transform 0.15s ease; }
 .vcard:hover { box-shadow: 0 2px 8px rgba(20, 30, 45, 0.07), 0 18px 38px rgba(20, 30, 45, 0.1); }
 
-.veh-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 8px; }
+.veh-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 8px; flex-wrap: wrap; }
 .veh-tag { font-weight: 700; font-size: 12px; padding: 5px 11px; border-radius: 999px; white-space: nowrap; }
 .veh-name { font-size: 14px; font-weight: 700; color: var(--ink); margin: 0 0 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .veh-head-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
@@ -186,19 +186,16 @@ input[type='number']::-webkit-inner-spin-button, input[type='number']::-webkit-o
 .legend .lg { display: inline-flex; align-items: center; gap: 6px; }
 .dot { width: 11px; height: 11px; border-radius: 4px; display: inline-block; box-shadow: var(--shadow-sm); }
 
-/* stacked cost-breakdown bars (one per car; segments = cost components) */
-.stack-table { display: flex; flex-direction: column; gap: 10px; }
-.stack-row { display: grid; grid-template-columns: 112px 1fr; gap: 10px; align-items: center; }
-.stack-label { display: flex; align-items: center; gap: 6px; min-width: 0; font-size: 12px; font-weight: 600; }
-.stack-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.stack-bar { display: flex; align-items: center; gap: 8px; min-width: 0; }
-.stack-track { display: flex; height: 16px; border-radius: 5px; overflow: hidden; min-width: 2px; box-shadow: var(--shadow-sm); }
-.seg { height: 100%; min-width: 1px; transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
-.stack-total { font-size: 11.5px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); white-space: nowrap; }
-.stack-credit { color: var(--faint); font-weight: 500; }
-@media (max-width: 460px) {
-  .stack-row { grid-template-columns: 1fr; gap: 4px; }
-}
+/* vertical stacked columns (one per car; taller = costs more) */
+.vstack { display: flex; align-items: flex-end; gap: 8px; padding-top: 4px; overflow-x: auto; }
+.vcol { flex: 1 0 46px; min-width: 46px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.vcol-total { font-size: 10.5px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); white-space: nowrap; }
+.vcol-plot { height: 200px; width: 100%; display: flex; align-items: flex-end; justify-content: center; }
+.vcol-bar { width: 100%; max-width: 56px; display: flex; flex-direction: column-reverse; border-radius: 5px 5px 0 0; overflow: hidden; min-height: 2px; box-shadow: var(--shadow-sm); }
+.vseg { width: 100%; min-height: 1px; transition: height 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+.vcol-label { display: flex; align-items: center; gap: 4px; max-width: 100%; min-width: 0; font-size: 11px; color: var(--muted); }
+.vcol-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.legend-bottom { margin: 12px 0 0; }
 
 /* line chart */
 .linechart { width: 100%; height: auto; display: block; }
@@ -217,7 +214,7 @@ input[type='number']::-webkit-inner-spin-button, input[type='number']::-webkit-o
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 
 /* how-it-works (collapsible methodology) */
-.howworks { margin-top: 16px; padding-top: 13px; border-top: 1px dashed var(--line); }
+.howworks { margin: 0; }
 .howworks > summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 13px; font-weight: 700; color: var(--accent); user-select: none; }
 .howworks > summary::-webkit-details-marker { display: none; }
 .howworks .chev { font-size: 17px; transition: transform 0.18s ease; line-height: 1; }

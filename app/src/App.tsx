@@ -86,6 +86,15 @@ export default function App() {
         </div>
       </header>
 
+      <section className="card results-card">
+        <h2>Results</h2>
+        <ResultsSummary items={items} holdingYears={state.assumptions.holdingYears} financingEnabled={state.assumptions.financing.enabled} />
+        <div className="panels">
+          <CategoryBreakdown items={items} holdingYears={state.assumptions.holdingYears} />
+          <CumulativeChart items={items} />
+        </div>
+      </section>
+
       <AssumptionsBar a={state.assumptions} update={cmp.updateAssumptions} onSaveDefaults={cmp.saveAssumptionDefaults} />
 
       <section className="vehicles-section">
@@ -113,13 +122,7 @@ export default function App() {
         </button>
       </section>
 
-      <section className="card results-card">
-        <h2>Results</h2>
-        <ResultsSummary items={items} holdingYears={state.assumptions.holdingYears} financingEnabled={state.assumptions.financing.enabled} />
-        <div className="panels">
-          <CategoryBreakdown items={items} holdingYears={state.assumptions.holdingYears} />
-          <CumulativeChart items={items} />
-        </div>
+      <section className="card">
         <HowItWorks />
       </section>
 
