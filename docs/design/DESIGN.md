@@ -129,7 +129,7 @@ keeps "math" and "pixels" cleanly separated.
 │  │ 64.1¢ / mile  │   │ 57.1¢ / mile  │                                │
 │  └───────────────┘   └───────────────┘                               │
 │                                                                       │
-│  CATEGORY BREAKDOWN (grouped bars A vs B per category)               │
+│  COST BREAKDOWN (one stacked bar per car; segments = components)     │
 │  Depreciation  ████████████  vs  ███████                             │
 │  Fuel/Energy   ████          vs  ███                                  │
 │  Maintenance   ██            vs  ████  ...                            │
@@ -170,11 +170,13 @@ src/
     presets.ts           curated sample vehicles
   components/
     AssumptionsBar.tsx
-    VehicleForm.tsx       (rendered twice)
-    Field.tsx             labeled input + tooltip + validation
-    ResultsSummary.tsx    3 headline metrics + winner badge
-    CategoryBreakdown.tsx grouped bar chart + table
+    VehicleCard.tsx       (rendered per car, 2–6)
+    LoadMenu.tsx          load preset/saved car + inline delete of saved
+    Field.tsx             labeled inputs
+    ResultsSummary.tsx    headline metrics + winner badge
+    CategoryBreakdown.tsx stacked bar per car (segments = cost components)
     CumulativeChart.tsx   crossover line chart
+    HowItWorks.tsx        plain-language methodology
 ```
 
 The prototype mirrors this structure informally:
@@ -186,8 +188,8 @@ The prototype mirrors this structure informally:
 
 1. User edits any input → debounced `recompute()`.
 2. For each vehicle: `computeTco(vehicle, assumptions)` → `TcoResult`.
-3. Diff the two results → winner, deltas, per-category gap contributions.
-4. Render: summary metrics, grouped bars, cumulative lines.
+3. Diff the results → winner, delta vs. priciest.
+4. Render: summary metrics, stacked breakdown bars (one per car), cumulative lines.
 5. Resale auto-seed: if the user hasn't manually overridden `resaleValue`, recompute the
    default from the depreciation curve whenever price/age/miles change; once edited, respect the override.
 

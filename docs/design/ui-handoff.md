@@ -21,9 +21,12 @@ and [`tco-model.md`](tco-model.md) (math).
 | `--good` | `#16a34a` | "cheapest" highlight |
 | radius | 14 / 9 px | cards / controls |
 | shadow | `0 2px 6px /.06`, `0 12px 28px /.07` | card elevation |
-| Slot colors | teal `#0f9b8e`, amber `#e08a1e`, indigo `#5b6ee0`, rose `#d6457f`, green `#3f9a4e`, violet `#8b5cf6` | per-vehicle identity for up to 6 slots (cards, bars, lines, rank chips — used consistently) |
+| Slot colors | teal `#0f9b8e`, amber `#e08a1e`, indigo `#5b6ee0`, rose `#d6457f`, green `#3f9a4e`, violet `#8b5cf6` | per-vehicle identity for up to 6 slots (cards, summary, cumulative lines, rank chips, breakdown row dots) |
+| Category colors | depreciation `#4f6bed`, financing `#e0851e`, energy `#16a34a`, insurance `#d6457f`, maintenance `#0f9b8e`, repairs `#8b5cf6`, taxes `#64748b` | stacked cost-breakdown segments (fixed per component) |
 
-Background is a soft dual radial-gradient wash (blue + teal) on `#eef2f7`.
+A full dark theme is provided via `:root[data-theme="dark"]` overriding the same vars
+(see §"Dark theme" in `app/src/styles.css`); all colors above are theme-aware except the
+fixed slot/category hues, which read on both. Background is a soft dual radial-gradient wash.
 Type: system stack; **tabular numerals** on all monetary figures; hero total ~27px/800.
 
 ## Component patterns
@@ -31,7 +34,7 @@ Type: system stack; **tabular numerals** on all monetary figures; hero total ~27
 - **Vehicle card** — colored top-border (slot color), header with rank/load/save/remove, then **progressive disclosure**: `Car` + `Energy` always visible; `Depreciation` and `Running costs` are collapsed `<details>` by default (chevron rotates on open). *Note for React:* keep the collapse purely visual — the values must stay mounted and feed the calc even when collapsed (the prototype relies on this).
 - **Summary card** — rank chip (#1–#6 in slot color), name, hero total, pill chips for `$/yr` and `¢/mi`, resale/down footnote. Cheapest gets a green ring + "🏆 cheapest" ribbon.
 - **Winner banner** — tinted with the winner's slot color; verdict + delta vs. priciest.
-- **Category bars** — rounded track + gradient fill per slot color, value right-aligned with fixed min-width for column alignment.
+- **Cost breakdown** — one **stacked horizontal bar per car** (rows = cars), bar length ∝ total spend (scaled to the max), segments = the 7 cost components in `CATEGORY_ORDER` colored by `CATEGORY_COLORS` (same order/color in every bar). Row label carries the car's slot-color dot; per-segment hover tooltips; total at the bar end. Collapses to one column under 460px.
 - **Cumulative chart** — inline SVG, per-slot gradient area fill under each line, white-cored data points, dashed gridlines.
 
 ## Critique pass — what changed (v0.3)

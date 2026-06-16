@@ -98,7 +98,7 @@ A transparent, editable, side-by-side TCO calculator where the user can:
 - **Total TCO** for each vehicle over the holding period
 - **Cost per year** and **cost per mile**
 - **Winner badge** + dollar delta and % difference
-- **Category breakdown** (depreciation, financing interest, fuel/energy, insurance, maintenance, repairs, tires, taxes & fees) as a table + comparative bar chart
+- **Cost breakdown** (depreciation, financing, fuel/energy, insurance, maintenance, repairs, taxes & fees) as a **stacked horizontal bar per car** — segments in a fixed order/color, bar length proportional to total spend
 - **Cumulative cost over time** (per-year line/area), so the user sees crossover points
 - Net price drivers called out (e.g., "Depreciation is 47% of the gap")
 

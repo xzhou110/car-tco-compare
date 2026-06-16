@@ -20,9 +20,9 @@ npm run preview  # serve the production build
 - **Warranty-aware repairs** — repairs are $0 while a car is within its age *and* mileage warranty, then kick in.
 - **Per-condition financing** (separate new vs. used brackets; down payment as % of price).
 - **Auto-save** to `localStorage` + **shareable URL** (state encoded in the hash) — close it and pick up later, or send a link.
-- Per-car **presets** and **saved cars**.
-- Category breakdown + cumulative-cost chart (starts at purchase price, recovers resale at sale).
-- Progressive disclosure, responsive layout, reduced-motion support, PWA manifest.
+- Per-car **presets** and **saved cars** (delete saved cars inline from the Load menu).
+- **Stacked cost-breakdown** — one bar per car, segments in a fixed order/color — plus a cumulative-cost chart (starts at purchase price, recovers resale at sale).
+- **Light / dark theme** (remembers choice, follows system), progressive disclosure, responsive layout, reduced-motion support, PWA manifest.
 
 ## Architecture
 
@@ -34,7 +34,7 @@ src/
   data/presets.ts     sample vehicles, defaults, slot colors
   types.ts            domain types
   state/useComparison.ts   state hook (localStorage + URL hash + profiles)
-  components/         AssumptionsBar, VehicleCard, ResultsSummary, CategoryBreakdown, CumulativeChart, Field
+  components/         AssumptionsBar, VehicleCard, LoadMenu, ResultsSummary, CategoryBreakdown, CumulativeChart, HowItWorks, Field
   App.tsx · main.tsx
 ```
 
