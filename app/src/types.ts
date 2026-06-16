@@ -70,3 +70,45 @@ export interface ComparisonState {
   assumptions: Assumptions;
   vehicles: Vehicle[];
 }
+
+export type SegmentKey =
+  | 'car-economy'
+  | 'car-midsize'
+  | 'car-luxury'
+  | 'car-sport'
+  | 'suv-compact'
+  | 'suv-midsize'
+  | 'suv-large'
+  | 'luxury-suv'
+  | 'truck'
+  | 'minivan';
+
+/** A scraped car-for-sale listing (Set 1), normalized in proxy/scrape.js. */
+export interface Listing {
+  source: string;
+  url: string;
+  vin: string | null;
+  year: number;
+  make: string;
+  model: string;
+  trim: string | null;
+  price: number | null;
+  mileage: number | null;
+  condition: Condition;
+  segment: SegmentKey;
+  powertrain: Powertrain;
+  mpg: number | null;
+  bodyStyle: string;
+  fuelType: string;
+  dealer: string | null;
+  location: string | null;
+  fetchedAt: string;
+}
+
+export interface ListingsSnapshot {
+  generatedAt: string;
+  source: string;
+  note?: string;
+  count: number;
+  listings: Listing[];
+}

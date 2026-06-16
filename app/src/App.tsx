@@ -8,6 +8,11 @@ import { ResultsSummary, type ResultItem } from './components/ResultsSummary';
 import { CategoryBreakdown } from './components/CategoryBreakdown';
 import { CumulativeChart } from './components/CumulativeChart';
 import { HowItWorks } from './components/HowItWorks';
+import { ListingModal } from './components/ListingModal';
+import { loadListingsSnapshot } from './lib/listings';
+import { resolveVehicle } from './lib/resolveVehicle';
+import { REFERENCE } from './data/reference';
+import type { Listing, ListingsSnapshot } from './types';
 
 export default function App() {
   const cmp = useComparison();
@@ -51,6 +56,43 @@ export default function App() {
     }
   };
 
+  const [modalOpen, setModalOpen] = useState(false);
+  const [snapshot, setSnapshot] = useState<ListingsSnapshot | null>(null);
+  const [snapLoading, setSnapLoading] = useState(false);
+  const [region, setRegion] = useState('national');
+  const [addedCount, setAddedCount] = useState(0);
+
+  const openModal = async () => {
+    setAddedCount(0);
+    setModalOpen(true);
+    if (!snapshot && !snapLoading) {
+      setSnapLoading(true);
+      setSnapshot(await loadListingsSnapshot());
+      setSnapLoading(false);
+    }
+  };
+
+  const onRegionChange = (r: string) => {
+    setRegion(r);
+    const reg = REFERENCE.regions[r] ?? REFERENCE.regions.national;
+    cmp.updateAssumptions((a) => {
+      a.fuelPricePerGallon = reg.fuelPricePerGallon;
+      a.electricityPricePerKWh = reg.electricityPricePerKWh;
+      a.salesTaxRate = reg.salesTaxRate;
+      a.registrationAnnual = reg.registrationAnnual;
+    });
+  };
+
+  const onAddListing = (l: Listing) => {
+    const name = [l.year, l.make, l.model, l.trim].filter(Boolean).join(' ');
+    const v = resolveVehicle(
+      { name, segment: l.segment, powertrain: l.powertrain, condition: l.condition, purchasePrice: l.price ?? 0, year: l.year, mileage: l.mileage ?? 0, mpg: l.mpg },
+      region,
+    );
+    cmp.importVehicle(v);
+    setAddedCount((n) => n + 1);
+  };
+
   const atMax = state.vehicles.length >= MAX_CARS;
 
   return (
@@ -60,7 +102,7 @@ export default function App() {
           <span className="logo">🚗</span>
           <div>
             <h1>Car TCO Compare</h1>
-            <p className="tagline">Total cost of ownership, side by side — compare up to 6 cars: new vs. used, EV vs. gas, any A vs. B vs. C.</p>
+            <p className="tagline">Compare total cost of ownership, side by side — up to 6 cars: new vs. used, EV vs. gas.</p>
           </div>
         </div>
         <div className="actions">
@@ -75,8 +117,11 @@ export default function App() {
           <button className="btn ghost" onClick={share} title="Copy a shareable link to this comparison">
             {copied ? 'Link copied ✓' : '🔗 Share'}
           </button>
+          <button className="btn hdr-cta" onClick={openModal} title="Load a real car for sale from Autotrader">
+            🔎 Load a real car
+          </button>
           <button
-            className="btn"
+            className="btn hdr-cta"
             onClick={() => {
               if (confirm('Reset all inputs to defaults? This clears your saved session.')) cmp.reset();
             }}
@@ -127,8 +172,19 @@ export default function App() {
       </section>
 
       <footer className="foot">
-        Your inputs auto-save in this browser and sync to the URL — use 🔗 Share to send a comparison. All numbers illustrative.
+        Your inputs auto-save in this browser and sync to the URL — use 🔗 Share to send a comparison. Listings are a free Autotrader snapshot (best-effort — verify before buying); cost assumptions are illustrative.
       </footer>
+
+      <ListingModal
+        open={modalOpen}
+        snapshot={snapshot}
+        loading={snapLoading}
+        region={region}
+        addedCount={addedCount}
+        onRegionChange={onRegionChange}
+        onAdd={onAddListing}
+        onClose={() => setModalOpen(false)}
+      />
     </>
   );
 }

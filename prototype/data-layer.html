@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Layer Prototype — Set 2 (segment assumptions)</title>
+  <style>
+    :root { --ink:#1f2430; --muted:#5b6472; --line:#e3e7ee; --bg:#f6f8fb; --card:#fff;
+      --listing:#e0851e; --segment:#2563eb; --region:#0f9b8e; --derived:#94a3b8; }
+    * { box-sizing: border-box; }
+    body { margin:0; font:15px/1.5 system-ui, -apple-system, Segoe UI, Roboto, sans-serif; color:var(--ink); background:var(--bg); }
+    .dl-wrap { max-width: 1100px; margin: 0 auto; padding: 24px 16px 64px; }
+    h1 { font-size: 22px; margin: 0 0 4px; }
+    .dl-sub { color: var(--muted); margin: 0 0 4px; }
+    #asof { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+    .dl-card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px 16px; margin-bottom:16px; }
+    .dl-card h3 { margin:0 0 12px; font-size:15px; }
+    .dl-card h3 small { color:var(--muted); font-weight:400; }
+    .dl-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(min(160px,100%),1fr)); gap:12px; }
+    .dl-field { display:flex; flex-direction:column; gap:4px; min-width:0; }
+    .dl-field-label { font-size:12px; color:var(--muted); }
+    input, select { padding:7px 9px; border:1px solid var(--line); border-radius:7px; font-size:14px; background:#fff; min-width:0; }
+    .dl-results { display:grid; grid-template-columns: repeat(auto-fit, minmax(min(280px,100%),1fr)); gap:16px; align-items:start; }
+    .dl-table { width:100%; border-collapse:collapse; font-size:13px; }
+    .dl-table td { padding:5px 6px; border-bottom:1px solid var(--line); }
+    .dl-k { color:var(--muted); white-space:nowrap; }
+    .dl-v { font-variant-numeric: tabular-nums; font-weight:500; }
+    .dl-pill { font-size:11px; padding:1px 7px; border-radius:999px; color:#fff; white-space:nowrap; }
+    .dl-pill-listing { background:var(--listing); } .dl-pill-segment { background:var(--segment); }
+    .dl-pill-region { background:var(--region); } .dl-pill-derived { background:var(--derived); }
+    .dl-tag-listing { color:var(--listing); } .dl-tag-region { color:var(--region); }
+    .dl-list { margin:0; padding-left:18px; font-size:13px; color:var(--ink); }
+    .dl-metrics { display:flex; gap:18px; margin-bottom:12px; flex-wrap:wrap; }
+    .dl-metric-num { font-size:24px; font-weight:600; font-variant-numeric: tabular-nums; }
+    .dl-metric-lab { font-size:12px; color:var(--muted); }
+    .dl-legend { font-size:12px; color:var(--muted); margin-top:8px; }
+    .dl-legend .dl-pill { margin-right:4px; }
+    button { padding:8px 14px; border:1px solid var(--segment); background:var(--segment); color:#fff; border-radius:7px; font-size:14px; cursor:pointer; }
+    button:hover { filter:brightness(1.07); }
+    .dl-listing { display:flex; flex-direction:column; gap:6px; }
+    .dl-listing-title { font-weight:500; }
+    .dl-listing-price { font-size:20px; font-weight:600; font-variant-numeric: tabular-nums; }
+    .dl-listing-meta { font-size:12px; color:var(--muted); }
+    .dl-btn-end { display:flex; align-items:flex-end; }
+  </style>
+</head>
+<body>
+  <div class="dl-wrap">
+    <h1>Data layer prototype — Set 2</h1>
+    <p class="dl-sub">A segment pick + region resolves into a full vehicle and a real TCO, reusing the existing engine. The listing fields stand in for what a live scrape (Set 1) will supply.</p>
+    <p id="asof"></p>
+
+    <div class="dl-card" id="live-card">
+      <h3 class="dl-tag-listing">Live listings — Autotrader <small>(free direct scrape · experimental · spotlight only)</small></h3>
+      <div class="dl-grid">
+        <label class="dl-field"><span class="dl-field-label">ZIP</span><input id="f-zip" type="text" value="60601" /></label>
+        <label class="dl-field"><span class="dl-field-label">Radius (mi)</span><input id="f-radius" type="number" value="25" /></label>
+        <div class="dl-field dl-btn-end"><button id="fetch-live" type="button">Fetch live</button></div>
+      </div>
+      <p id="live-status" class="dl-legend"></p>
+      <div id="live-results" class="dl-results"></div>
+    </div>
+
+    <div id="app"></div>
+    <div id="output"></div>
+    <p class="dl-legend">
+      Provenance:
+      <span class="dl-pill dl-pill-listing">listing</span> from the car itself ·
+      <span class="dl-pill dl-pill-segment">segment table</span> Set 2 ·
+      <span class="dl-pill dl-pill-region">region</span> location ·
+      <span class="dl-pill dl-pill-derived">derived</span> computed
+    </p>
+  </div>
+  <script src="js/tco.js"></script>
+  <script src="js/reference.js"></script>
+  <script src="js/resolve.js"></script>
+  <script src="js/data-layer-app.js"></script>
+</body>
+</html>

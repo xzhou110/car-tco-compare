@@ -137,6 +137,19 @@ export function useComparison() {
       return { ...s, vehicles };
     });
 
+  // Add a resolved vehicle (e.g. from a real listing) as a new card; if already at
+  // MAX_CARS, replace the last slot so the action always lands somewhere.
+  const importVehicle = (v: Vehicle) =>
+    setState((s) => {
+      const fresh = { ...clone(v), id: newId() };
+      if (s.vehicles.length >= MAX_CARS) {
+        const vehicles = [...s.vehicles];
+        vehicles[vehicles.length - 1] = fresh;
+        return { ...s, vehicles };
+      }
+      return { ...s, vehicles: [...s.vehicles, fresh] };
+    });
+
   const reset = () => {
     try {
       localStorage.removeItem(SESSION_KEY);
@@ -194,6 +207,7 @@ export function useComparison() {
     addVehicle,
     removeVehicle,
     loadVehicle,
+    importVehicle,
     reset,
     saveProfile,
     deleteProfile,
