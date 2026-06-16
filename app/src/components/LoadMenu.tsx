@@ -50,9 +50,7 @@ export function LoadMenu({ presets, profiles, onLoad, onDeleteProfile }: Props) 
               className="load-del"
               aria-label={`Remove saved car ${n}`}
               title={`Remove “${n}”`}
-              onClick={() => {
-                if (confirm(`Remove saved car “${n}”? This only deletes the saved entry, not any car in the comparison.`)) onDeleteProfile(n);
-              }}
+              onClick={() => onDeleteProfile(n)}
             >
               ✕
             </button>

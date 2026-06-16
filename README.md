@@ -67,10 +67,19 @@ comparison update.
 - **How every dollar is computed:** [`docs/design/tco-model.md`](docs/design/tco-model.md)
 - **Run the prototype:** [`prototype/README.md`](prototype/README.md)
 
+## Deploy
+
+The app (`app/`) is a static single-page app (`app/` → `app/dist`, no server needed).
+Recommended for a commercial product: keep the **repo private** and deploy via **Vercel**
+or **Cloudflare Pages** (both deploy from private repos, with HTTPS + custom domains).
+Full steps: [`docs/deploy/`](docs/deploy/README.md).
+
 ## License
 
 **© 2026 xzhou110. All rights reserved. Proprietary — see [LICENSE](LICENSE).**
 
-This is **not** open-source software. The code is source-visible for reference only; no
-permission is granted to use, copy, modify, deploy, or distribute it. Contact the owner
-for permission.
+This is a **commercial product in development**, kept source-visible for now — it is **not**
+open source. No permission is granted to use, copy, modify, deploy, or distribute it. The
+owner retains all rights, including the right to commercialize. (Proprietary is the right
+choice here: an open-source license would let others use your code; you can always relax to
+a permissive license later, but not the reverse.) Contact the owner for licensing inquiries.
