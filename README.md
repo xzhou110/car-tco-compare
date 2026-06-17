@@ -32,7 +32,7 @@ no-build [`prototype/`](prototype/) remains as the design reference.
 - **Per-condition financing** — separate New vs Used down-payment %, APR, and term.
 - **Presets + saved cars** — load a built-in preset or a car you saved; **delete saved cars inline**.
 - **Results-first layout** — the verdict (ranked summary with total, $/yr, ¢/mi, and the winner) sits at the top, above the inputs.
-- **Cost breakdown** — a vertical stacked column per car, plus a cumulative-cost-over-time chart.
+- **Cost breakdown** — a vertical stacked column per car, plus a cumulative-cost-over-time chart. Both are **interactive**: hover a breakdown segment to see its exact dollar value and share of the car's total spend, or hover the cumulative chart to snap a crosshair to the nearest year and read every car's running total at that point.
 - **Light / dark theme**, **auto-save** to your browser, and a **shareable URL** that encodes the whole comparison.
 
 ## How the data works (two sets)

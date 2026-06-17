@@ -150,6 +150,10 @@ keeps "math" and "pixels" cleanly separated.
 - **Cost breakdown** = vertical stacked columns (taller = costs more), components stacked
   bottom-to-top in a fixed order/color; **category legend at the bottom**, consistent with
   the cumulative chart. Scrolls horizontally within its panel when many cars don't fit.
+- **Both charts are interactive on hover** (mouse + touch via pointer events): the breakdown
+  shows a per-segment value + %-of-total tooltip; the cumulative chart snaps a crosshair to the
+  nearest year and lists every car's running total there. Tooltips share `ChartTooltip` and stay
+  on-screen by flipping near edges. No chart library — hand-rolled HTML bars + inline SVG.
 - Recompute live on every change. Powertrain selector toggles the efficiency field (MPG ⇄ mi/kWh).
 
 ### Visual language
@@ -179,8 +183,9 @@ src/
     LoadMenu.tsx          load preset/saved car + inline delete of saved
     Field.tsx             labeled inputs
     ResultsSummary.tsx    headline metrics + winner badge
-    CategoryBreakdown.tsx vertical stacked columns per car (legend at bottom)
-    CumulativeChart.tsx   crossover line chart
+    CategoryBreakdown.tsx vertical stacked columns per car (legend at bottom); hover segment → value + % tooltip
+    CumulativeChart.tsx   crossover line chart; hover → nearest-year crosshair + per-car running-total tooltip
+    ChartTooltip.tsx      shared cursor-following tooltip overlay (edge-flipping, pointer/touch aware)
     HowItWorks.tsx        plain-language methodology
 ```
 
