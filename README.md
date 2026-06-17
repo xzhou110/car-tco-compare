@@ -5,7 +5,9 @@ purchase, depreciation, financing, insurance, fuel/charging, maintenance, repair
 taxes & fees, and resale. Put **up to 6 vehicles** side by side under *your* holding
 period and mileage, and see the real cost of ownership — not just the sticker price.
 
-**Live:** https://xzhou110.github.io/car-tco-compare/
+### 🚗 [Open the live app →](https://xzhou110.github.io/car-tco-compare/)
+
+Runs in your browser — no install, no sign-up.
 
 > ⚠️ **Listings** (price, mileage, year) are a *best-effort* snapshot scraped from
 > public listings — verify against the live listing before buying. **Cost assumptions**
