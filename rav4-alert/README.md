@@ -86,6 +86,7 @@ browser's publishable key passes the gateway). `send-confirmations.mjs` is the f
 | `node send-confirmations.mjs` | Email confirm links to unconfirmed signups. |
 | `node preview-email.mjs` | Render the email + xlsx from the cache (no Supabase subscriber table needed) → `out/`. |
 | `node verify-rpc.mjs` | Smoke-test the confirm/unsubscribe RPCs. |
+| `node lifecycle-test.mjs phase1\|phase2` | End-to-end test: signup → instant confirm → confirm → (digest) → unsubscribe → re-signup, asserting DB state + Resend IDs. Sends REAL email to `TEST_EMAIL`. |
 
 ## Email digest
 
