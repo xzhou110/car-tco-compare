@@ -59,6 +59,24 @@ The app stays a **static, free, client-only SPA** — no backend in production.
 
 > Listings come from the **Auto.dev API** (free tier for now); commercial redistribution needs a license. The legacy Autotrader scraper in [`proxy/`](proxy/) is kept only as a fallback.
 
+## Automation (GitHub Actions)
+
+Four workflows show up under the repo's **Actions** tab. Three are ours (YAML in
+[`.github/workflows/`](.github/workflows/)); the fourth is GitHub-managed.
+
+| Workflow | File | Trigger | What it does |
+|---|---|---|---|
+| **Deploy app to GitHub Pages** | [`deploy.yml`](.github/workflows/deploy.yml) | push to `main` touching `app/**` (+ manual) | Builds the Vite/React app and publishes it to GitHub Pages. The main app deploy. |
+| **Refresh listings snapshot (weekly)** | [`refresh-listings.yml`](.github/workflows/refresh-listings.yml) | cron **Mon 16:00 UTC** (8am PT) (+ manual) | Rebuilds the "Load a real car" snapshot ([`listings.json`](app/public/data/listings.json)) for all 3 models from Auto.dev, commits it, **and builds + deploys Pages itself** (a bot-token commit can't trigger `deploy.yml`). |
+| **Deal Alerts** | [`alerts.yml`](.github/workflows/alerts.yml) | cron **15:00 + 21:00 UTC** (8am + 2pm PT) (+ manual) | The email backend: refreshes the RAV4 alert cache (Auto.dev → Supabase), sends double-opt-in confirmation emails, then sends each subscriber their TCO-ranked digest. See [`rav4-alert/`](rav4-alert/). |
+| **pages-build-deployment** | _(none — GitHub-managed)_ | every Pages deployment | GitHub's own "last-mile" job that actually publishes the uploaded Pages artifact. It appears automatically once Pages is enabled and runs after `deploy.yml` / `refresh-listings.yml` upload the build — you don't author or edit it. |
+
+**Why two deploy paths?** `deploy.yml` handles ordinary code pushes; `refresh-listings.yml`
+self-deploys because the snapshot commit it pushes is made with `GITHUB_TOKEN`, and
+token-made pushes deliberately **don't** trigger other workflows (loop protection). Both end
+by handing an artifact to `pages-build-deployment`. The two Auto.dev crons stay inside the
+free 1,000-calls/mo tier (RAV4-only twice daily + one ~100-call full pull weekly ≈ <600/mo).
+
 ## Repo structure
 
 ```

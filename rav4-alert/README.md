@@ -128,6 +128,10 @@ wave + midday adds), not evenly spread; GitHub cron is fixed UTC, so in PST they
 ~100 calls weekly ≈ <600/mo). Adding a workflow file to GitHub needs a token with the
 `workflow` scope: `gh auth refresh -h github.com -s workflow`.
 
+> The two tables above cover the **data-refresh** crons. For the full list of *all four*
+> repo workflows — including the app's `deploy.yml` and GitHub's managed
+> `pages-build-deployment` — see [**Automation (GitHub Actions)** in the root README](../README.md#automation-github-actions).
+
 ## Before public launch
 
 - ✅ **Resend domain verified** — `send.xuspark.com` (DKIM + SPF + return-path MX). Emails now
