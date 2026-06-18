@@ -20,6 +20,7 @@ export interface ListingFilters {
   condition?: string;
   powertrain?: string;
   maxPrice?: number;
+  minYear?: number;
 }
 
 export function filterListings(listings: Listing[], f: ListingFilters): Listing[] {
@@ -30,6 +31,7 @@ export function filterListings(listings: Listing[], f: ListingFilters): Listing[
     if (f.condition && L.condition !== f.condition) return false;
     if (f.powertrain && L.powertrain !== f.powertrain) return false;
     if (f.maxPrice && (L.price ?? Infinity) > f.maxPrice) return false;
+    if (f.minYear && (L.year ?? 0) < f.minYear) return false;
     return true;
   });
 }

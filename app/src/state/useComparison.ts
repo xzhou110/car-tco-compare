@@ -1,6 +1,7 @@
 // State hook: holds the comparison, persists to localStorage + the URL hash (shareable),
 // manages named saved-car profiles, and exposes mutation actions.
 import { useEffect, useState } from 'react';
+import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
 import type { Assumptions, ComparisonState, Vehicle } from '../types';
 import { DEFAULT_ASSUMPTIONS, MAX_CARS, MIN_CARS, PRESETS, newId } from '../data/presets';
 
@@ -52,8 +53,20 @@ function hydrate(raw: any): ComparisonState | null {
   return { assumptions, vehicles };
 }
 
-const encode = (s: ComparisonState): string => encodeURIComponent(JSON.stringify(s));
+// Compact, URL-safe encoding (LZ-compressed) so a shared link is short, not a multi-KB hash.
+const encode = (s: ComparisonState): string => compressToEncodedURIComponent(JSON.stringify(s));
 const decode = (h: string): ComparisonState | null => {
+  // New format: LZ-compressed.
+  try {
+    const j = decompressFromEncodedURIComponent(h);
+    if (j) {
+      const s = hydrate(JSON.parse(j));
+      if (s) return s;
+    }
+  } catch {
+    /* fall through to legacy */
+  }
+  // Legacy format: raw URL-encoded JSON (older shared links still work).
   try {
     return hydrate(JSON.parse(decodeURIComponent(h)));
   } catch {
@@ -90,19 +103,26 @@ export function useComparison() {
   const [state, setState] = useState<ComparisonState>(initialState);
   const [profiles, setProfiles] = useState<Record<string, Vehicle>>(loadProfiles);
 
-  // persist on every change: localStorage (restore next visit) + URL hash (shareable)
+  // Persist working state to localStorage only (restores next visit). The URL is NOT
+  // live-synced — that kept the entire comparison in the address bar (multi-KB). A short,
+  // compressed shareable link is built on demand via shareUrl(); the Share button copies it.
   useEffect(() => {
     try {
       localStorage.setItem(SESSION_KEY, JSON.stringify(state));
     } catch {
       /* ignore */
     }
-    try {
-      window.history.replaceState(null, '', '#' + encode(state));
-    } catch {
-      /* ignore */
-    }
   }, [state]);
+
+  // Opened via a shared (state) link? initialState already loaded it — strip the hash so the
+  // address bar stays clean. Route hashes (#/confirm, #/unsubscribe) never reach here: this
+  // hook only mounts on the app route, so any hash here is a state blob.
+  useEffect(() => {
+    const h = window.location.hash.replace(/^#/, '');
+    if (h && decode(h)) {
+      window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
+  }, []);
 
   const updateAssumptions = (fn: (a: Assumptions) => void) =>
     setState((s) => {

@@ -23,6 +23,7 @@ export function ListingModal({ open, snapshot, loading, region, addedCount, onRe
   const [segment, setSegment] = useState('');
   const [condition, setCondition] = useState('');
   const [powertrain, setPowertrain] = useState('');
+  const [minYear, setMinYear] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
 
   useEffect(() => {
@@ -38,9 +39,13 @@ export function ListingModal({ open, snapshot, loading, region, addedCount, onRe
     () => [...new Set(listings.filter((l) => !make || l.make === make).map((l) => l.model).filter(Boolean))].sort(),
     [listings, make],
   );
+  const years = useMemo(
+    () => [...new Set(listings.map((l) => l.year).filter((y): y is number => typeof y === 'number'))].sort((a, b) => b - a),
+    [listings],
+  );
   const filtered = useMemo(
-    () => filterListings(listings, { make, model, segment, condition, powertrain, maxPrice: maxPrice ? +maxPrice : undefined }),
-    [listings, make, model, segment, condition, powertrain, maxPrice],
+    () => filterListings(listings, { make, model, segment, condition, powertrain, maxPrice: maxPrice ? +maxPrice : undefined, minYear: minYear ? +minYear : undefined }),
+    [listings, make, model, segment, condition, powertrain, maxPrice, minYear],
   );
   const shown = filtered.slice(0, 60);
 
@@ -78,6 +83,12 @@ export function ListingModal({ open, snapshot, loading, region, addedCount, onRe
               <option value="">Any model</option>
               {models.map((m) => (
                 <option key={m} value={m}>{m}</option>
+              ))}
+            </select>
+            <select value={minYear} onChange={(e) => setMinYear(e.target.value)} title="Minimum year">
+              <option value="">Any year</option>
+              {years.map((y) => (
+                <option key={y} value={y}>{y}+</option>
               ))}
             </select>
             <select value={segment} onChange={(e) => setSegment(e.target.value)}>

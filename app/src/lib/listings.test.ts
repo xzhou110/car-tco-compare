@@ -14,9 +14,9 @@ const mk = (o: Partial<Listing>): Listing => ({
 
 describe('filterListings', () => {
   const list = [
-    mk({}),
-    mk({ make: 'Honda', model: 'CR-V' }),
-    mk({ model: 'Highlander', segment: 'suv-midsize', powertrain: 'hybrid', price: 45000 }),
+    mk({ year: 2022 }),
+    mk({ make: 'Honda', model: 'CR-V', year: 2020 }),
+    mk({ model: 'Highlander', segment: 'suv-midsize', powertrain: 'hybrid', price: 45000, year: 2025 }),
   ];
 
   it('make filter', () => expect(filterListings(list, { make: 'Honda' })).toHaveLength(1));
@@ -24,5 +24,6 @@ describe('filterListings', () => {
   it('segment filter', () => expect(filterListings(list, { segment: 'suv-midsize' })).toHaveLength(1));
   it('powertrain filter', () => expect(filterListings(list, { powertrain: 'hybrid' })).toHaveLength(1));
   it('maxPrice filter', () => expect(filterListings(list, { maxPrice: 35000 })).toHaveLength(2));
+  it('minYear filter', () => expect(filterListings(list, { minYear: 2022 })).toHaveLength(2));
   it('empty filters return all', () => expect(filterListings(list, {})).toHaveLength(3));
 });
