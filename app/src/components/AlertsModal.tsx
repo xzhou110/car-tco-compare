@@ -109,15 +109,15 @@ export function AlertsModal({ open, onClose }: Props) {
     };
   }, [open, listings.length]);
 
-  // Distinct trims among listings matching this preference's make AND model.
+  // Trim works as a standalone filter too: scope options to make/model when chosen,
+  // otherwise offer every trim in the snapshot so it's usable before a model is picked.
   const trimOptionsFor = (p: Pref): string[] => {
     const make = p.make.trim().toLowerCase();
     const model = p.model.trim().toLowerCase();
-    if (!model) return [];
     const set = new Set<string>();
     for (const L of listings) {
       if (make && L.make.toLowerCase() !== make) continue;
-      if (L.model.toLowerCase() !== model) continue;
+      if (model && L.model.toLowerCase() !== model) continue;
       if (L.trim) set.add(L.trim);
     }
     return [...set].sort();
@@ -130,14 +130,15 @@ export function AlertsModal({ open, onClose }: Props) {
     const make = p.make.trim().toLowerCase();
     return [...new Set(listings.filter((l) => !make || l.make.toLowerCase() === make).map((l) => l.model).filter(Boolean))].sort();
   };
+  // Fuel type works as a standalone filter: scope options to make/model when chosen,
+  // otherwise offer every powertrain in the snapshot so it's usable before a model is picked.
   const fuelOptionsFor = (p: Pref): string[] => {
     const make = p.make.trim().toLowerCase();
     const model = p.model.trim().toLowerCase();
-    if (!model) return [];
     const set = new Set<string>();
     for (const L of listings) {
       if (make && L.make.toLowerCase() !== make) continue;
-      if (L.model.toLowerCase() !== model) continue;
+      if (model && L.model.toLowerCase() !== model) continue;
       if (L.powertrain) set.add(L.powertrain);
     }
     return [...set].sort();
@@ -298,19 +299,20 @@ export function AlertsModal({ open, onClose }: Props) {
                       {modelOptionsFor(p).map((m) => (<option key={m} value={m}>{m}</option>))}
                     </select>
                   </label>
-                  {(() => {
-                    const fuels = fuelOptionsFor(p);
-                    if (fuels.length === 0) return null;
-                    return (
-                      <label className="alerts-field">
-                        <span className="alerts-label">Fuel type</span>
-                        <select value={p.powertrain} onChange={(e) => updatePref(i, { powertrain: e.target.value })}>
-                          <option value="">Any fuel</option>
-                          {fuels.map((f) => (<option key={f} value={f}>{FUEL_LABEL[f] ?? f}</option>))}
-                        </select>
-                      </label>
-                    );
-                  })()}
+                  <label className="alerts-field">
+                    <span className="alerts-label">Trim</span>
+                    <select value={p.trims[0] ?? ''} onChange={(e) => updatePref(i, { trims: e.target.value ? [e.target.value] : [] })}>
+                      <option value="">Any trim</option>
+                      {trimOptionsFor(p).map((t) => (<option key={t} value={t}>{t}</option>))}
+                    </select>
+                  </label>
+                  <label className="alerts-field">
+                    <span className="alerts-label">Fuel type</span>
+                    <select value={p.powertrain} onChange={(e) => updatePref(i, { powertrain: e.target.value })}>
+                      <option value="">Any fuel</option>
+                      {fuelOptionsFor(p).map((f) => (<option key={f} value={f}>{FUEL_LABEL[f] ?? f}</option>))}
+                    </select>
+                  </label>
                   <label className="alerts-field">
                     <span className="alerts-label">Zip</span>
                     <input type="text" inputMode="numeric" placeholder="94016" value={p.zip} onChange={(e) => updatePref(i, { zip: e.target.value })} />
@@ -335,24 +337,6 @@ export function AlertsModal({ open, onClose }: Props) {
                     <span className="alerts-label">Max miles</span>
                     <input type="number" min={0} placeholder="60000" value={p.milesMax} onChange={(e) => updatePref(i, { milesMax: e.target.value })} />
                   </label>
-                  {(() => {
-                    const trims = trimOptionsFor(p);
-                    if (trims.length === 0) return null;
-                    return (
-                      <label className="alerts-field" style={{ gridColumn: '1 / -1' }}>
-                        <span className="alerts-label">Trim (optional)</span>
-                        <select
-                          value={p.trims[0] ?? ''}
-                          onChange={(e) => updatePref(i, { trims: e.target.value ? [e.target.value] : [] })}
-                        >
-                          <option value="">Any trim</option>
-                          {trims.map((t) => (
-                            <option key={t} value={t}>{t}</option>
-                          ))}
-                        </select>
-                      </label>
-                    );
-                  })()}
                 </div>
               </fieldset>
             ))}

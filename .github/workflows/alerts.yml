@@ -32,6 +32,14 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
 
+      - name: Send confirmation emails (double opt-in)
+        run: node send-confirmations.mjs
+        continue-on-error: true  # a confirmation hiccup must not block digests to confirmed users
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+
       - name: Send subscriber digests
         run: node alert-cron.mjs
         env:
