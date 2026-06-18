@@ -1,0 +1,8 @@
+# Minimal Supabase config so `supabase functions deploy` can find the project + function.
+# The full schema lives in schema.sql / phase2b.sql (applied via the SQL editor).
+project_id = "grlkuouatrehmrutulhj"
+
+[functions.send-confirmation]
+# Invoked by the frontend with the project's anon key (a valid JWT), so keep JWT
+# verification on — blocks anonymous internet callers without the key.
+verify_jwt = true
