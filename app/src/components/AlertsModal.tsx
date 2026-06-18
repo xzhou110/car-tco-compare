@@ -12,6 +12,7 @@ interface Pref {
   name: string;
   make: string;
   model: string;
+  powertrain: string;
   zip: string;
   radius: string;
   priceMin: string;
@@ -28,6 +29,7 @@ const emptyPref = (): Pref => ({
   name: '',
   make: '',
   model: '',
+  powertrain: '',
   zip: '',
   radius: '',
   priceMin: '',
@@ -46,13 +48,14 @@ const num = (s: string): number | undefined => {
 };
 
 const hasContent = (p: Pref): boolean =>
-  !!(p.make.trim() || p.model.trim() || p.zip.trim() || p.radius.trim() || p.priceMin.trim() || p.priceMax.trim() || p.yearMin.trim() || p.milesMax.trim());
+  !!(p.make.trim() || p.model.trim() || p.powertrain.trim() || p.zip.trim() || p.radius.trim() || p.priceMin.trim() || p.priceMax.trim() || p.yearMin.trim() || p.milesMax.trim());
 
 /** Build the exact filters jsonb the cron reads: numbers as numbers, blanks omitted. */
 function buildFilters(p: Pref) {
   const f: Record<string, unknown> = {};
   if (p.make.trim()) f.make = p.make.trim();
   if (p.model.trim()) f.model = p.model.trim();
+  if (p.powertrain.trim()) f.powertrain = p.powertrain.trim();
   if (p.zip.trim()) f.zip = p.zip.trim();
   const radius = num(p.radius);
   if (radius !== undefined) f.radius = radius;
@@ -119,6 +122,27 @@ export function AlertsModal({ open, onClose }: Props) {
     }
     return [...set].sort();
   };
+
+  // Distinct makes / models / fuel types in the snapshot — drive the dropdowns so the
+  // selected values always match the data (and trim/fuel options can populate).
+  const makeOptions = [...new Set(listings.map((l) => l.make).filter(Boolean))].sort();
+  const modelOptionsFor = (p: Pref): string[] => {
+    const make = p.make.trim().toLowerCase();
+    return [...new Set(listings.filter((l) => !make || l.make.toLowerCase() === make).map((l) => l.model).filter(Boolean))].sort();
+  };
+  const fuelOptionsFor = (p: Pref): string[] => {
+    const make = p.make.trim().toLowerCase();
+    const model = p.model.trim().toLowerCase();
+    if (!model) return [];
+    const set = new Set<string>();
+    for (const L of listings) {
+      if (make && L.make.toLowerCase() !== make) continue;
+      if (L.model.toLowerCase() !== model) continue;
+      if (L.powertrain) set.add(L.powertrain);
+    }
+    return [...set].sort();
+  };
+  const FUEL_LABEL: Record<string, string> = { gas: 'Gas', hybrid: 'Hybrid', ev: 'EV' };
 
   // Reset to a clean form each time the modal is freshly opened.
   useEffect(() => {
@@ -262,12 +286,31 @@ export function AlertsModal({ open, onClose }: Props) {
                   </label>
                   <label className="alerts-field">
                     <span className="alerts-label">Make</span>
-                    <input type="text" placeholder="Toyota" value={p.make} onChange={(e) => updatePref(i, { make: e.target.value, trims: [] })} />
+                    <select value={p.make} onChange={(e) => updatePref(i, { make: e.target.value, model: '', powertrain: '', trims: [] })}>
+                      <option value="">Any make</option>
+                      {makeOptions.map((m) => (<option key={m} value={m}>{m}</option>))}
+                    </select>
                   </label>
                   <label className="alerts-field">
                     <span className="alerts-label">Model</span>
-                    <input type="text" placeholder="RAV4" value={p.model} onChange={(e) => updatePref(i, { model: e.target.value, trims: [] })} />
+                    <select value={p.model} onChange={(e) => updatePref(i, { model: e.target.value, powertrain: '', trims: [] })}>
+                      <option value="">Any model</option>
+                      {modelOptionsFor(p).map((m) => (<option key={m} value={m}>{m}</option>))}
+                    </select>
                   </label>
+                  {(() => {
+                    const fuels = fuelOptionsFor(p);
+                    if (fuels.length === 0) return null;
+                    return (
+                      <label className="alerts-field">
+                        <span className="alerts-label">Fuel type</span>
+                        <select value={p.powertrain} onChange={(e) => updatePref(i, { powertrain: e.target.value })}>
+                          <option value="">Any fuel</option>
+                          {fuels.map((f) => (<option key={f} value={f}>{FUEL_LABEL[f] ?? f}</option>))}
+                        </select>
+                      </label>
+                    );
+                  })()}
                   <label className="alerts-field">
                     <span className="alerts-label">Zip</span>
                     <input type="text" inputMode="numeric" placeholder="94016" value={p.zip} onChange={(e) => updatePref(i, { zip: e.target.value })} />

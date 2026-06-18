@@ -20,6 +20,16 @@ Web app signup form ──► Supabase: subscribers + watchlists│
 Key idea: **one cached (model × region) tile serves all users** — alert sending makes
 *zero* Auto.dev calls, so API cost scales with models×regions, not subscribers.
 
+## Signup form (in the app)
+
+`app/src/components/AlertsModal.tsx` — up to 3 preferences. Each preference uses
+**data-driven dropdowns** sourced from the listings snapshot so selections always match
+the data: **Make → Model** (cascading), **Fuel type** and **Trim** (populated from the
+chosen make+model), plus Zip, Radius, Min/Max price, Min year, Max miles. On submit it
+writes a `subscribers` row (`confirmed=false`) + up to 3 `watchlists` rows via the
+publishable key. Each watchlist's `filters` jsonb may contain:
+`{ make, model, powertrain, trims[], zip, radius, priceMin, priceMax, yearMin, milesMax }`.
+
 ## Environment variables
 
 | Var | Used by | Notes |
