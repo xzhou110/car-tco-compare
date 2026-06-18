@@ -109,13 +109,11 @@ export function ListingModal({ open, snapshot, loading, region, addedCount, onRe
               <option value="ev">EV</option>
             </select>
             <input type="number" placeholder="Max $" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} style={{ width: 110 }} />
-            <label className="lm-reglab">Region
-              <select value={region} onChange={(e) => onRegionChange(e.target.value)}>
-                {REGION_LIST.map((r) => (
-                  <option key={r.key} value={r.key}>{r.label}</option>
-                ))}
-              </select>
-            </label>
+            <select value={region} onChange={(e) => onRegionChange(e.target.value)} title="Region — sets the cost assumptions (fuel, tax, rates) applied to imported cars">
+              {REGION_LIST.map((r) => (
+                <option key={r.key} value={r.key}>{r.label}</option>
+              ))}
+            </select>
           </div>
 
           <p className="hint-line">{filtered.length} match{filtered.length === 1 ? '' : 'es'}{filtered.length > 60 ? ' (showing first 60)' : ''}</p>

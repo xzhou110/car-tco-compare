@@ -294,7 +294,6 @@ input[type='number']::-webkit-inner-spin-button, input[type='number']::-webkit-o
 .lm-filters { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: -14px -22px 6px; padding: 14px 22px 12px; background: var(--surface); border-bottom: 1px solid var(--hairline); }
 .lm-filters input, .lm-filters select { width: auto; }
 .lm-filters input[type='text'] { flex: 1 1 200px; min-width: 150px; }
-.lm-reglab { font-size: 12px; color: var(--muted); display: flex; gap: 6px; align-items: center; white-space: nowrap; }
 .lm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(230px, 100%), 1fr)); gap: 12px; }
 .lcard { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 12px 13px; background: var(--surface-2); display: flex; flex-direction: column; gap: 6px; min-width: 0; transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease; }
 .lcard:hover { border-color: var(--line-strong); box-shadow: var(--shadow-sm); transform: translateY(-1px); }
