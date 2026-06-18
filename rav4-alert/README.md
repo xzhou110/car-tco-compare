@@ -81,6 +81,8 @@ browser's publishable key passes the gateway). `send-confirmations.mjs` is the f
 |---------|--------------|
 | `node cache-refresh.mjs` | **Only Auto.dev caller.** Pull model×region tiles → upsert `listings_cache` (set `last_seen`) → `expire_stale_listings()`. Keep page caps small. |
 | `node seed-cache.mjs` | Dev seed of `listings_cache` from the app snapshot (no Auto.dev calls). |
+| `node build-app-listings.mjs` | Rebuild the app's "Load a real car" snapshot (`app/public/data/listings.json`) from Auto.dev — all 3 models (~100 calls). Run weekly by `refresh-listings.yml`. |
+| `node build-applistings-from-cache.mjs` | Rebuild that snapshot from `listings_cache` instead — **0 Auto.dev calls** (reuses what the alert cron already pulled). |
 | `node seed-watchlists.mjs` | Seed a test subscriber + 2 RAV4 Hybrid watchlists. |
 | `node alert-cron.mjs [--dry]` | The digest job. `--dry` builds previews in `out/` without sending/recording. |
 | `node send-confirmations.mjs` | Email confirm links to unconfirmed signups. |
@@ -100,11 +102,23 @@ the spreadsheet). TCO mirrors the web app's engine (`tco.mjs`, CA assumptions).
 and deactivates that user's watchlists (the row is kept for re-engagement; they can
 re-subscribe any time from the form — `start_subscription` revives it).
 
-## Scheduling
+## Scheduling — two cadences, two data stores
 
-[`../.github/workflows/alerts.yml`](../.github/workflows/alerts.yml) runs cache-refresh
-then alert-cron twice daily (UTC), using repo secrets. (Adding the workflow to GitHub
-needs a token with the `workflow` scope: `gh auth refresh -h github.com -s workflow`.)
+The **alert cache** (`listings_cache`, what digests match against) and the app's
+**"Load a real car" snapshot** (`listings.json`) are separate and refresh on different
+schedules:
+
+| Workflow | When | Refreshes |
+|---|---|---|
+| [`alerts.yml`](../.github/workflows/alerts.yml) | twice daily — **15:00 + 21:00 UTC (8am + 2pm Pacific)** | the alert cache (`cache-refresh.mjs`, **RAV4 only** to stay free) → then sends digests (`alert-cron.mjs`) |
+| [`refresh-listings.yml`](../.github/workflows/refresh-listings.yml) | weekly — **Mon 16:00 UTC (8am PT)** | the "Load a real car" snapshot (`build-app-listings.mjs`, **all 3 models**) → commits it → builds + deploys Pages |
+
+The twice-daily times are clustered for when fresh dealer inventory lands (overnight feed
+wave + midday adds), not evenly spread; GitHub cron is fixed UTC, so in PST they're
+7am/1pm. The weekly job self-deploys because a `GITHUB_TOKEN` commit doesn't trigger
+`deploy.yml`. Both stay inside Auto.dev's free 1,000/mo tier (RAV4 dozens/run twice daily +
+~100 calls weekly ≈ <600/mo). Adding a workflow file to GitHub needs a token with the
+`workflow` scope: `gh auth refresh -h github.com -s workflow`.
 
 ## Before public launch
 

@@ -39,19 +39,20 @@ no-build [`prototype/`](prototype/) remains as the design reference.
 
 The app stays a **static, free, client-only SPA** — no backend in production.
 
-- **Set 1 — Listings (real, refreshed):** a generator scrapes Autotrader for the curated
-  models, normalizes them, and writes [`app/public/data/listings.json`](app/public/data/listings.json).
-  Vite copies `public/` into the build, so the snapshot ships to GitHub Pages and the app
-  fetches it at runtime (lazy-loaded when you open "Load a real car"). The scrape runs **on
-  your machine** (a residential IP — the only place the free scrape works reliably), so
-  refreshing the data is just: re-run the generator → commit → push → the deploy Action
-  republishes.
+- **Set 1 — Listings (real, auto-refreshed):** [`build-app-listings.mjs`](rav4-alert/build-app-listings.mjs)
+  pulls the curated models (Toyota RAV4 / Highlander, Honda CR-V — gas + hybrid, 2020+) from the
+  **Auto.dev API**, normalizes them, and writes [`app/public/data/listings.json`](app/public/data/listings.json).
+  Vite copies `public/` into the build, so the snapshot ships to GitHub Pages and the app fetches it
+  at runtime (lazy-loaded when you open "Load a real car"). A **weekly GitHub Action**
+  ([`refresh-listings.yml`](.github/workflows/refresh-listings.yml)) re-runs the pull, commits the
+  snapshot, and redeploys — so the data stays fresh hands-free. (A separate twice-daily
+  [Deal Alerts cron](rav4-alert/) keeps its own RAV4 alert cache in Supabase current.)
 - **Set 2 — Assumptions (curated, stable):** segment × powertrain cost-rate tables plus a
   region table ([`app/src/data/reference.ts`](app/src/data/reference.ts)). A pure, unit-tested
   [`resolveVehicle()`](app/src/lib/resolveVehicle.ts) joins a listing to its segment estimates
   to fill a full vehicle for the engine — which is left untouched.
 
-> The scraper is for **personal, low-volume** use and is subject to the source site's terms.
+> Listings come from the **Auto.dev API** (free tier for now); commercial redistribution needs a license. The legacy Autotrader scraper in [`proxy/`](proxy/) is kept only as a fallback.
 
 ## Repo structure
 
