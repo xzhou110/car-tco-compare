@@ -103,6 +103,8 @@ export interface Listing {
   dealer: string | null;
   location: string | null;
   fetchedAt: string;
+  firstSeen?: string; // first snapshot this VIN appeared in (→ days on market)
+  lastSeen?: string; // most recent snapshot this VIN appeared in (basis for sold-car expiry)
 }
 
 export interface ListingsSnapshot {

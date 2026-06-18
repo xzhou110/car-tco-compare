@@ -19,7 +19,8 @@ describe('filterListings', () => {
     mk({ model: 'Highlander', segment: 'suv-midsize', powertrain: 'hybrid', price: 45000 }),
   ];
 
-  it('text query matches make/model', () => expect(filterListings(list, { q: 'cr-v' })).toHaveLength(1));
+  it('make filter', () => expect(filterListings(list, { make: 'Honda' })).toHaveLength(1));
+  it('model filter', () => expect(filterListings(list, { model: 'Highlander' })).toHaveLength(1));
   it('segment filter', () => expect(filterListings(list, { segment: 'suv-midsize' })).toHaveLength(1));
   it('powertrain filter', () => expect(filterListings(list, { powertrain: 'hybrid' })).toHaveLength(1));
   it('maxPrice filter', () => expect(filterListings(list, { maxPrice: 35000 })).toHaveLength(2));

@@ -9,12 +9,49 @@ import { CategoryBreakdown } from './components/CategoryBreakdown';
 import { CumulativeChart } from './components/CumulativeChart';
 import { HowItWorks } from './components/HowItWorks';
 import { ListingModal } from './components/ListingModal';
+import { AlertsModal } from './components/AlertsModal';
+import { ConfirmPage } from './components/ConfirmPage';
+import { UnsubscribePage } from './components/UnsubscribePage';
 import { loadListingsSnapshot } from './lib/listings';
 import { resolveVehicle } from './lib/resolveVehicle';
 import { REFERENCE } from './data/reference';
 import type { Listing, ListingsSnapshot } from './types';
 
+/**
+ * Hash-based routing (no router lib). Splits the hash into a path and a query
+ * string so the token survives regardless of leading "#", "#/", or order of
+ * "?token=…". Returns the matched route plus the parsed token.
+ */
+type Route = { page: 'confirm' | 'unsubscribe' | 'app'; token: string };
+
+function parseHashRoute(hash: string): Route {
+  const raw = hash.replace(/^#\/?/, ''); // drop leading "#" and optional "/"
+  const qIndex = raw.indexOf('?');
+  const path = (qIndex >= 0 ? raw.slice(0, qIndex) : raw).replace(/\/+$/, '');
+  const query = qIndex >= 0 ? raw.slice(qIndex + 1) : '';
+  const token = new URLSearchParams(query).get('token') ?? '';
+  if (path === 'confirm') return { page: 'confirm', token };
+  if (path === 'unsubscribe') return { page: 'unsubscribe', token };
+  return { page: 'app', token: '' };
+}
+
 export default function App() {
+  const [route, setRoute] = useState<Route>(() =>
+    parseHashRoute(typeof window !== 'undefined' ? window.location.hash : ''),
+  );
+
+  useEffect(() => {
+    const onHashChange = () => setRoute(parseHashRoute(window.location.hash));
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
+
+  if (route.page === 'confirm') return <ConfirmPage token={route.token} />;
+  if (route.page === 'unsubscribe') return <UnsubscribePage token={route.token} />;
+  return <MainApp />;
+}
+
+function MainApp() {
   const cmp = useComparison();
   const { state } = cmp;
   const [copied, setCopied] = useState(false);
@@ -57,6 +94,7 @@ export default function App() {
   };
 
   const [modalOpen, setModalOpen] = useState(false);
+  const [alertsOpen, setAlertsOpen] = useState(false);
   const [snapshot, setSnapshot] = useState<ListingsSnapshot | null>(null);
   const [snapLoading, setSnapLoading] = useState(false);
   const [region, setRegion] = useState('national');
@@ -106,6 +144,7 @@ export default function App() {
           </div>
         </div>
         <div className="actions">
+          {/* Utility buttons grouped first, then the blue primary actions together. */}
           <button
             className="btn ghost theme-toggle"
             aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
@@ -117,8 +156,11 @@ export default function App() {
           <button className="btn ghost" onClick={share} title="Copy a shareable link to this comparison">
             {copied ? 'Link copied ✓' : '🔗 Share'}
           </button>
-          <button className="btn hdr-cta" onClick={openModal} title="Load a real car for sale from Autotrader">
+          <button className="btn hdr-cta" onClick={openModal} title="Load a real car for sale from Auto.dev">
             🔎 Load a real car
+          </button>
+          <button className="btn hdr-cta" onClick={() => setAlertsOpen(true)} title="Get an email when matching cars hit the market">
+            🔔 Get deal alerts
           </button>
           <button
             className="btn hdr-cta"
@@ -172,7 +214,7 @@ export default function App() {
       </section>
 
       <footer className="foot">
-        Your inputs auto-save in this browser and sync to the URL — use 🔗 Share to send a comparison. Listings are a free Autotrader snapshot (best-effort — verify before buying); cost assumptions are illustrative.
+        Your inputs auto-save in this browser and sync to the URL — use 🔗 Share to send a comparison. Listings are an Auto.dev snapshot (best-effort — verify before buying); cost assumptions are illustrative.
       </footer>
 
       <ListingModal
@@ -185,6 +227,8 @@ export default function App() {
         onAdd={onAddListing}
         onClose={() => setModalOpen(false)}
       />
+
+      <AlertsModal open={alertsOpen} onClose={() => setAlertsOpen(false)} />
     </>
   );
 }
