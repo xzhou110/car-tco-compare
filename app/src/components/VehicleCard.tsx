@@ -47,7 +47,7 @@ export function VehicleCard({ index, vehicle: v, color, removable, presets, prof
       <fieldset>
         <legend>Energy</legend>
         <div className="grid">
-          <SelectField label="Powertrain" value={v.powertrain} options={['gas', 'hybrid', 'ev'] as const} onChange={(p) => update((d) => { d.powertrain = p; })} />
+          <SelectField label="Fuel type" value={v.powertrain} options={['gas', 'hybrid', 'ev'] as const} onChange={(p) => update((d) => { d.powertrain = p; })} />
           {isEv ? (
             <NumField label="Efficiency" suf="mi/kWh" step={0.1} value={v.miPerKWh} onChange={(n) => update((d) => { d.miPerKWh = n ?? 0; })} />
           ) : (

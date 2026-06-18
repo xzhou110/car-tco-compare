@@ -92,7 +92,7 @@ export function ListingModal({ open, snapshot, loading, region, addedCount, onRe
               <option value="used">Used</option>
             </select>
             <select value={powertrain} onChange={(e) => setPowertrain(e.target.value)}>
-              <option value="">Any powertrain</option>
+              <option value="">Any fuel type</option>
               <option value="gas">Gas</option>
               <option value="hybrid">Hybrid</option>
               <option value="ev">EV</option>

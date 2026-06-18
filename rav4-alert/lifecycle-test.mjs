@@ -18,10 +18,11 @@ const EMAIL = process.env.TEST_EMAIL || 'pastnoefuture@gmail.com';
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://grlkuouatrehmrutulhj.supabase.co';
 const SERVICE = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-const PREF1 = { name: 'RAV4 Hybrid — under $35k', active: true,
-  filters: { make: 'Toyota', model: 'RAV4 Hybrid', priceMax: 35000, yearMin: 2020, milesMax: 60000 } };
+// Multi-select filters (makes/models/fuels arrays), matching the new AlertsModal output.
+const PREF1 = { name: 'Hybrid SUVs — under $35k', active: true,
+  filters: { makes: ['Toyota', 'Honda'], models: ['RAV4 Hybrid', 'CR-V Hybrid'], fuels: ['hybrid'], priceMax: 35000, yearMin: 2020, milesMax: 60000 } };
 const PREF2 = { name: 'RAV4 Hybrid XLE — under $40k', active: true,
-  filters: { make: 'Toyota', model: 'RAV4 Hybrid', priceMax: 40000, yearMin: 2021, milesMax: 70000, trims: ['XLE'] } };
+  filters: { makes: ['Toyota'], models: ['RAV4 Hybrid'], trims: ['XLE'], priceMax: 40000, yearMin: 2021, milesMax: 70000 } };
 
 let pass = 0, fail = 0;
 const ok = (cond, msg, extra) => { cond ? pass++ : fail++; console.log(`  ${cond ? 'PASS' : 'FAIL'}  ${msg}${extra !== undefined ? '  →  ' + extra : ''}`); };
@@ -58,7 +59,7 @@ if (PHASE === 'phase1') {
   let sub = await getSub();
   ok(sub && sub.confirmed === false && !sub.unsubscribed_at, 'subscriber is UNCONFIRMED, not unsubscribed', sub ? `confirmed=${sub.confirmed}` : 'no row');
   const wls = await getWls(id1);
-  ok(wls.length === 1 && wls[0].filters.model === 'RAV4 Hybrid' && wls[0].active, 'preference saved as 1 active watchlist', JSON.stringify(wls.map((w) => w.name)));
+  ok(wls.length === 1 && wls[0].filters.models?.includes('RAV4 Hybrid') && wls[0].active, 'preference saved as 1 active watchlist', JSON.stringify(wls.map((w) => w.name)));
 
   // instant confirmation email (REAL send via the deployed function)
   const r1 = await invokeConfirm(id1);

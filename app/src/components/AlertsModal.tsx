@@ -10,16 +10,17 @@ interface Props {
 
 interface Pref {
   name: string;
-  make: string;
-  model: string;
-  powertrain: string;
+  // Multi-select: each is a set of chosen values (empty = "any").
+  makes: string[];
+  models: string[];
+  fuels: string[];
+  trims: string[];
   zip: string;
   radius: string;
   priceMin: string;
   priceMax: string;
   yearMin: string;
   milesMax: string;
-  trims: string[];
 }
 
 const MAX_PREFS = 3;
@@ -27,16 +28,16 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const emptyPref = (): Pref => ({
   name: '',
-  make: '',
-  model: '',
-  powertrain: '',
+  makes: [],
+  models: [],
+  fuels: [],
+  trims: [],
   zip: '',
   radius: '',
   priceMin: '',
   priceMax: '',
   yearMin: '',
   milesMax: '',
-  trims: [],
 });
 
 /** Parse a numeric field; blank/invalid -> undefined so it is omitted from the filters jsonb. */
@@ -48,14 +49,16 @@ const num = (s: string): number | undefined => {
 };
 
 const hasContent = (p: Pref): boolean =>
-  !!(p.make.trim() || p.model.trim() || p.powertrain.trim() || p.zip.trim() || p.radius.trim() || p.priceMin.trim() || p.priceMax.trim() || p.yearMin.trim() || p.milesMax.trim());
+  !!(p.makes.length || p.models.length || p.fuels.length || p.trims.length || p.zip.trim() || p.radius.trim() || p.priceMin.trim() || p.priceMax.trim() || p.yearMin.trim() || p.milesMax.trim());
 
-/** Build the exact filters jsonb the cron reads: numbers as numbers, blanks omitted. */
+/** Build the exact filters jsonb the cron reads: multi-select arrays, numbers as numbers, blanks omitted. */
 function buildFilters(p: Pref) {
   const f: Record<string, unknown> = {};
-  if (p.make.trim()) f.make = p.make.trim();
-  if (p.model.trim()) f.model = p.model.trim();
-  if (p.powertrain.trim()) f.powertrain = p.powertrain.trim();
+  // Multi-select arrays — omit a key entirely when nothing is chosen ("any").
+  if (p.makes.length) f.makes = p.makes;
+  if (p.models.length) f.models = p.models;
+  if (p.fuels.length) f.fuels = p.fuels;
+  if (p.trims.length) f.trims = p.trims;
   if (p.zip.trim()) f.zip = p.zip.trim();
   const radius = num(p.radius);
   if (radius !== undefined) f.radius = radius;
@@ -67,16 +70,14 @@ function buildFilters(p: Pref) {
   if (yearMin !== undefined) f.yearMin = yearMin;
   const milesMax = num(p.milesMax);
   if (milesMax !== undefined) f.milesMax = milesMax;
-  // Selected trims (data-driven, model-aware); omit the key entirely when none chosen.
-  if (p.trims.length > 0) f.trims = p.trims;
   return f;
 }
 
-/** Resolve the alert's display name: explicit name, else "make model", else "Preference N". */
+/** Resolve the alert's display name: explicit name, else makes+models, else "Preference N". */
 const nameFor = (p: Pref, index: number): string => {
   const explicit = p.name.trim();
   if (explicit) return explicit;
-  const makeModel = `${p.make} ${p.model}`.trim();
+  const makeModel = `${p.makes.join('/')} ${p.models.join('/')}`.trim();
   return makeModel || `Preference ${index + 1}`;
 };
 
@@ -109,41 +110,34 @@ export function AlertsModal({ open, onClose }: Props) {
     };
   }, [open, listings.length]);
 
-  // Trim works as a standalone filter too: scope options to make/model when chosen,
-  // otherwise offer every trim in the snapshot so it's usable before a model is picked.
-  const trimOptionsFor = (p: Pref): string[] => {
-    const make = p.make.trim().toLowerCase();
-    const model = p.model.trim().toLowerCase();
-    const set = new Set<string>();
-    for (const L of listings) {
-      if (make && L.make.toLowerCase() !== make) continue;
-      if (model && L.model.toLowerCase() !== model) continue;
-      if (L.trim) set.add(L.trim);
-    }
-    return [...set].sort();
-  };
+  // Multi-select option derivation. Each field is "any" until chips are picked; options
+  // scope to the makes/models chosen so far but ALWAYS render (usable before a model is picked).
+  const matchingListings = (p: Pref): Listing[] =>
+    listings.filter(
+      (L) =>
+        (p.makes.length === 0 || p.makes.includes(L.make)) &&
+        (p.models.length === 0 || p.models.includes(L.model)),
+    );
 
-  // Distinct makes / models / fuel types in the snapshot — drive the dropdowns so the
-  // selected values always match the data (and trim/fuel options can populate).
   const makeOptions = [...new Set(listings.map((l) => l.make).filter(Boolean))].sort();
-  const modelOptionsFor = (p: Pref): string[] => {
-    const make = p.make.trim().toLowerCase();
-    return [...new Set(listings.filter((l) => !make || l.make.toLowerCase() === make).map((l) => l.model).filter(Boolean))].sort();
-  };
-  // Fuel type works as a standalone filter: scope options to make/model when chosen,
-  // otherwise offer every powertrain in the snapshot so it's usable before a model is picked.
-  const fuelOptionsFor = (p: Pref): string[] => {
-    const make = p.make.trim().toLowerCase();
-    const model = p.model.trim().toLowerCase();
-    const set = new Set<string>();
-    for (const L of listings) {
-      if (make && L.make.toLowerCase() !== make) continue;
-      if (model && L.model.toLowerCase() !== model) continue;
-      if (L.powertrain) set.add(L.powertrain);
-    }
-    return [...set].sort();
-  };
+  const modelOptionsFor = (p: Pref): string[] =>
+    [...new Set(listings.filter((l) => p.makes.length === 0 || p.makes.includes(l.make)).map((l) => l.model).filter(Boolean))].sort();
+  const fuelOptionsFor = (p: Pref): string[] =>
+    [...new Set<string>(matchingListings(p).map((l) => l.powertrain).filter(Boolean))].sort();
+  const trimOptionsFor = (p: Pref): string[] =>
+    [...new Set(matchingListings(p).map((l) => l.trim).filter((v): v is string => !!v))].sort();
   const FUEL_LABEL: Record<string, string> = { gas: 'Gas', hybrid: 'Hybrid', ev: 'EV' };
+
+  // Toggle a value in a multi-select array.
+  const toggle = (arr: string[], v: string): string[] => (arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v]);
+  // After makes/models change, drop model/fuel/trim picks that no longer have any data.
+  const cleanPref = (p: Pref): Pref => {
+    const models = modelOptionsFor(p);
+    const p2: Pref = { ...p, models: p.models.filter((m) => models.includes(m)) };
+    const fuels = fuelOptionsFor(p2);
+    const trims = trimOptionsFor(p2);
+    return { ...p2, fuels: p.fuels.filter((f) => fuels.includes(f)), trims: p.trims.filter((t) => trims.includes(t)) };
+  };
 
   // Reset to a clean form each time the modal is freshly opened.
   useEffect(() => {
@@ -156,12 +150,41 @@ export function AlertsModal({ open, onClose }: Props) {
     }
   }, [open]);
 
-  const updatePref = (i: number, patch: Partial<Pref>) =>
-    setPrefs((rows) => rows.map((r, idx) => (idx === i ? { ...r, ...patch } : r)));
+  // Accepts a plain patch or an updater (r => patch). The updater form reads the LATEST
+  // pref, so toggling several chips quickly never clobbers earlier selections.
+  const updatePref = (i: number, patch: Partial<Pref> | ((r: Pref) => Partial<Pref>)) =>
+    setPrefs((rows) => rows.map((r, idx) => (idx === i ? { ...r, ...(typeof patch === 'function' ? patch(r) : patch) } : r)));
 
   const addPref = () => setPrefs((rows) => (rows.length >= MAX_PREFS ? rows : [...rows, emptyPref()]));
 
   const removePref = (i: number) => setPrefs((rows) => rows.filter((_, idx) => idx !== i));
+
+  // A multi-select chip group for one field — always shown; "any" until chips are picked.
+  const chipGroup = (
+    label: string,
+    options: string[],
+    selected: string[],
+    onToggle: (v: string) => void,
+    fmt?: (v: string) => string,
+  ) => (
+    <div className="alerts-field" style={{ gridColumn: '1 / -1' }}>
+      <span className="alerts-label">{label}{selected.length ? ` · ${selected.length} selected` : ''}</span>
+      {options.length === 0 ? (
+        <span className="alerts-chips-empty">No options in the current data.</span>
+      ) : (
+        <div className="alerts-chips">
+          {options.map((o) => {
+            const on = selected.includes(o);
+            return (
+              <button key={o} type="button" className={`alerts-chip${on ? ' on' : ''}`} aria-pressed={on} onClick={() => onToggle(o)}>
+                {fmt ? fmt(o) : o}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
 
   const submit = async () => {
     setError('');
@@ -283,34 +306,10 @@ export function AlertsModal({ open, onClose }: Props) {
                     <span className="alerts-label">Name this alert</span>
                     <input type="text" placeholder="e.g. My RAV4 hunt" value={p.name} onChange={(e) => updatePref(i, { name: e.target.value })} />
                   </label>
-                  <label className="alerts-field">
-                    <span className="alerts-label">Make</span>
-                    <select value={p.make} onChange={(e) => updatePref(i, { make: e.target.value, model: '', powertrain: '', trims: [] })}>
-                      <option value="">Any make</option>
-                      {makeOptions.map((m) => (<option key={m} value={m}>{m}</option>))}
-                    </select>
-                  </label>
-                  <label className="alerts-field">
-                    <span className="alerts-label">Model</span>
-                    <select value={p.model} onChange={(e) => updatePref(i, { model: e.target.value, powertrain: '', trims: [] })}>
-                      <option value="">Any model</option>
-                      {modelOptionsFor(p).map((m) => (<option key={m} value={m}>{m}</option>))}
-                    </select>
-                  </label>
-                  <label className="alerts-field">
-                    <span className="alerts-label">Trim</span>
-                    <select value={p.trims[0] ?? ''} onChange={(e) => updatePref(i, { trims: e.target.value ? [e.target.value] : [] })}>
-                      <option value="">Any trim</option>
-                      {trimOptionsFor(p).map((t) => (<option key={t} value={t}>{t}</option>))}
-                    </select>
-                  </label>
-                  <label className="alerts-field">
-                    <span className="alerts-label">Fuel type</span>
-                    <select value={p.powertrain} onChange={(e) => updatePref(i, { powertrain: e.target.value })}>
-                      <option value="">Any fuel</option>
-                      {fuelOptionsFor(p).map((f) => (<option key={f} value={f}>{FUEL_LABEL[f] ?? f}</option>))}
-                    </select>
-                  </label>
+                  {chipGroup('Make', makeOptions, p.makes, (v) => updatePref(i, (r) => cleanPref({ ...r, makes: toggle(r.makes, v) })))}
+                  {chipGroup('Model', modelOptionsFor(p), p.models, (v) => updatePref(i, (r) => cleanPref({ ...r, models: toggle(r.models, v) })))}
+                  {chipGroup('Trim', trimOptionsFor(p), p.trims, (v) => updatePref(i, (r) => ({ trims: toggle(r.trims, v) })))}
+                  {chipGroup('Fuel type', fuelOptionsFor(p), p.fuels, (v) => updatePref(i, (r) => ({ fuels: toggle(r.fuels, v) })), (v) => FUEL_LABEL[v] ?? v)}
                   <label className="alerts-field">
                     <span className="alerts-label">Zip</span>
                     <input type="text" inputMode="numeric" placeholder="94016" value={p.zip} onChange={(e) => updatePref(i, { zip: e.target.value })} />

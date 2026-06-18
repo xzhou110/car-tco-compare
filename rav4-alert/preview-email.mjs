@@ -40,8 +40,12 @@ async function selectAll(buildQuery) {
 async function match(filters) {
   const build = () => {
     let q = supabase.from('listings_cache').select('*');
-    if (filters.make) q = q.eq('make', filters.make);
-    if (filters.model) q = q.eq('model', filters.model);
+    const makes = filters.makes ?? (filters.make ? [filters.make] : null);
+    if (makes?.length) q = q.in('make', makes);
+    const models = filters.models ?? (filters.model ? [filters.model] : null);
+    if (models?.length) q = q.in('model', models);
+    const fuels = filters.fuels ?? (filters.powertrain ? [filters.powertrain] : null);
+    if (fuels?.length) q = q.in('powertrain', fuels);
     if (filters.priceMin) q = q.gte('price', filters.priceMin);
     if (filters.priceMax) q = q.lte('price', filters.priceMax);
     if (filters.yearMin) q = q.gte('year', filters.yearMin);

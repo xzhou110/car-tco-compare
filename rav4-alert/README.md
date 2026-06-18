@@ -23,12 +23,20 @@ Key idea: **one cached (model × region) tile serves all users** — alert sendi
 ## Signup form (in the app)
 
 `app/src/components/AlertsModal.tsx` — up to 3 preferences. Each preference uses
-**data-driven dropdowns** sourced from the listings snapshot so selections always match
-the data: **Make → Model** (cascading), **Fuel type** and **Trim** (populated from the
-chosen make+model), plus Zip, Radius, Min/Max price, Min year, Max miles. On submit it
-writes a `subscribers` row (`confirmed=false`) + up to 3 `watchlists` rows via the
-publishable key. Each watchlist's `filters` jsonb may contain:
-`{ make, model, powertrain, trims[], zip, radius, priceMin, priceMax, yearMin, milesMax }`.
+**data-driven multi-select chips** sourced from the listings snapshot, so selections always
+match the data: **Make**, **Model**, **Trim**, and **Fuel type** are each **multi-select**
+(pick several values, OR'd together), **always shown** (usable before a model is picked),
+and scope to the makes/models chosen so far — plus Zip, Radius, Min/Max price, Min year,
+Max miles. ("Fuel type" is the user-facing label for the internal `powertrain` field — the
+car card uses the same wording.)
+
+On submit it calls the `start_subscription` RPC (upsert subscriber + replace watchlists, so
+**re-signup after unsubscribe works** instead of hitting the unique-email constraint), then
+invokes the `send-confirmation` Edge Function for an **instant** double-opt-in email (the
+twice-daily `send-confirmations.mjs` cron stays as a fallback). Each watchlist's `filters`
+jsonb may contain (arrays mean "any of"):
+`{ makes[], models[], fuels[], trims[], zip, radius, priceMin, priceMax, yearMin, milesMax }`.
+The cron still also accepts the older single-value `make`/`model`/`powertrain` keys.
 
 ## Environment variables
 
@@ -45,9 +53,26 @@ the registry (`[Environment]::GetEnvironmentVariable(...,'User')`).
 
 ## Database
 
-Run once in the Supabase SQL editor: [`supabase/schema.sql`](supabase/schema.sql) then
+Run once in the Supabase SQL editor, in order: [`supabase/schema.sql`](supabase/schema.sql),
 [`supabase/phase2b.sql`](supabase/phase2b.sql) (double opt-in + unsubscribe RPCs +
-`unsubscribed_at`/`confirmation_sent_at` columns + hardened RLS).
+`unsubscribed_at`/`confirmation_sent_at` columns + hardened RLS), then
+[`supabase/phase3-resubscribe.sql`](supabase/phase3-resubscribe.sql) — the
+`start_subscription` RPC for idempotent signup / re-signup.
+
+## Instant confirmation (Edge Function)
+
+[`supabase/functions/send-confirmation/`](supabase/functions/send-confirmation/index.ts) is a
+Deno Edge Function the signup form invokes so the confirmation email goes out **immediately**
+(not on the next cron run). Deploy it + set its secret:
+
+```powershell
+npx supabase functions deploy send-confirmation --project-ref <ref>   # needs SUPABASE_ACCESS_TOKEN
+npx supabase secrets set RESEND_API_KEY=re_xxx --project-ref <ref>     # SUPABASE_URL/SERVICE_ROLE auto-injected
+```
+
+It reads the confirm token with the service role, sends via Resend, and stamps
+`confirmation_sent_at` so the cron never double-sends. `verify_jwt` stays **on** (the
+browser's publishable key passes the gateway). `send-confirmations.mjs` is the fallback.
 
 ## Scripts
 
@@ -67,6 +92,11 @@ Run once in the Supabase SQL editor: [`supabase/schema.sql`](supabase/schema.sql
 per preference (named by the user's watchlist), and a single **.xlsx** attachment with
 one tab per preference. Vehicle names are clickable listing links (in both the email and
 the spreadsheet). TCO mirrors the web app's engine (`tco.mjs`, CA assumptions).
+
+**Unsubscribe:** every digest has a one-click **Unsubscribe** link in the footer →
+`#/unsubscribe?token=…` in the app → the `unsubscribe_all` RPC timestamps `unsubscribed_at`
+and deactivates that user's watchlists (the row is kept for re-engagement; they can
+re-subscribe any time from the form — `start_subscription` revives it).
 
 ## Scheduling
 
