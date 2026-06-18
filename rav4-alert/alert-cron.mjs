@@ -69,10 +69,13 @@ async function matchWatchlist(filters) {
   let rows = await selectAll(build);
   // Radius filter by ZIP centroid (no-op until cache rows carry lat/lng — see geo.mjs).
   if (filters.zip && filters.radius) rows = withinRadius(rows, filters.zip, filters.radius);
-  const cars = rows.map(cacheRowToCar);
-  // "XLE and above" is RAV4-specific (trim ladders differ per model) → only apply for RAV4.
-  const xle = !!filters.xlePlusOnly && /rav4/i.test(filters.model || '');
-  const { kept } = filterList(cars, { xlePlusOnly: xle }); // trim filter + price sort
+  let cars = rows.map(cacheRowToCar);
+  // Trim filter: the explicit trims chosen in the form (exact, case-insensitive).
+  const trims = Array.isArray(filters.trims) ? filters.trims.map((t) => String(t).toLowerCase()) : [];
+  if (trims.length) cars = cars.filter((c) => c.trim && trims.includes(String(c.trim).toLowerCase()));
+  // Legacy fallback for old watchlists: "XLE and above" (RAV4 only) when no trims given.
+  const xle = trims.length === 0 && !!filters.xlePlusOnly && /rav4/i.test(filters.model || '');
+  const { kept } = filterList(cars, { xlePlusOnly: xle }); // legacy xle + price sort
   for (const c of kept) c.tco = tcoForCar(c);
   return kept;
 }

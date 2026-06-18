@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
+import { loadListingsSnapshot } from '../lib/listings';
+import type { Listing } from '../types';
 
 interface Props {
   open: boolean;
@@ -16,7 +18,7 @@ interface Pref {
   priceMax: string;
   yearMin: string;
   milesMax: string;
-  xlePlusOnly: boolean;
+  trims: string[];
 }
 
 const MAX_PREFS = 3;
@@ -32,11 +34,8 @@ const emptyPref = (): Pref => ({
   priceMax: '',
   yearMin: '',
   milesMax: '',
-  xlePlusOnly: false,
+  trims: [],
 });
-
-/** RAV4-only filter: the "XLE and above only" option only applies to RAV4 models. */
-const isRav4 = (model: string): boolean => model.trim().toLowerCase().includes('rav4');
 
 /** Parse a numeric field; blank/invalid -> undefined so it is omitted from the filters jsonb. */
 const num = (s: string): number | undefined => {
@@ -65,8 +64,8 @@ function buildFilters(p: Pref) {
   if (yearMin !== undefined) f.yearMin = yearMin;
   const milesMax = num(p.milesMax);
   if (milesMax !== undefined) f.milesMax = milesMax;
-  // "XLE and above only" only applies to RAV4; omit it for any other model.
-  if (isRav4(p.model)) f.xlePlusOnly = p.xlePlusOnly;
+  // Selected trims (data-driven, model-aware); omit the key entirely when none chosen.
+  if (p.trims.length > 0) f.trims = p.trims;
   return f;
 }
 
@@ -85,6 +84,8 @@ export function AlertsModal({ open, onClose }: Props) {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
   const [done, setDone] = useState(false);
+  // Cache the listings snapshot once (same source ListingModal uses) to derive trim options.
+  const [listings, setListings] = useState<Listing[]>([]);
 
   useEffect(() => {
     const d = ref.current;
@@ -92,6 +93,39 @@ export function AlertsModal({ open, onClose }: Props) {
     if (open && !d.open) d.showModal();
     if (!open && d.open) d.close();
   }, [open]);
+
+  // Load the listings snapshot once, the first time the modal is opened.
+  useEffect(() => {
+    if (!open || listings.length > 0) return;
+    let cancelled = false;
+    void loadListingsSnapshot().then((snap) => {
+      if (!cancelled && snap) setListings(snap.listings);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [open, listings.length]);
+
+  // Distinct trims among listings matching this preference's make AND model.
+  const trimOptionsFor = (p: Pref): string[] => {
+    const make = p.make.trim().toLowerCase();
+    const model = p.model.trim().toLowerCase();
+    if (!model) return [];
+    const set = new Set<string>();
+    for (const L of listings) {
+      if (make && L.make.toLowerCase() !== make) continue;
+      if (L.model.toLowerCase() !== model) continue;
+      if (L.trim) set.add(L.trim);
+    }
+    return [...set].sort();
+  };
+
+  const toggleTrim = (i: number, trim: string) =>
+    setPrefs((rows) =>
+      rows.map((r, idx) =>
+        idx === i ? { ...r, trims: r.trims.includes(trim) ? r.trims.filter((t) => t !== trim) : [...r.trims, trim] } : r,
+      ),
+    );
 
   // Reset to a clean form each time the modal is freshly opened.
   useEffect(() => {
@@ -235,11 +269,11 @@ export function AlertsModal({ open, onClose }: Props) {
                   </label>
                   <label className="alerts-field">
                     <span className="alerts-label">Make</span>
-                    <input type="text" placeholder="Toyota" value={p.make} onChange={(e) => updatePref(i, { make: e.target.value })} />
+                    <input type="text" placeholder="Toyota" value={p.make} onChange={(e) => updatePref(i, { make: e.target.value, trims: [] })} />
                   </label>
                   <label className="alerts-field">
                     <span className="alerts-label">Model</span>
-                    <input type="text" placeholder="RAV4" value={p.model} onChange={(e) => updatePref(i, { model: e.target.value })} />
+                    <input type="text" placeholder="RAV4" value={p.model} onChange={(e) => updatePref(i, { model: e.target.value, trims: [] })} />
                   </label>
                   <label className="alerts-field">
                     <span className="alerts-label">Zip</span>
@@ -265,12 +299,31 @@ export function AlertsModal({ open, onClose }: Props) {
                     <span className="alerts-label">Max miles</span>
                     <input type="number" min={0} placeholder="60000" value={p.milesMax} onChange={(e) => updatePref(i, { milesMax: e.target.value })} />
                   </label>
-                  {isRav4(p.model) ? (
-                    <label className="alerts-check">
-                      <input type="checkbox" checked={p.xlePlusOnly} onChange={(e) => updatePref(i, { xlePlusOnly: e.target.checked })} />
-                      <span>XLE and above only</span>
-                    </label>
-                  ) : null}
+                  {(() => {
+                    const trims = trimOptionsFor(p);
+                    if (trims.length === 0) return null;
+                    return (
+                      <div className="alerts-field" style={{ gridColumn: '1 / -1' }}>
+                        <span className="alerts-label">Trim (optional)</span>
+                        <div className="trim-chips">
+                          {trims.map((t) => {
+                            const on = p.trims.includes(t);
+                            return (
+                              <button
+                                key={t}
+                                type="button"
+                                className={`trim-chip${on ? ' on' : ''}`}
+                                aria-pressed={on}
+                                onClick={() => toggleTrim(i, t)}
+                              >
+                                {t}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               </fieldset>
             ))}

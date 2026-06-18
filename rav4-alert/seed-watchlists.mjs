@@ -27,7 +27,7 @@ const watchlists = [
   },
   {
     subscriber_id: sub.id, name: 'RAV4 Hybrid XLE+ — under $35k', active: true,
-    filters: { make: 'Toyota', model: 'RAV4 Hybrid', priceMax: 35000, yearMin: 2022, milesMax: 60000, xlePlusOnly: true },
+    filters: { make: 'Toyota', model: 'RAV4 Hybrid', priceMax: 35000, yearMin: 2022, milesMax: 60000, trims: ['XLE', 'XSE', 'XLE Premium', 'Limited', 'SE', 'Woodland Edition'] },
   },
 ];
 const { error } = await supabase.from('watchlists').insert(watchlists);

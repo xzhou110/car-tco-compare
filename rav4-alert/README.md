@@ -1,48 +1,73 @@
-# rav4-alert (POC)
+# Deal Alerts (rav4-alert/)
 
-Twice-daily used-car listing alert for a Toyota RAV4 Hybrid, near zip 94030.
-Data source: **Auto.dev** listings API (SDK). Long-term goal: a consumer-facing app.
+Backend for the **car-tco-compare** "Deal Alerts" feature: twice-daily, TCO-ranked
+used-car email digests. Users sign up on the web app and pick up to 3 preferences
+(watchlists); a scheduled job filters a cached pool of listings, computes 5-year
+total cost of ownership, and emails each subscriber a digest + spreadsheet.
 
-## One-time setup
+## Architecture
 
-1. **Install Node.js LTS** (system-wide, on PATH):
-   ```powershell
-   winget install OpenJS.NodeJS.LTS
-   ```
-   Open a NEW terminal and confirm: `node -v`
-
-2. **Set your Auto.dev API key** as a Windows User env var (regenerate it first if it was ever exposed):
-   ```powershell
-   [Environment]::SetEnvironmentVariable('AUTODEV_API_KEY', 'PASTE_FRESH_KEY', 'User')
-   ```
-   Verify in a new terminal: `[Environment]::GetEnvironmentVariable('AUTODEV_API_KEY','User')`
-
-3. **Install deps** (from this folder):
-   ```powershell
-   npm install
-   ```
-
-## Run the reconnaissance query
-
-```powershell
-npm run query
+```
+Auto.dev API ──(cache-refresh.mjs, twice daily)──► Supabase: listings_cache
+                                                          │
+Web app signup form ──► Supabase: subscribers + watchlists│
+                                                          ▼
+                          alert-cron.mjs: per subscriber → filter cache by each
+                          watchlist → TCO (tco.mjs) → NEW vs sent_state →
+                          digest (digest.mjs) → Resend → record sent_state
 ```
 
-`query.mjs` hits Auto.dev for both target lists and dumps the raw response, so we
-can confirm (a) real RAV4 Hybrids come back and (b) whether the payload carries any
-vehicle-history fields (accident / owners / title). This answers the open question
-about the "free Carfax/AutoCheck badge" plan.
+Key idea: **one cached (model × region) tile serves all users** — alert sending makes
+*zero* Auto.dev calls, so API cost scales with models×regions, not subscribers.
 
-## Interfaces
+## Environment variables
 
-- **SDK** (`@auto.dev/sdk`) — what the actual scheduled routine uses. ← primary
-- **MCP** (`.mcp.json`, `auto --mcp`) — for interactive querying inside Claude Code.
-  Requires `npm install -g @auto.dev/sdk` and a Claude Code restart.
+| Var | Used by | Notes |
+|-----|---------|-------|
+| `AUTODEV_API_KEY` | cache-refresh | Auto.dev listings |
+| `SUPABASE_URL` | all server scripts | defaults to the project URL in `supabase/client.mjs` |
+| `SUPABASE_SECRET_KEY` | all server scripts | server-only (bypasses RLS) — never ship to the browser |
+| `RESEND_API_KEY` | alert-cron, send-confirmations | email |
+| `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` | the web app | publishable key is browser-safe (RLS protects data) |
 
-## Status / open items
+On Windows these are User env vars; a fresh PowerShell may need a PATH/env refresh from
+the registry (`[Environment]::GetEnvironmentVariable(...,'User')`).
 
-- Auto.dev has **no documented `trim` filter** → XLE+ (List 2) is filtered client-side.
-- Auto.dev has **no documented history fields** → "no accident / clean title / personal
-  use" handling is TBD pending the recon query. Fallbacks: best-effort/verify-on-click,
-  or a cheap NMVTIS lookup (VinAudit ~$1-3/VIN). "Personal use" is Carfax-only.
-- Email digest + scheduling: not built yet. Sends outbound (own provider); no inbox auth.
+## Database
+
+Run once in the Supabase SQL editor: [`supabase/schema.sql`](supabase/schema.sql) then
+[`supabase/phase2b.sql`](supabase/phase2b.sql) (double opt-in + unsubscribe RPCs +
+`unsubscribed_at`/`confirmation_sent_at` columns + hardened RLS).
+
+## Scripts
+
+| Command | What it does |
+|---------|--------------|
+| `node cache-refresh.mjs` | **Only Auto.dev caller.** Pull model×region tiles → upsert `listings_cache` (set `last_seen`) → `expire_stale_listings()`. Keep page caps small. |
+| `node seed-cache.mjs` | Dev seed of `listings_cache` from the app snapshot (no Auto.dev calls). |
+| `node seed-watchlists.mjs` | Seed a test subscriber + 2 RAV4 Hybrid watchlists. |
+| `node alert-cron.mjs [--dry]` | The digest job. `--dry` builds previews in `out/` without sending/recording. |
+| `node send-confirmations.mjs` | Email confirm links to unconfirmed signups. |
+| `node preview-email.mjs` | Render the email + xlsx from the cache (no Supabase subscriber table needed) → `out/`. |
+| `node verify-rpc.mjs` | Smoke-test the confirm/unsubscribe RPCs. |
+
+## Email digest
+
+`digest.mjs` builds: a 🏆 **Top-10 by lowest 5-yr TCO** table, then one summary table
+per preference (named by the user's watchlist), and a single **.xlsx** attachment with
+one tab per preference. Vehicle names are clickable listing links (in both the email and
+the spreadsheet). TCO mirrors the web app's engine (`tco.mjs`, CA assumptions).
+
+## Scheduling
+
+[`../.github/workflows/alerts.yml`](../.github/workflows/alerts.yml) runs cache-refresh
+then alert-cron twice daily (UTC), using repo secrets. (Adding the workflow to GitHub
+needs a token with the `workflow` scope: `gh auth refresh -h github.com -s workflow`.)
+
+## Before public launch
+
+- **Resend domain verification** — until done, mail only delivers to the account owner.
+- **Auto.dev commercial license** — before charging / serving many users.
+- **Deploy** the web app (off GitHub Pages if you want server features) and enable the cron.
+- **Production cache-refresh** to backfill `lat/lng` (radius filtering), history, and
+  carfax into `listings_cache` (the dev seed from the app snapshot is lossy).

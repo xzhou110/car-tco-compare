@@ -71,11 +71,11 @@ h3 { font-size: 15px; margin: 0 0 12px; font-weight: 700; color: var(--ink); }
 small { color: var(--muted); font-weight: 400; }
 
 /* topbar */
-.topbar { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px 20px; margin-bottom: 20px; flex-wrap: wrap; }
+.topbar { display: flex; flex-direction: column; align-items: stretch; gap: 14px; margin-bottom: 20px; }
 .brand { display: flex; gap: 13px; align-items: flex-start; min-width: 0; }
 .logo { font-size: 32px; line-height: 1; filter: drop-shadow(0 2px 4px rgba(20, 30, 45, 0.15)); }
 .tagline { margin: 5px 0 0; color: var(--ink); font-size: 14.5px; font-weight: 500; max-width: 64ch; }
-.actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; padding-top: 14px; border-top: 1px solid var(--line); }
 .theme-toggle { padding: 9px 12px; font-size: 15px; line-height: 1; }
 
 /* buttons */
@@ -336,8 +336,11 @@ input[type='number']::-webkit-inner-spin-button, input[type='number']::-webkit-o
 .alerts-remove { border: 0; background: transparent; color: var(--faint); font-size: 13px; line-height: 1; width: 22px; height: 22px; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: background 0.12s ease, color 0.12s ease; }
 .alerts-remove:hover { color: var(--ink); background: var(--track); }
 .alerts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr)); gap: 10px 12px; }
-.alerts-check { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--ink); cursor: pointer; }
-.alerts-check input { width: auto; }
+.trim-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.trim-chip { font-size: 12px; font-weight: 600; line-height: 1; padding: 6px 11px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease, box-shadow 0.12s ease; }
+.trim-chip:hover { border-color: var(--line-strong); background: var(--surface-2); }
+.trim-chip.on { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: var(--shadow-sm); }
+.trim-chip.on:hover { background: var(--accent-d); border-color: var(--accent-d); }
 .alerts-add { align-self: flex-start; }
 .alerts-error { margin: 0; color: var(--bad, #c0392b); font-size: 12.5px; font-weight: 600; }
 .alerts-foot { margin: 2px -22px -14px; border-top: 1px solid var(--line); }
