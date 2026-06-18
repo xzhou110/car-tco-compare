@@ -3,6 +3,9 @@
 project_id = "grlkuouatrehmrutulhj"
 
 [functions.send-confirmation]
-# Invoked by the frontend with the project's anon key (a valid JWT), so keep JWT
-# verification on — blocks anonymous internet callers without the key.
+# Invoked by the frontend with the project's publishable key (sb_publishable_…). The
+# Supabase gateway accepts that key with verify_jwt on (verified live → HTTP 200), so we
+# keep JWT verification ENABLED, which blocks anonymous callers that don't present a
+# project key. The function also abuse-guards itself: it only ever emails a subscriber
+# that already exists AND is unconfirmed AND hasn't been emailed yet (once).
 verify_jwt = true
