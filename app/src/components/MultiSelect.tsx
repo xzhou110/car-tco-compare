@@ -35,7 +35,7 @@ export function MultiSelect({ label, options, selected, onToggle, fmt, placehold
     selected.length === 0 ? placeholder : selected.length <= 2 ? selected.map(show).join(', ') : `${selected.length} selected`;
 
   return (
-    <div className="alerts-field" style={{ gridColumn: '1 / -1' }} ref={ref}>
+    <div className="alerts-field" ref={ref}>
       <span className="alerts-label">{label}{selected.length ? ` · ${selected.length}` : ''}</span>
       <div className="ms">
         <button
