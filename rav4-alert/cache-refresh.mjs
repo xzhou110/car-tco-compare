@@ -6,8 +6,8 @@
 //       node cache-refresh.mjs --dry           (fetch + report, no DB write)
 //       node cache-refresh.mjs --models "Toyota:RAV4 Hybrid:suv-compact" --max-pages 1   (smoke test)
 //
-// Call budget: ~1 Auto.dev call per page (~20 listings). Full 6-tile refresh at the
-// 25-page cap ≈ ~100 calls — run sparingly; the starter tier rate-limits (429).
+// Call budget: ~1 Auto.dev call per page (~20 listings). POC is narrowed to 2 RAV4
+// tiles (~a few dozen calls); add tiles / raise --max-pages cautiously (starter 429s).
 
 import { paginate } from './autodev.mjs';
 import { supabase } from './supabase/client.mjs';
@@ -18,13 +18,11 @@ const DRY = argv.includes('--dry');
 const MAX_PAGES = parseInt(arg('--max-pages', '25'), 10);
 const ZIP = '94030', RADIUS = '200', MIN_YEAR = 2020;
 
+// POC: narrowed to Toyota RAV4 only (gas + hybrid) to keep Auto.dev usage low.
+// Add more tiles here later (Highlander, CR-V, …) when scaling past the POC.
 const ALL_TILES = [
   { make: 'Toyota', model: 'RAV4', segment: 'suv-compact' },
   { make: 'Toyota', model: 'RAV4 Hybrid', segment: 'suv-compact' },
-  { make: 'Toyota', model: 'Highlander', segment: 'suv-midsize' },
-  { make: 'Toyota', model: 'Highlander Hybrid', segment: 'suv-midsize' },
-  { make: 'Honda', model: 'CR-V', segment: 'suv-compact' },
-  { make: 'Honda', model: 'CR-V Hybrid', segment: 'suv-compact' },
 ];
 const only = arg('--models', '');
 const tiles = only

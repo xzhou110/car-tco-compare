@@ -110,8 +110,8 @@ for (const sub of subs) {
   const totalMatches = allCars.length;
   const totalNew = newVins.size;
 
-  const intro = `<p style="font:15px system-ui;margin:0 0 4px">Hi 👋</p>
-    <p style="font:13px system-ui;color:#444;margin:0 0 14px;line-height:1.5">Here are the lowest <b>total-cost-to-own</b> cars matching your ${wls.length} preference${wls.length === 1 ? '' : 's'} right now${totalNew ? ` — including <b>${totalNew} new</b> since last time` : ''}. The 🏆 top 10 by 5-year cost are first, then a breakdown per preference; full detail (every match, all columns) is in the attached spreadsheet.</p>`;
+  const intro = `<p style="font-family:system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.4;margin:0 0 6px">Hi 👋</p>
+    <p style="font-family:system-ui,-apple-system,sans-serif;font-size:13px;line-height:1.6;color:#444;margin:0 0 14px">Here are the lowest <b>total-cost-to-own</b> cars matching your ${wls.length} preference${wls.length === 1 ? '' : 's'} right now${totalNew ? ` — including <b>${totalNew} new</b> since last time` : ''}. The 🏆 top 10 by 5-year cost are first, then a breakdown per preference; full detail (every match, all columns) is in the attached spreadsheet.</p>`;
   const unsubscribeUrl = sub.unsubscribe_token ? `${APP_URL}#/unsubscribe?token=${sub.unsubscribe_token}` : '';
   const html = buildHtml([topTcoSection(allCars, 10), ...sections], { intro, unsubscribeUrl });
   const xlsx = await buildWorkbook(perList);
