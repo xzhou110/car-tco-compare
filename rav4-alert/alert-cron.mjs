@@ -60,6 +60,7 @@ async function matchWatchlist(filters) {
     let q = supabase.from('listings_cache').select('*');
     if (filters.make) q = q.eq('make', filters.make);
     if (filters.model) q = q.eq('model', filters.model);
+    if (filters.powertrain) q = q.eq('powertrain', filters.powertrain);
     if (filters.priceMin) q = q.gte('price', filters.priceMin);
     if (filters.priceMax) q = q.lte('price', filters.priceMax);
     if (filters.yearMin) q = q.gte('year', filters.yearMin);
