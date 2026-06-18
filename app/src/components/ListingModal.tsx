@@ -108,7 +108,7 @@ export function ListingModal({ open, snapshot, loading, region, addedCount, onRe
               <option value="hybrid">Hybrid</option>
               <option value="ev">EV</option>
             </select>
-            <input type="number" placeholder="Max $" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} style={{ width: 110 }} />
+            <input type="number" placeholder="Max $" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} />
             <select value={region} onChange={(e) => onRegionChange(e.target.value)} title="Region — sets the cost assumptions (fuel, tax, rates) applied to imported cars">
               {REGION_LIST.map((r) => (
                 <option key={r.key} value={r.key}>{r.label}</option>
