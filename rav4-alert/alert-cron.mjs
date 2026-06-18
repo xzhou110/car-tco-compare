@@ -85,7 +85,10 @@ async function matchWatchlist(filters) {
   return kept;
 }
 
-const resend = DRY ? null : new Resend(process.env.RESEND_API_KEY);
+// Strip any stray BOM/whitespace a mis-set secret may carry — a leading U+FEFF makes the
+// Resend client throw "Cannot convert argument to a ByteString" while building the auth header.
+const RESEND_KEY = (process.env.RESEND_API_KEY || '').replace(/[^\x21-\x7E]/g, '');
+const resend = DRY ? null : new Resend(RESEND_KEY);
 
 const { data: subs, error: subErr } = await supabase.from('subscribers').select('*')
   .eq('confirmed', true).is('unsubscribed_at', null);

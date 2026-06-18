@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { loadListingsSnapshot } from '../lib/listings';
+import { MultiSelect } from './MultiSelect';
 import type { Listing } from '../types';
 
 interface Props {
@@ -159,33 +160,6 @@ export function AlertsModal({ open, onClose }: Props) {
 
   const removePref = (i: number) => setPrefs((rows) => rows.filter((_, idx) => idx !== i));
 
-  // A multi-select chip group for one field — always shown; "any" until chips are picked.
-  const chipGroup = (
-    label: string,
-    options: string[],
-    selected: string[],
-    onToggle: (v: string) => void,
-    fmt?: (v: string) => string,
-  ) => (
-    <div className="alerts-field" style={{ gridColumn: '1 / -1' }}>
-      <span className="alerts-label">{label}{selected.length ? ` · ${selected.length} selected` : ''}</span>
-      {options.length === 0 ? (
-        <span className="alerts-chips-empty">No options in the current data.</span>
-      ) : (
-        <div className="alerts-chips">
-          {options.map((o) => {
-            const on = selected.includes(o);
-            return (
-              <button key={o} type="button" className={`alerts-chip${on ? ' on' : ''}`} aria-pressed={on} onClick={() => onToggle(o)}>
-                {fmt ? fmt(o) : o}
-              </button>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-
   const submit = async () => {
     setError('');
     const trimmedEmail = email.trim();
@@ -306,10 +280,10 @@ export function AlertsModal({ open, onClose }: Props) {
                     <span className="alerts-label">Name this alert</span>
                     <input type="text" placeholder="e.g. My RAV4 hunt" value={p.name} onChange={(e) => updatePref(i, { name: e.target.value })} />
                   </label>
-                  {chipGroup('Make', makeOptions, p.makes, (v) => updatePref(i, (r) => cleanPref({ ...r, makes: toggle(r.makes, v) })))}
-                  {chipGroup('Model', modelOptionsFor(p), p.models, (v) => updatePref(i, (r) => cleanPref({ ...r, models: toggle(r.models, v) })))}
-                  {chipGroup('Trim', trimOptionsFor(p), p.trims, (v) => updatePref(i, (r) => ({ trims: toggle(r.trims, v) })))}
-                  {chipGroup('Fuel type', fuelOptionsFor(p), p.fuels, (v) => updatePref(i, (r) => ({ fuels: toggle(r.fuels, v) })), (v) => FUEL_LABEL[v] ?? v)}
+                  <MultiSelect label="Make" options={makeOptions} selected={p.makes} onToggle={(v) => updatePref(i, (r) => cleanPref({ ...r, makes: toggle(r.makes, v) }))} />
+                  <MultiSelect label="Model" options={modelOptionsFor(p)} selected={p.models} onToggle={(v) => updatePref(i, (r) => cleanPref({ ...r, models: toggle(r.models, v) }))} />
+                  <MultiSelect label="Trim" options={trimOptionsFor(p)} selected={p.trims} onToggle={(v) => updatePref(i, (r) => ({ trims: toggle(r.trims, v) }))} />
+                  <MultiSelect label="Fuel type" options={fuelOptionsFor(p)} selected={p.fuels} onToggle={(v) => updatePref(i, (r) => ({ fuels: toggle(r.fuels, v) }))} fmt={(v) => FUEL_LABEL[v] ?? v} />
                   <label className="alerts-field">
                     <span className="alerts-label">Zip</span>
                     <input type="text" inputMode="numeric" placeholder="94016" value={p.zip} onChange={(e) => updatePref(i, { zip: e.target.value })} />
