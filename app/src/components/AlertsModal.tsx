@@ -180,32 +180,30 @@ export function AlertsModal({ open, onClose }: Props) {
 
     setSending(true);
     try {
-      const id = crypto.randomUUID();
-      // RLS allows INSERT only — do NOT chain .select() or it will be blocked.
-      const { error: subErr } = await supabase
-        .from('subscribers')
-        .insert({ id, email: trimmedEmail, confirmed: false });
-      if (subErr) {
-        if (subErr.code === '23505') {
-          setError("You're already subscribed with that email.");
-        } else {
-          setError('Something went wrong. Please try again in a moment.');
-        }
-        setSending(false);
-        return;
-      }
-
-      const rows = activePrefs.map(({ p, index }) => ({
-        subscriber_id: id,
+      const watchlists = activePrefs.map(({ p, index }) => ({
         name: nameFor(p, index),
         filters: buildFilters(p),
         active: true,
       }));
-      const { error: wlErr } = await supabase.from('watchlists').insert(rows);
-      if (wlErr) {
-        setError('We saved your email but could not save your alerts. Please try again.');
+      // start_subscription (SECURITY DEFINER RPC) upserts the subscriber and replaces
+      // their watchlists in one call — so re-signup after unsubscribe works instead of
+      // hitting the unique-email constraint. Returns the subscriber id.
+      const { data: subId, error: rpcErr } = await supabase.rpc('start_subscription', {
+        p_email: trimmedEmail,
+        p_watchlists: watchlists,
+      });
+      if (rpcErr || !subId) {
+        setError('Something went wrong. Please try again in a moment.');
         setSending(false);
         return;
+      }
+
+      // Send the confirmation email instantly. Non-fatal: the twice-daily cron
+      // (send-confirmations.mjs) re-sends to anyone this misses.
+      try {
+        await supabase.functions.invoke('send-confirmation', { body: { id: subId } });
+      } catch {
+        /* cron fallback covers a failed instant send */
       }
 
       setDone(true);
