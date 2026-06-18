@@ -9,6 +9,23 @@ const extract = (res) => {
   return Array.isArray(r) ? r : (r?.records ?? []);
 };
 
+// Call Auto.dev with a small backoff on 429 (free/starter tier rate-limits easily).
+async function callListings(params, tries = 3) {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await auto.listings(params);
+    } catch (e) {
+      const status = e?.status ?? e?.statusCode ?? e?.response?.status;
+      const rateLimited = status === 429 || /\b429\b|rate.?limit/i.test(String(e?.message || ''));
+      if (rateLimited && attempt < tries) {
+        await new Promise((r) => setTimeout(r, 3000 * (attempt + 1)));
+        continue;
+      }
+      throw e;
+    }
+  }
+}
+
 // Paginate a query until exhausted; dedupe by VIN; return RAW Auto.dev records.
 export async function paginate(query, opts = {}) {
   const zip = opts.zip ?? SETTINGS.zip;
@@ -18,7 +35,7 @@ export async function paginate(query, opts = {}) {
   const seen = new Set();
   let pageSize = null;
   for (let page = 1; page <= maxPages; page++) {
-    const batch = extract(await auto.listings({ ...query, zip, distance, page, limit: 50 }));
+    const batch = extract(await callListings({ ...query, zip, distance, page, limit: 50 }));
     if (pageSize === null) pageSize = batch.length;
     for (const x of batch) if (x.vin && !seen.has(x.vin)) { seen.add(x.vin); all.push(x); }
     if (batch.length === 0 || batch.length < pageSize) break;

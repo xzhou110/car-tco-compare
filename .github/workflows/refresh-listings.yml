@@ -1,0 +1,75 @@
+name: Refresh listings snapshot (weekly)
+
+# Keeps the app's "Load a real car" snapshot (app/public/data/listings.json) fresh for
+# all 3 models. Separate from the twice-daily Deal Alerts cron (that refreshes only the
+# RAV4 alert cache to stay in Auto.dev's free tier). One full 3-model pull ≈100-130
+# Auto.dev calls; weekly ≈ <600/mo, within the free 1,000/mo tier.
+#
+# A push made with GITHUB_TOKEN does NOT trigger other workflows, so this job can't rely
+# on deploy.yml firing — it commits the fresh data AND builds + deploys Pages itself.
+
+on:
+  schedule:
+    - cron: '0 16 * * 1'   # Mondays 16:00 UTC = 8am Pacific (PST 8am / PDT 9am)
+  workflow_dispatch: {}
+
+permissions:
+  contents: write   # commit the refreshed snapshot back to main
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  refresh-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install rav4-alert deps
+        working-directory: rav4-alert
+        run: npm install --no-audit --no-fund
+
+      - name: Rebuild listings.json from Auto.dev (RAV4 + Highlander + CR-V, gas + hybrid)
+        working-directory: rav4-alert
+        run: node build-app-listings.mjs
+        env:
+          AUTODEV_API_KEY: ${{ secrets.AUTODEV_API_KEY }}
+
+      - name: Commit refreshed snapshot (if it changed)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add app/public/data/listings.json
+          if git diff --staged --quiet; then
+            echo "No change in listings.json — skipping commit."
+          else
+            git commit -m "chore: weekly listings snapshot refresh [skip ci]"
+            git push
+          fi
+
+      - name: Install app deps
+        working-directory: app
+        run: npm ci
+
+      - name: Build app
+        working-directory: app
+        run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: app/dist
+      - id: deployment
+        uses: actions/deploy-pages@v4
