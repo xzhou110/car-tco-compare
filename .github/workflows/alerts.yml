@@ -1,10 +1,13 @@
 name: Deal Alerts
 
-# Twice daily (UTC) ≈ 7am / 7pm Pacific. Adjust as needed.
+# Twice daily, timed for when fresh dealer inventory lands (intentionally NOT evenly spread):
+#   15:00 UTC = 8am Pacific  — catches the overnight DMS-feed wave (most new listings appear overnight)
+#   21:00 UTC = 2pm Pacific  — catches midday / early-afternoon additions
+# GitHub cron is fixed UTC (no DST), so in PST these shift to 7am / 1pm — still morning + midday.
 on:
   schedule:
-    - cron: '0 14 * * *'
-    - cron: '0 2 * * *'
+    - cron: '0 15 * * *'
+    - cron: '0 21 * * *'
   workflow_dispatch: {}
 
 concurrency:
