@@ -140,7 +140,7 @@ function MainApp() {
           <span className="logo">🚗</span>
           <div>
             <h1>Car TCO Compare</h1>
-            <p className="tagline">Compare total cost of ownership, side by side — up to 6 cars: new vs. used, EV vs. gas.</p>
+            <p className="tagline">Know what a car <em>really</em> costs — not just the sticker price. Compare the 5-year total cost of ownership across up to 6 cars (new or used; gas, hybrid, or EV), then get the best-value deals emailed to you the moment they hit the market.</p>
           </div>
         </div>
         <div className="actions">

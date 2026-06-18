@@ -43,12 +43,11 @@ export function summarySection(list, kept, newVins, topVins) {
     const zebra = i % 2 ? 'background:#fafbfc;' : '';
     const isNew = newVins.has(c.vin);
     const badge = isNew ? `<span style="background:#16a34a;color:#ffffff;border-radius:4px;padding:2px 6px;font:600 9px system-ui;letter-spacing:.04em;margin-left:6px;vertical-align:middle">NEW</span>` : '';
-    const name = esc([c.make, c.model, c.trim].filter(Boolean).join(' '));
+    const name = esc([c.year, c.make, c.model, c.trim].filter(Boolean).join(' '));
     const carfax = c.carfaxUrl ? `<br><a href="${esc(c.carfaxUrl)}" style="font:11px system-ui;color:#94a3b8;text-decoration:none">carfax ↗</a>` : '';
     return `<tr style="${zebra}">
       ${td(`<span style="color:#64748b">${dateOnly(c.createdAt)}</span>`)}
       ${tdNum(`<span style="color:#64748b">${daysListed(c.createdAt)}</span>`)}
-      ${tdNum(c.year)}
       ${td(`<a href="${esc(c.vdp)}" style="font-weight:600;color:#0f172a;text-decoration:underline;text-decoration-color:#cbd5e1">${name}</a>` + badge + carfax)}
       ${td(`<span style="color:#475569">${esc(String(c.fuel ?? ''))}</span>`)}
       ${tdNum(`<b style="color:#0f172a">${money(c.price)}</b>`)}
@@ -63,7 +62,7 @@ export function summarySection(list, kept, newVins, topVins) {
   return `<h2 style="font:600 16px system-ui;margin:30px 0 0;color:#0f172a">${esc(list.name)} <span style="color:#94a3b8;font-weight:400;font-size:14px">— ${kept.length} match${kept.length === 1 ? '' : 'es'}</span></h2>
     <div style="overflow-x:auto;margin-top:10px;border:1px solid #e8edf2;border-radius:10px">
     <table style="border-collapse:collapse;width:100%;background:#ffffff">
-      <thead><tr style="background:#f8fafc">${['Listed', 'Days on mkt', 'Year', 'Vehicle', 'Fuel', 'Price', '5-yr TCO', 'Miles', 'Location', 'Dealer'].map((t) => th(t, numeric.has(t) ? 'right' : 'left')).join('')}</tr></thead>
+      <thead><tr style="background:#f8fafc">${['Listed', 'Days on mkt', 'Vehicle', 'Fuel', 'Price', '5-yr TCO', 'Miles', 'Location', 'Dealer'].map((t) => th(t, numeric.has(t) ? 'right' : 'left')).join('')}</tr></thead>
       <tbody>${rows}</tbody>
     </table>
     </div>`;
@@ -169,8 +168,6 @@ const DETAIL_COLS = [
   ['interiorColor', (c) => c.interiorColor, 16, 'Interior Color'],
   ['cpo', (c) => c.cpo, 7, 'CPO'],
   ['vin', (c) => c.vin, 19, 'VIN'],
-  ['vdp', (c) => c.vdp, 46, 'Listing URL'],
-  ['primaryImage', (c) => c.primaryImage, 46, 'Photo URL'],
   ['carfaxUrl', (c) => c.carfaxUrl, 46, 'Carfax URL'],
 ];
 
@@ -207,12 +204,11 @@ export async function buildWorkbook(perList) {
     ws.columns = DETAIL_COLS.map(([n, , w, h]) => ({ header: h, key: n, width: w ?? 14 }));
     for (const c of cars) {
       const obj = Object.fromEntries(DETAIL_COLS.map(([n, f]) => [n, f(c)]));
-      for (const k of ['vdp', 'primaryImage', 'carfaxUrl']) {
-        const u = obj[k];
-        if (typeof u === 'string' && /^https?:/i.test(u)) obj[k] = { text: u, hyperlink: u };
-      }
+      // Vehicle name → clickable listing link (replaces the standalone URL column).
+      if (typeof c.vdp === 'string' && /^https?:/i.test(c.vdp)) obj.vehicle = { text: String(obj.vehicle ?? ''), hyperlink: c.vdp };
+      if (typeof obj.carfaxUrl === 'string' && /^https?:/i.test(obj.carfaxUrl)) obj.carfaxUrl = { text: obj.carfaxUrl, hyperlink: obj.carfaxUrl };
       const row = ws.addRow(obj);
-      for (const k of ['vdp', 'primaryImage', 'carfaxUrl']) {
+      for (const k of ['vehicle', 'carfaxUrl']) {
         const cell = row.getCell(k);
         if (cell.value && cell.value.hyperlink) cell.font = { color: { argb: 'FF2563EB' }, underline: true };
       }

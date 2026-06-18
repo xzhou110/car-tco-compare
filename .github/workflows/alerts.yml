@@ -1,0 +1,39 @@
+name: Deal Alerts
+
+# Twice daily (UTC) ≈ 7am / 7pm Pacific. Adjust as needed.
+on:
+  schedule:
+    - cron: '0 14 * * *'
+    - cron: '0 2 * * *'
+  workflow_dispatch: {}
+
+concurrency:
+  group: deal-alerts
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: rav4-alert
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install --no-audit --no-fund
+
+      - name: Refresh listings cache (Auto.dev → Supabase)
+        run: node cache-refresh.mjs
+        env:
+          AUTODEV_API_KEY: ${{ secrets.AUTODEV_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+
+      - name: Send subscriber digests
+        run: node alert-cron.mjs
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
