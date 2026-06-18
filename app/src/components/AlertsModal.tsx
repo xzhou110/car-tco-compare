@@ -120,13 +120,6 @@ export function AlertsModal({ open, onClose }: Props) {
     return [...set].sort();
   };
 
-  const toggleTrim = (i: number, trim: string) =>
-    setPrefs((rows) =>
-      rows.map((r, idx) =>
-        idx === i ? { ...r, trims: r.trims.includes(trim) ? r.trims.filter((t) => t !== trim) : [...r.trims, trim] } : r,
-      ),
-    );
-
   // Reset to a clean form each time the modal is freshly opened.
   useEffect(() => {
     if (open) {
@@ -303,25 +296,18 @@ export function AlertsModal({ open, onClose }: Props) {
                     const trims = trimOptionsFor(p);
                     if (trims.length === 0) return null;
                     return (
-                      <div className="alerts-field" style={{ gridColumn: '1 / -1' }}>
+                      <label className="alerts-field" style={{ gridColumn: '1 / -1' }}>
                         <span className="alerts-label">Trim (optional)</span>
-                        <div className="trim-chips">
-                          {trims.map((t) => {
-                            const on = p.trims.includes(t);
-                            return (
-                              <button
-                                key={t}
-                                type="button"
-                                className={`trim-chip${on ? ' on' : ''}`}
-                                aria-pressed={on}
-                                onClick={() => toggleTrim(i, t)}
-                              >
-                                {t}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
+                        <select
+                          value={p.trims[0] ?? ''}
+                          onChange={(e) => updatePref(i, { trims: e.target.value ? [e.target.value] : [] })}
+                        >
+                          <option value="">Any trim</option>
+                          {trims.map((t) => (
+                            <option key={t} value={t}>{t}</option>
+                          ))}
+                        </select>
+                      </label>
                     );
                   })()}
                 </div>

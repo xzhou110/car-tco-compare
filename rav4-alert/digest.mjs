@@ -31,12 +31,12 @@ const usageText = (c) => (c.historyKnown ? (c.usageType ?? '—') : 'unverified'
 // ---------- summary HTML (email body) ----------  Price is shown before Miles.
 export function summarySection(list, kept, newVins, topVins) {
   const th = (t, align = 'left') => `<th style="text-align:${align};padding:9px 12px;border-bottom:2px solid #e2e8f0;font:600 11px system-ui;letter-spacing:.03em;text-transform:uppercase;color:#64748b;white-space:nowrap">${t}</th>`;
-  const td = (t, extra = '') => `<td style="padding:10px 12px;border-bottom:1px solid #eef2f6;font:13px system-ui;color:#1e293b;vertical-align:top;${extra}">${t}</td>`;
+  const td = (t, extra = '') => `<td style="padding:10px 12px;border-bottom:1px solid #eef2f6;font-family:system-ui,-apple-system,sans-serif;font-size:13px;line-height:1.5;color:#1e293b;vertical-align:top;${extra}">${t}</td>`;
   const tdNum = (t, extra = '') => td(t, 'text-align:right;white-space:nowrap;' + extra);
 
   if (!kept.length) {
     return `<h2 style="font:600 16px system-ui;margin:30px 0 8px;color:#0f172a">${esc(list.name)}</h2>
-      <p style="font:13px system-ui;color:#94a3b8;margin:0">No current matches.</p>`;
+      <p style="font-family:system-ui,-apple-system,sans-serif;font-size:13px;line-height:1.5;color:#94a3b8;margin:0">No current matches.</p>`;
   }
 
   const rows = kept.map((c, i) => {
@@ -44,7 +44,7 @@ export function summarySection(list, kept, newVins, topVins) {
     const isNew = newVins.has(c.vin);
     const badge = isNew ? `<span style="background:#16a34a;color:#ffffff;border-radius:4px;padding:2px 6px;font:600 9px system-ui;letter-spacing:.04em;margin-left:6px;vertical-align:middle">NEW</span>` : '';
     const name = esc([c.year, c.make, c.model, c.trim].filter(Boolean).join(' '));
-    const carfax = c.carfaxUrl ? `<br><a href="${esc(c.carfaxUrl)}" style="font:11px system-ui;color:#94a3b8;text-decoration:none">carfax ↗</a>` : '';
+    const carfax = c.carfaxUrl ? `<br><a href="${esc(c.carfaxUrl)}" style="font-family:system-ui,-apple-system,sans-serif;font-size:11px;line-height:1.5;color:#94a3b8;text-decoration:none">carfax ↗</a>` : '';
     return `<tr style="${zebra}">
       ${td(`<span style="color:#64748b">${dateOnly(c.createdAt)}</span>`)}
       ${tdNum(`<span style="color:#64748b">${daysListed(c.createdAt)}</span>`)}
@@ -54,7 +54,6 @@ export function summarySection(list, kept, newVins, topVins) {
       ${tdNum(c.tco ? `<b style="${!topVins || topVins.has(c.vin) ? 'color:#0b6f66' : 'color:#1e293b'}">${money(Math.round(c.tco.total))}</b>` : '<span style="color:#cbd5e1">—</span>')}
       ${tdNum(`<span style="color:#475569">${num(c.miles)}</span>`)}
       ${td(`<span style="color:#475569">${esc(c.location)}</span>`)}
-      ${td(`<span style="color:#94a3b8">${esc(c.dealer)}</span>`)}
     </tr>`;
   }).join('');
 
@@ -62,7 +61,7 @@ export function summarySection(list, kept, newVins, topVins) {
   return `<h2 style="font:600 16px system-ui;margin:30px 0 0;color:#0f172a">${esc(list.name)} <span style="color:#94a3b8;font-weight:400;font-size:14px">— ${kept.length} match${kept.length === 1 ? '' : 'es'}</span></h2>
     <div style="overflow-x:auto;margin-top:10px;border:1px solid #e8edf2;border-radius:10px">
     <table style="border-collapse:collapse;width:100%;background:#ffffff">
-      <thead><tr style="background:#f8fafc">${['Listed', 'Days on mkt', 'Vehicle', 'Fuel', 'Price', '5-yr TCO', 'Miles', 'Location', 'Dealer'].map((t) => th(t, numeric.has(t) ? 'right' : 'left')).join('')}</tr></thead>
+      <thead><tr style="background:#f8fafc">${['Listed', 'Days on mkt', 'Vehicle', 'Fuel', 'Price', '5-yr TCO', 'Miles', 'Location'].map((t) => th(t, numeric.has(t) ? 'right' : 'left')).join('')}</tr></thead>
       <tbody>${rows}</tbody>
     </table>
     </div>`;
@@ -87,7 +86,7 @@ export function topTcoSection(cars, n = 10) {
     .slice(0, n);
   if (!ranked.length) return '';
   const th = (t, align = 'left') => `<th style="text-align:${align};padding:9px 12px;border-bottom:2px solid #cdeee9;font:600 11px system-ui;letter-spacing:.03em;text-transform:uppercase;color:#0b6f66;white-space:nowrap">${t}</th>`;
-  const td = (t, extra = '') => `<td style="padding:11px 12px;border-bottom:1px solid #eef2f6;font:13px system-ui;color:#1e293b;${extra}">${t}</td>`;
+  const td = (t, extra = '') => `<td style="padding:11px 12px;border-bottom:1px solid #eef2f6;font-family:system-ui,-apple-system,sans-serif;font-size:13px;line-height:1.5;color:#1e293b;${extra}">${t}</td>`;
   const tdNum = (t, extra = '') => td(t, 'text-align:right;white-space:nowrap;' + extra);
   const rows = ranked.map((c, i) => {
     const zebra = i % 2 ? 'background:#fafbfc;' : '';
@@ -104,7 +103,7 @@ export function topTcoSection(cars, n = 10) {
   }).join('');
   const numeric = new Set(['Price', '5-yr TCO', 'Miles', 'Days on mkt']);
   return `<h2 style="font:700 18px system-ui;margin:0 0 4px;color:#0f172a">🏆 Top ${ranked.length} — lowest 5-yr cost to own</h2>
-    <p style="font:12px system-ui;color:#94a3b8;margin:0 0 10px;line-height:1.5">Ranked across your preferences. 5-yr TCO = depreciation + fuel + insurance + maintenance + repairs + taxes (CA, 12k mi/yr, no financing).</p>
+    <p style="font-family:system-ui,-apple-system,sans-serif;font-size:12px;line-height:1.5;color:#94a3b8;margin:0 0 10px;line-height:1.5">Ranked across your preferences. 5-yr TCO = depreciation + fuel + insurance + maintenance + repairs + taxes (CA, 12k mi/yr, no financing).</p>
     <div style="overflow-x:auto;border:1px solid #d7ede9;border-radius:10px">
     <table style="border-collapse:collapse;width:100%;background:#ffffff">
       <thead><tr style="background:#f0faf8">${['#', 'Vehicle', 'Price', '5-yr TCO', 'Miles', 'Days on mkt', 'Location'].map((t) => th(t, numeric.has(t) ? 'right' : 'left')).join('')}</tr></thead>
@@ -114,13 +113,13 @@ export function topTcoSection(cars, n = 10) {
 }
 
 export function buildHtml(sections, opts = {}) {
-  const intro = opts.intro || `<p style="font:13px system-ui;color:#475569;margin:0">Your car deal alert · ${new Date().toLocaleString('en-US')}</p>`;
+  const intro = opts.intro || `<p style="font-family:system-ui,-apple-system,sans-serif;font-size:13px;line-height:1.5;color:#475569;margin:0">Your car deal alert · ${new Date().toLocaleString('en-US')}</p>`;
   const unsub = opts.unsubscribeUrl
     ? ` · <a href="${esc(opts.unsubscribeUrl)}" style="color:#94a3b8;text-decoration:underline">Unsubscribe</a>` : '';
   const header = `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse">
         <tr><td style="background:#0f9b8e;background-image:linear-gradient(135deg,#0f9b8e,#0b6f66);padding:22px 28px;border-radius:14px 14px 0 0">
           <span style="font:700 20px system-ui;color:#ffffff;letter-spacing:-.01em">🚗 Car Deal Alerts</span>
-          <div style="font:13px system-ui;color:#d6f1ee;margin-top:3px">Lowest 5-year cost-to-own picks, fresh from the market</div>
+          <div style="font-family:system-ui,-apple-system,sans-serif;font-size:13px;line-height:1.5;color:#d6f1ee;margin-top:3px">Lowest 5-year cost-to-own picks, fresh from the market</div>
         </td></tr>
       </table>`;
   return `<div style="background:#f1f5f9;margin:0;padding:24px 12px">
@@ -132,7 +131,7 @@ export function buildHtml(sections, opts = {}) {
             <div style="margin-bottom:6px">${intro}</div>
             ${sections.join('')}
             <hr style="border:none;border-top:1px solid #eef2f6;margin:28px 0 14px">
-            <p style="font:11px system-ui;color:#94a3b8;margin:0;line-height:1.6">History shown when available; "unverified" means we had no record — open the Carfax link to confirm. Full detail (every match, all columns) is in the attached spreadsheet, one tab per preference.${unsub}</p>
+            <p style="font-family:system-ui,-apple-system,sans-serif;font-size:11px;line-height:1.5;color:#94a3b8;margin:0;line-height:1.6">History shown when available; "unverified" means we had no record — open the Carfax link to confirm. Full detail (every match, all columns) is in the attached spreadsheet, one tab per preference.${unsub}</p>
           </td></tr>
         </table>
       </td></tr>

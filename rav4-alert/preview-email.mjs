@@ -64,8 +64,8 @@ const topVins = rankTopVins(allCars, 10);
 const newVins = new Set(allCars.map((c) => c.vin)); // preview: mark all NEW
 const sections = perWl.map(({ wl, kept }) => summarySection({ name: wl.name }, kept, newVins, topVins));
 const perList = perWl.map(({ wl, kept }) => ({ tab: wl.name, cars: kept }));
-const intro = `<p style="font:15px system-ui;margin:0 0 4px">Hi 👋</p>
-  <p style="font:13px system-ui;color:#444;margin:0 0 14px;line-height:1.5">Here are the lowest <b>total-cost-to-own</b> cars matching your ${PREFS.length} preferences right now. The 🏆 top 10 by 5-year cost are first, then a breakdown per preference; full detail is in the attached spreadsheet.</p>`;
+const intro = `<p style="font-family:system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.4;margin:0 0 6px">Hi 👋</p>
+  <p style="font-family:system-ui,-apple-system,sans-serif;font-size:13px;line-height:1.6;color:#444;margin:0 0 14px">Here are the lowest <b>total-cost-to-own</b> cars matching your ${PREFS.length} preferences right now. The 🏆 top 10 by 5-year cost are first, then a breakdown per preference; full detail is in the attached spreadsheet.</p>`;
 const html = buildHtml([topTcoSection(allCars, 10), ...sections], { intro, unsubscribeUrl: 'https://example.com/#/unsubscribe?token=demo' });
 const xlsx = await buildWorkbook(perList);
 
