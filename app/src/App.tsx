@@ -141,6 +141,7 @@ function MainApp() {
           <div>
             <h1>Car TCO Compare</h1>
             <p className="tagline">Know what a car <em>really</em> costs — not just the sticker price. Compare the 5-year total cost of ownership across up to 6 cars (new or used; gas, hybrid, or EV), then get the best-value deals emailed to you the moment they hit the market.</p>
+            <a className="brand-by" href="https://xuspark.com" target="_blank" rel="noopener noreferrer">by XuSpark&nbsp;↗</a>
           </div>
         </div>
         <div className="actions">
@@ -214,7 +215,8 @@ function MainApp() {
       </section>
 
       <footer className="foot">
-        Your inputs auto-save in this browser and sync to the URL — use 🔗 Share to send a comparison. Listings are an Auto.dev snapshot (best-effort — verify before buying); cost assumptions are illustrative.
+        <p className="foot-note">Your inputs auto-save in this browser and sync to the URL — use 🔗 Share to send a comparison. Listings are an Auto.dev snapshot (best-effort — verify before buying); cost assumptions are illustrative.</p>
+        <p className="foot-brand"><span aria-hidden="true">🚗</span> Car TCO Compare — a project by <a href="https://xuspark.com" target="_blank" rel="noopener noreferrer">XuSpark&nbsp;↗</a></p>
       </footer>
 
       <ListingModal

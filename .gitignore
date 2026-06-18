@@ -18,3 +18,7 @@ Thumbs.db
 # logs
 *.log
 npm-debug.log*
+
+# local build backups written by the listings scripts (the canonical data is
+# listings.json) — keep them on disk but never commit/ship them to Pages
+app/public/data/*.bak.json

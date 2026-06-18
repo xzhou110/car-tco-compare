@@ -1,15 +1,40 @@
-// Ported TCO engine — faithful JS mirror of the app's tco.ts + resolveVehicle.ts +
-// reference.ts + presets DEFAULT_ASSUMPTIONS, so the email's TCO matches the app.
-// Region defaults to CA (zip 94030). Listings are treated as 'used'.
+// Ported TCO engine — faithful JS mirror of the app's tco.ts + depreciation.ts +
+// resolveVehicle.ts + reference.ts + presets DEFAULT_ASSUMPTIONS, so the email's TCO
+// matches the app (incl. the value-retention depreciation curve and model-year-derived
+// age). Region defaults to CA (zip 94030). Listings are treated as 'used'.
 
 const clamp = (x, lo, hi) => Math.max(lo, Math.min(hi, x));
 const sum = (a) => a.reduce((p, c) => p + c, 0);
 
 export const DEFAULT_ASSUMPTIONS = {
-  holdingYears: 5, annualMiles: 12000, salesTaxRate: 0.07, registrationAnnual: 200,
-  fuelPricePerGallon: 3.75, electricityPricePerKWh: 0.16,
-  financing: { enabled: false, new: { downPct: 0.1, apr: 0.069, termYears: 5 }, used: { downPct: 0.15, apr: 0.099, termYears: 5 } },
+  holdingYears: 5, annualMiles: 12000, salesTaxRate: 0.09, registrationAnnual: 200,
+  fuelPricePerGallon: 6, electricityPricePerKWh: 0.35,
+  financing: { enabled: false, new: { downPct: 0.1, apr: 0.05, termYears: 5 }, used: { downPct: 0.15, apr: 0.099, termYears: 5 } },
 };
+
+// Value-retention curve (mirror of app/src/lib/depreciation.ts) — fraction of original
+// (age-0) value retained at each whole-year age, anchored to the Toyota RAV4 curve.
+const RETENTION_BY_AGE = [1.0, 0.86, 0.83, 0.8, 0.77, 0.72, 0.69, 0.57, 0.53, 0.52, 0.49];
+const BASELINE_DEP_RATE = 0.16; // depRate at which depFactor === 1.0 (RAV4 benchmark)
+const TAIL_SLOPE = -0.025, TAIL_FLOOR = 0.12, SALVAGE_FLOOR = 0.1;
+const lerp = (a, b, t) => a + (b - a) * t;
+
+function retentionAt(age) {
+  if (age <= 0) return 1;
+  const last = RETENTION_BY_AGE.length - 1;
+  if (age >= last) return Math.max(TAIL_FLOOR, RETENTION_BY_AGE[last] + (age - last) * Math.abs(TAIL_SLOPE) * -1);
+  const lo = Math.floor(age);
+  return lerp(RETENTION_BY_AGE[lo], RETENTION_BY_AGE[lo + 1], age - lo);
+}
+const depFactorFromRate = (rate) => (rate || 0) / BASELINE_DEP_RATE;
+const scaledRetention = (age, depFactor) => Math.max(SALVAGE_FLOOR, 1 - depFactor * (1 - retentionAt(age)));
+function estimateResale(price, ageNow, holdingYears, depFactor = 1) {
+  const ageNowC = Math.max(0, ageNow), saleAge = ageNowC + Math.max(0, holdingYears);
+  const now = scaledRetention(ageNowC, depFactor), sale = scaledRetention(saleAge, depFactor);
+  return clamp(now > 0 ? price * (sale / now) : 0, 0, price);
+}
+// Age "now" derived from the model year (auto-calculated, not stored).
+const vehicleAgeNow = (v, asOfYear = new Date().getFullYear()) => Math.max(0, asOfYear - (v.modelYear || asOfYear));
 
 const REFERENCE = {
   rates: {
@@ -27,8 +52,7 @@ const REFERENCE = {
 };
 
 function seedResaleValue(v, a) {
-  const rate = v.annualDepRate != null ? v.annualDepRate : v.condition === 'used' ? 0.12 : 0.16;
-  const resale = v.purchasePrice * Math.pow(1 - rate, a.holdingYears);
+  const resale = estimateResale(v.purchasePrice, vehicleAgeNow(v), a.holdingYears, depFactorFromRate(v.annualDepRate));
   return clamp(Math.round(resale / 100) * 100, 0, v.purchasePrice);
 }
 
@@ -62,9 +86,10 @@ export function computeTco(v, a) {
   const downPayment = (br.downPct || 0) * v.purchasePrice;
   const fin = financingSchedule(a.financing.enabled, v.purchasePrice + salesTax, downPayment, br.apr, br.termYears, Y);
   const energy = (totalMiles / Math.max(0.1, v.mpg)) * a.fuelPricePerGallon;
+  const ageNow = vehicleAgeNow(v);
   const repairByYear = [];
   for (let k = 0; k < Y; k++) {
-    const ageThatYear = v.ageAtPurchase + k;
+    const ageThatYear = ageNow + k;
     const milesThatYear = v.odometerAtPurchase + (k + 1) * M;
     const underWarranty = ageThatYear < v.warrantyYears && milesThatYear < v.warrantyMiles;
     repairByYear.push(underWarranty ? 0 : v.repairAnnual);
@@ -95,7 +120,7 @@ function resolveVehicle(src, regionKey) {
     purchasePrice: Number(src.purchasePrice) || 0,
     powertrain: src.powertrain,
     mpg: src.mpg || rate.mpg,
-    ageAtPurchase: Math.max(0, currentYear - (Number(src.year) || currentYear)),
+    modelYear: Number(src.year) || currentYear, // engine derives age "now" from this
     odometerAtPurchase: Number(src.mileage) || 0,
     resaleValue: null,
     annualDepRate: src.condition === 'used' ? rate.depRateUsed : rate.depRateNew,

@@ -72,6 +72,8 @@ Deno.serve(async (req: Request) => {
     <p>Confirm your email to start receiving your twice-daily, TCO-ranked digest:</p>
     <p style="margin:18px 0"><a href="${link}" style="background:#2563eb;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none">Confirm my subscription</a></p>
     <p style="font:12px system-ui;color:#888">Or paste this link: ${link}<br>If you didn't sign up, you can ignore this email.</p>
+    <hr style="border:none;border-top:1px solid #eee;margin:18px 0 12px">
+    <p style="font:11px system-ui;color:#aaa;margin:0">🚗 Car Deal Alerts — a project by <a href="https://xuspark.com" style="color:#2563eb;font-weight:600;text-decoration:none">XuSpark ↗</a></p>
   </div>`;
 
   const send = await fetch('https://api.resend.com/emails', {

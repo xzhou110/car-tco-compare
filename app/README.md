@@ -17,6 +17,7 @@ npm run preview  # serve the production build
 
 - Compare **1–6 cars** — start with one, add/remove, each with its own slot color.
 - **7-line Edmunds-style TCO**: depreciation, financing, fuel/energy, insurance, maintenance, repairs, taxes & fees (minus incentives).
+- **Curve-based depreciation** (`lib/depreciation.ts`): resale auto-seeds from a value-retention-by-age curve (RAV4-anchored), keyed off each car's **model year** + holding period.
 - **Warranty-aware repairs** — repairs are $0 while a car is within its age *and* mileage warranty, then kick in.
 - **Per-condition financing** (separate new vs. used brackets; down payment as % of price).
 - **Auto-save** to `localStorage` + **shareable URL** (state encoded in the hash) — close it and pick up later, or send a link.

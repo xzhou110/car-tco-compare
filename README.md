@@ -7,7 +7,7 @@ period and mileage, and see the real cost of ownership — not just the sticker 
 
 ### 🚗 [Open the live app →](https://xzhou110.github.io/car-tco-compare/)
 
-Runs in your browser — no install, no sign-up.
+Runs in your browser — no install, no sign-up. A project by **[XuSpark](https://xuspark.com)**.
 
 > ⚠️ **Listings** (price, mileage, year) are a *best-effort* snapshot scraped from
 > public listings — verify against the live listing before buying. **Cost assumptions**

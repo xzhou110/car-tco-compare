@@ -98,7 +98,12 @@ domain, so mail delivers to any subscriber — not just the account owner); over
 `digest.mjs` builds: a 🏆 **Top-10 by lowest 5-yr TCO** table, then one summary table
 per preference (named by the user's watchlist), and a single **.xlsx** attachment with
 one tab per preference. Vehicle names are clickable listing links (in both the email and
-the spreadsheet). TCO mirrors the web app's engine (`tco.mjs`, CA assumptions).
+the spreadsheet). TCO mirrors the web app's engine (`tco.mjs`, CA assumptions) — including
+the **value-retention depreciation curve** and **model-year-derived age** (kept in sync with
+`app/src/lib/depreciation.ts` + `tco.ts`), so the digest's ranking matches the app.
+
+**Branding:** every email (digest + double-opt-in confirmation) carries a *"a project by
+**[XuSpark](https://xuspark.com)**"* byline, matching the web app's header/footer attribution.
 
 **Unsubscribe:** every digest has a one-click **Unsubscribe** link in the footer →
 `#/unsubscribe?token=…` in the app → the `unsubscribe_all` RPC timestamps `unsubscribed_at`

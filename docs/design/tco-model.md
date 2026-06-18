@@ -8,6 +8,10 @@ Single source of truth for the production calculation engine
 The model is deliberately **rough and transparent** — big estimates, no false precision, every
 input user-overridable.
 
+> The email Deal-Alerts digest uses a faithful JS mirror of this engine
+> ([`rav4-alert/tco.mjs`](../../rav4-alert/tco.mjs)) — including the retention curve and
+> model-year-derived age — so the digest's TCO ranking matches the app. Keep the two in sync.
+
 > v0.3: depreciation moved from a flat declining-balance rate to an age-based **value-retention
 > curve** (RAV4-anchored); the per-car "Age now" input became **Model year** (age is now derived);
 > defaults refreshed (sales tax 9%, fuel $6.00/gal, electricity $0.35/kWh, new-car APR 5%).

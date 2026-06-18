@@ -119,7 +119,7 @@ export function buildHtml(sections, opts = {}) {
   const header = `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse">
         <tr><td style="background:#0f9b8e;background-image:linear-gradient(135deg,#0f9b8e,#0b6f66);padding:22px 28px;border-radius:14px 14px 0 0">
           <span style="font:700 20px system-ui;color:#ffffff;letter-spacing:-.01em">🚗 Car Deal Alerts</span>
-          <div style="font-family:system-ui,-apple-system,sans-serif;font-size:13px;line-height:1.5;color:#d6f1ee;margin-top:3px">Lowest 5-year cost-to-own picks, fresh from the market</div>
+          <div style="font-family:system-ui,-apple-system,sans-serif;font-size:13px;line-height:1.5;color:#d6f1ee;margin-top:3px">Lowest 5-year cost-to-own picks, fresh from the market · <a href="https://xuspark.com" style="color:#ffffff;text-decoration:underline;font-weight:600">by XuSpark</a></div>
         </td></tr>
       </table>`;
   return `<div style="background:#f1f5f9;margin:0;padding:24px 12px">
@@ -132,6 +132,7 @@ export function buildHtml(sections, opts = {}) {
             ${sections.join('')}
             <hr style="border:none;border-top:1px solid #eef2f6;margin:28px 0 14px">
             <p style="font-family:system-ui,-apple-system,sans-serif;font-size:11px;line-height:1.5;color:#94a3b8;margin:0;line-height:1.6">History shown when available; "unverified" means we had no record — open the Carfax link to confirm. Full detail (every match, all columns) is in the attached spreadsheet, one tab per preference.${unsub}</p>
+            <p style="font-family:system-ui,-apple-system,sans-serif;font-size:12px;line-height:1.5;color:#64748b;margin:14px 0 0">🚗 Car Deal Alerts — a project by <a href="https://xuspark.com" style="color:#0b6f66;font-weight:600;text-decoration:none">XuSpark ↗</a></p>
           </td></tr>
         </table>
       </td></tr>

@@ -272,6 +272,18 @@ input[type='number']::-webkit-inner-spin-button, input[type='number']::-webkit-o
 .howworks-caveat { color: var(--faint); }
 .foot code { background: var(--surface-2); padding: 1px 6px; border-radius: 5px; font-size: 11px; border: 1px solid var(--line); }
 .foot { text-align: center; color: var(--faint); font-size: 11.5px; margin-top: 10px; padding: 12px; }
+.foot-note { margin: 0; }
+.foot-brand { margin: 9px 0 0; font-size: 12px; font-weight: 500; color: var(--muted); }
+.foot-brand a { color: var(--accent); font-weight: 600; text-decoration: none; }
+.foot-brand a:hover { color: var(--accent-d); text-decoration: underline; }
+
+/* "by XuSpark" maker byline under the header tagline */
+.brand-by { display: inline-block; margin-top: 6px; font-size: 12.5px; font-weight: 600; letter-spacing: 0.01em; color: var(--accent); text-decoration: none; }
+.brand-by:hover { color: var(--accent-d); text-decoration: underline; }
+
+/* "by XuSpark" byline on the confirm / unsubscribe account pages */
+.account-by { display: block; margin-top: 14px; font-size: 12px; font-weight: 600; color: var(--accent); text-decoration: none; }
+.account-by:hover { color: var(--accent-d); text-decoration: underline; }
 
 /* header CTAs — Load a real car + Reset, equal size */
 .hdr-cta { min-width: 168px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; }

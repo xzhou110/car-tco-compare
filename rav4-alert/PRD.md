@@ -53,6 +53,8 @@ Near **zip 94030, 200-mile radius**, Toyota RAV4 Hybrid.
 
 ## 7. Output / email design
 - **Sender:** `Car Deal Alerts <alerts@send.xuspark.com>` (verified Resend domain — delivers to anyone).
+- **Branding:** digest + confirmation emails carry a *"a project by [XuSpark](https://xuspark.com)"* byline (header + footer), matching the web app's attribution.
+- **TCO methodology:** `tco.mjs` mirrors the app engine — value-retention depreciation curve + model-year-derived age + shared defaults (sales tax 9%, fuel $6/gal, electricity $0.35/kWh; CA region overlay for the digest).
 - **Recipient:** any subscriber (verifying the domain lifted the test-mode account-owner-only limit).
 - **Subject:** `RAV4 Hybrid alert — N matches (List 1: a, List 2: b) — <date>`
 - **Body (brief table, per list):** Listed date · Year · Vehicle (make model trim) ·

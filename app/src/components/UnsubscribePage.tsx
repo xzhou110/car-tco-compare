@@ -45,6 +45,7 @@ export function UnsubscribePage({ token }: Props) {
           <p className="account-msg">Something went wrong. Please try again in a moment.</p>
         )}
         <a className="btn account-home" href="#/">Back to Car TCO Compare</a>
+        <a className="account-by" href="https://xuspark.com" target="_blank" rel="noopener noreferrer">a project by XuSpark&nbsp;↗</a>
       </div>
     </div>
   );
