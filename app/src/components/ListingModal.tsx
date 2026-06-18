@@ -18,7 +18,8 @@ const usd = (n: number) => '$' + Math.round(n).toLocaleString('en-US');
 
 export function ListingModal({ open, snapshot, loading, region, addedCount, onRegionChange, onAdd, onClose }: Props) {
   const ref = useRef<HTMLDialogElement>(null);
-  const [q, setQ] = useState('');
+  const [make, setMake] = useState('');
+  const [model, setModel] = useState('');
   const [segment, setSegment] = useState('');
   const [condition, setCondition] = useState('');
   const [powertrain, setPowertrain] = useState('');
@@ -32,16 +33,21 @@ export function ListingModal({ open, snapshot, loading, region, addedCount, onRe
   }, [open]);
 
   const listings = snapshot?.listings ?? [];
+  const makes = useMemo(() => [...new Set(listings.map((l) => l.make).filter(Boolean))].sort(), [listings]);
+  const models = useMemo(
+    () => [...new Set(listings.filter((l) => !make || l.make === make).map((l) => l.model).filter(Boolean))].sort(),
+    [listings, make],
+  );
   const filtered = useMemo(
-    () => filterListings(listings, { q, segment, condition, powertrain, maxPrice: maxPrice ? +maxPrice : undefined }),
-    [listings, q, segment, condition, powertrain, maxPrice],
+    () => filterListings(listings, { make, model, segment, condition, powertrain, maxPrice: maxPrice ? +maxPrice : undefined }),
+    [listings, make, model, segment, condition, powertrain, maxPrice],
   );
   const shown = filtered.slice(0, 60);
 
   const note = loading
     ? 'Loading listings…'
     : snapshot
-      ? `${listings.length} real Autotrader listings · snapshot ${new Date(snapshot.generatedAt).toLocaleDateString()} · RAV4 · Highlander · CR-V (2020+)`
+      ? `${listings.length} real Auto.dev listings · snapshot ${new Date(snapshot.generatedAt).toLocaleDateString()} · RAV4 · Highlander · CR-V (2020+)`
       : 'Could not load listings — you can still add cars manually.';
 
   return (
@@ -62,7 +68,18 @@ export function ListingModal({ open, snapshot, loading, region, addedCount, onRe
 
         <div className="lm-body">
           <div className="lm-filters">
-            <input type="text" placeholder="Search make / model / trim" value={q} onChange={(e) => setQ(e.target.value)} />
+            <select value={make} onChange={(e) => { setMake(e.target.value); setModel(''); }}>
+              <option value="">Any make</option>
+              {makes.map((m) => (
+                <option key={m} value={m}>{m}</option>
+              ))}
+            </select>
+            <select value={model} onChange={(e) => setModel(e.target.value)}>
+              <option value="">Any model</option>
+              {models.map((m) => (
+                <option key={m} value={m}>{m}</option>
+              ))}
+            </select>
             <select value={segment} onChange={(e) => setSegment(e.target.value)}>
               <option value="">Any segment</option>
               {SEGMENT_LIST.map((s) => (

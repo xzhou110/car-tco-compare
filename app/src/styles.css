@@ -323,3 +323,32 @@ input[type='number']::-webkit-inner-spin-button, input[type='number']::-webkit-o
 .sk-badges { height: 14px; width: 70%; border-radius: 999px; }
 .sk-btn { height: 28px; width: 110px; margin-top: 2px; border-radius: 7px; }
 @keyframes skshimmer { to { transform: translateX(100%); } }
+
+/* deal-alerts modal */
+.lm-title.alerts-title::before { content: '🔔'; }
+.alerts-form { display: flex; flex-direction: column; gap: 14px; }
+.alerts-field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.alerts-label { font-size: 11.5px; font-weight: 600; color: var(--muted); }
+.alerts-field input { width: 100%; }
+.alerts-email { max-width: 360px; }
+.alerts-pref { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 12px 14px 14px; margin: 0; background: var(--surface-2); }
+.alerts-pref-legend { font-size: 12.5px; font-weight: 700; color: var(--ink); padding: 0 6px; display: inline-flex; align-items: center; gap: 8px; }
+.alerts-remove { border: 0; background: transparent; color: var(--faint); font-size: 13px; line-height: 1; width: 22px; height: 22px; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: background 0.12s ease, color 0.12s ease; }
+.alerts-remove:hover { color: var(--ink); background: var(--track); }
+.alerts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr)); gap: 10px 12px; }
+.alerts-check { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--ink); cursor: pointer; }
+.alerts-check input { width: auto; }
+.alerts-add { align-self: flex-start; }
+.alerts-error { margin: 0; color: var(--bad, #c0392b); font-size: 12.5px; font-weight: 600; }
+.alerts-foot { margin: 2px -22px -14px; border-top: 1px solid var(--line); }
+.alerts-success { text-align: center; padding: 26px 16px 30px; }
+.alerts-success-icon { width: 46px; height: 46px; margin: 0 auto 12px; border-radius: 999px; background: var(--good); color: #fff; font-size: 24px; display: inline-flex; align-items: center; justify-content: center; }
+.alerts-success-title { margin: 0 0 8px; font-size: 16px; font-weight: 800; color: var(--ink); }
+
+/* confirm / unsubscribe account pages (hash-routed) */
+.account-page { display: flex; align-items: center; justify-content: center; min-height: 70vh; padding: 24px 0; }
+.account-card { width: min(440px, 100%); text-align: center; padding: 32px 28px; }
+.account-card .logo { font-size: 40px; display: block; margin: 0 auto 14px; }
+.account-msg { margin: 0 0 20px; font-size: 16px; font-weight: 600; color: var(--ink); line-height: 1.5; }
+.account-msg.account-ok { color: var(--good); }
+.account-home { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }

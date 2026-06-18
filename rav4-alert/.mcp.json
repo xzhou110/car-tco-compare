@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "auto-dev": {
+      "command": "auto",
+      "args": ["--mcp"]
+    }
+  }
+}

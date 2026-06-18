@@ -14,7 +14,8 @@ export async function loadListingsSnapshot(): Promise<ListingsSnapshot | null> {
 }
 
 export interface ListingFilters {
-  q?: string;
+  make?: string;
+  model?: string;
   segment?: string;
   condition?: string;
   powertrain?: string;
@@ -22,12 +23,9 @@ export interface ListingFilters {
 }
 
 export function filterListings(listings: Listing[], f: ListingFilters): Listing[] {
-  const q = (f.q || '').toLowerCase().trim();
   return listings.filter((L) => {
-    if (q) {
-      const hay = `${L.year} ${L.make} ${L.model} ${L.trim || ''}`.toLowerCase();
-      if (!hay.includes(q)) return false;
-    }
+    if (f.make && L.make !== f.make) return false;
+    if (f.model && L.model !== f.model) return false;
     if (f.segment && L.segment !== f.segment) return false;
     if (f.condition && L.condition !== f.condition) return false;
     if (f.powertrain && L.powertrain !== f.powertrain) return false;

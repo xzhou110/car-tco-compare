@@ -1,0 +1,20 @@
+{
+  "name": "rav4-alert",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Twice-daily used-car listing alert (Toyota RAV4 Hybrid) — Auto.dev data source. POC stage.",
+  "scripts": {
+    "query": "node query.mjs",
+    "dump": "node dump.mjs",
+    "send": "node run.mjs",
+    "dry": "node run.mjs --dry",
+    "applistings": "node build-app-listings.mjs"
+  },
+  "dependencies": {
+    "@auto.dev/sdk": "*",
+    "@supabase/supabase-js": "^2.108.2",
+    "exceljs": "^4.4.0",
+    "resend": "*"
+  }
+}
