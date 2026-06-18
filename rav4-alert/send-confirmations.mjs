@@ -10,7 +10,9 @@ import { supabase } from './supabase/client.mjs';
 import { SETTINGS, APP_URL } from './config.mjs';
 
 if (!process.env.RESEND_API_KEY) { console.error('❌ RESEND_API_KEY not set.'); process.exit(1); }
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Strip any stray BOM/whitespace a mis-set secret may carry (a leading U+FEFF crashes the
+// Resend client when it builds the Authorization header).
+const resend = new Resend((process.env.RESEND_API_KEY || '').replace(/[^\x21-\x7E]/g, ''));
 
 const { data: subs, error } = await supabase.from('subscribers')
   .select('id,email,confirm_token')

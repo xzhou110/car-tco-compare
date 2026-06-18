@@ -23,12 +23,13 @@ Key idea: **one cached (model × region) tile serves all users** — alert sendi
 ## Signup form (in the app)
 
 `app/src/components/AlertsModal.tsx` — up to 3 preferences. Each preference uses
-**data-driven multi-select chips** sourced from the listings snapshot, so selections always
-match the data: **Make**, **Model**, **Trim**, and **Fuel type** are each **multi-select**
-(pick several values, OR'd together), **always shown** (usable before a model is picked),
-and scope to the makes/models chosen so far — plus Zip, Radius, Min/Max price, Min year,
-Max miles. ("Fuel type" is the user-facing label for the internal `powertrain` field — the
-car card uses the same wording.)
+**data-driven multi-select dropdowns** ([`MultiSelect.tsx`](../app/src/components/MultiSelect.tsx))
+sourced from the listings snapshot, so options always match the data: **Make**, **Model**,
+**Trim**, and **Fuel type** are each a **multi-select** dropdown (collapsed trigger →
+expand a scrollable checklist; pick several values, OR'd together), always shown, with
+options scoped to the makes/models chosen so far — plus Zip, Radius, Min/Max price, Min
+year, Max miles. ("Fuel type" is the user-facing label for the internal `powertrain`
+field — the car card uses the same wording.)
 
 On submit it calls the `start_subscription` RPC (upsert subscriber + replace watchlists, so
 **re-signup after unsubscribe works** instead of hitting the unique-email constraint), then
