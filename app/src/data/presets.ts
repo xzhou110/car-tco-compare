@@ -8,22 +8,27 @@ export const MAX_CARS = 6;
 export const DEFAULT_ASSUMPTIONS: Assumptions = {
   holdingYears: 5,
   annualMiles: 12000,
-  salesTaxRate: 0.07,
+  salesTaxRate: 0.09,
   registrationAnnual: 200,
-  fuelPricePerGallon: 3.75,
-  electricityPricePerKWh: 0.16,
+  fuelPricePerGallon: 6,
+  electricityPricePerKWh: 0.35,
   financing: {
     enabled: false,
-    new: { downPct: 0.1, apr: 0.069, termYears: 5 },
+    new: { downPct: 0.1, apr: 0.05, termYears: 5 },
     used: { downPct: 0.15, apr: 0.099, termYears: 5 },
   },
 };
 
+// Model year is the user-facing input; the engine derives age "now" from it. Presets
+// are anchored to the current year so "New" stays age 0 and "Used 3yr" stays 3yr old
+// as time passes (computed at module load, not hard-coded to a fixed year).
+const CURRENT_YEAR = new Date().getFullYear();
+
 // Kept intentionally short (2) — the classic new-vs-used pair. Users edit freely
 // and save their own cars (which appear, and are deletable, in each card's Load… menu).
 export const PRESETS: Vehicle[] = [
-  { id: 'rav4h-new', name: 'RAV4 Hybrid (New)', condition: 'new', purchasePrice: 38000, powertrain: 'hybrid', mpg: 39, miPerKWh: 0, ageAtPurchase: 0, odometerAtPurchase: 0, resaleValue: null, annualDepRate: 0.16, insuranceAnnual: 1600, maintenanceAnnual: 700, repairAnnual: 500, warrantyYears: 3, warrantyMiles: 36000, incentives: 0 },
-  { id: 'rav4h-used', name: 'RAV4 Hybrid (Used 3yr)', condition: 'used', purchasePrice: 28000, powertrain: 'hybrid', mpg: 39, miPerKWh: 0, ageAtPurchase: 3, odometerAtPurchase: 36000, resaleValue: null, annualDepRate: 0.12, insuranceAnnual: 1450, maintenanceAnnual: 900, repairAnnual: 800, warrantyYears: 3, warrantyMiles: 36000, incentives: 0 },
+  { id: 'rav4h-new', name: 'RAV4 Hybrid (New)', condition: 'new', purchasePrice: 38000, powertrain: 'hybrid', mpg: 39, miPerKWh: 0, modelYear: CURRENT_YEAR, odometerAtPurchase: 0, resaleValue: null, annualDepRate: 0.16, insuranceAnnual: 1600, maintenanceAnnual: 700, repairAnnual: 500, warrantyYears: 3, warrantyMiles: 36000, incentives: 0 },
+  { id: 'rav4h-used', name: 'RAV4 Hybrid (Used 3yr)', condition: 'used', purchasePrice: 28000, powertrain: 'hybrid', mpg: 39, miPerKWh: 0, modelYear: CURRENT_YEAR - 3, odometerAtPurchase: 36000, resaleValue: null, annualDepRate: 0.12, insuranceAnnual: 1450, maintenanceAnnual: 900, repairAnnual: 800, warrantyYears: 3, warrantyMiles: 36000, incentives: 0 },
 ];
 
 export const CATEGORY_LABELS: Record<CategoryKey, string> = {

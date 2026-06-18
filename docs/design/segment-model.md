@@ -48,7 +48,7 @@ Fields per row (feed the matching `Vehicle` fields):
 
 | field | feeds `Vehicle.` | notes |
 |---|---|---|
-| `annualDepRate` | `annualDepRate` | seeds resale via existing `seedResaleValue` |
+| `annualDepRate` | `annualDepRate` | scales the retention curve (`depFactor = rate / 0.16`); seeds resale via `seedResaleValue` → `estimateResale` |
 | `insuranceAnnual` | `insuranceAnnual` | base; × region `insuranceMultiplier` |
 | `maintenanceAnnual` | `maintenanceAnnual` | includes tires (per model doc) |
 | `repairAnnual` | `repairAnnual` | applies once out of warranty |
@@ -66,7 +66,9 @@ Illustrative slice (placeholders):
 
 > "Used" cars use a lower `depRate` (the first-year cliff is already behind them) — apply the
 > same `condition`-based default the engine already encodes (0.12 used vs 0.16 new) unless the
-> segment row overrides it.
+> segment row overrides it. The rate now acts as a **depth scale on the shared RAV4 retention
+> curve** (`depFactor = depRate / 0.16`), not a flat per-year drop — see
+> [`tco-model.md` §1](tco-model.md).
 
 ## 4. Region table — `region`
 
@@ -96,10 +98,12 @@ function resolveVehicle(
 ): Vehicle
 ```
 Rules:
-1. Start from `src` (price, mileage→odometer, year→age, powertrain, name).
+1. Start from `src` (price, mileage→odometer, **year→`modelYear`**, powertrain, name). Age "now"
+   is derived from `modelYear` by the engine, not stored.
 2. Look up `tables.rates[segment][powertrain]` → insurance/maint/repair/depRate/warranty.
 3. Apply `region.insuranceMultiplier` to insurance.
-4. Leave `resaleValue: null` → existing `seedResaleValue` computes it.
+4. Leave `resaleValue: null` → `seedResaleValue` computes it from the retention curve
+   (model year + holding period).
 5. Return a complete `Vehicle`; **nothing hidden** — every field is now editable in the card.
 
 `region` also overlays the location inputs onto `Assumptions` (fuel/elec/tax/registration).

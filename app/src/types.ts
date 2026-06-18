@@ -33,10 +33,10 @@ export interface Vehicle {
   powertrain: Powertrain;
   mpg: number; // gas/hybrid
   miPerKWh: number; // ev
-  ageAtPurchase: number;
+  modelYear: number; // age "now" is derived from this (currentYear − modelYear)
   odometerAtPurchase: number;
-  resaleValue: number | null; // null => auto-estimate
-  annualDepRate: number; // used to seed the resale estimate
+  resaleValue: number | null; // null => auto-estimate from the retention curve
+  annualDepRate: number; // scales the retention curve's loss (0.16 = RAV4 benchmark)
   insuranceAnnual: number;
   maintenanceAnnual: number; // rough, includes tires
   repairAnnual: number; // applies once out of warranty

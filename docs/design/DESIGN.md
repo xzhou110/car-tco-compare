@@ -78,9 +78,9 @@ keeps "math" and "pixels" cleanly separated.
   powertrain: 'gas' | 'hybrid' | 'ev',
   mpg,                 // gas/hybrid
   miPerKWh,            // ev
-  ageAtPurchase, odometerAtPurchase,
-  resaleValue,         // editable; auto-seeded if blank
-  annualDepRate,       // used for the resale seed
+  modelYear, odometerAtPurchase,   // age "now" is derived from modelYear (currentYear − modelYear)
+  resaleValue,         // editable; auto-seeded from the retention curve if blank
+  annualDepRate,       // scales the retention curve's loss (depFactor = rate / 0.16)
   insuranceAnnual,
   maintenanceBase, maintenanceGrowth,
   warrantyYears, warrantyMiles, repairBase, repairGrowth,

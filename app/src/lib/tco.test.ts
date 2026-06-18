@@ -93,7 +93,7 @@ describe('computeTco', () => {
   });
 });
 
-describe('seedResaleValue', () => {
+describe('seedResaleValue (retention curve)', () => {
   it('stays within [0, price] and falls as depreciation rate rises', () => {
     const v = preset('rav4h-new');
     const a = A();
@@ -101,6 +101,27 @@ describe('seedResaleValue', () => {
     expect(s).toBeGreaterThanOrEqual(0);
     expect(s).toBeLessThanOrEqual(v.purchasePrice);
     expect(seedResaleValue({ ...v, annualDepRate: 0.3 }, a)).toBeLessThan(s);
+  });
+
+  it('new RAV4 (depFactor 1.0) held 5yr retains ~72% per the curve', () => {
+    const v = preset('rav4h-new'); // modelYear = current year → age now 0; annualDepRate 0.16
+    const s = seedResaleValue(v, A());
+    expect(s).toBe(Math.round((v.purchasePrice * 0.72) / 100) * 100); // 38000 × 0.72 = 27400
+  });
+
+  it('falls as the holding period lengthens (older at sale ⇒ less resale)', () => {
+    const v = preset('rav4h-new');
+    const short = seedResaleValue(v, { ...A(), holdingYears: 3 });
+    const long = seedResaleValue(v, { ...A(), holdingYears: 8 });
+    expect(long).toBeLessThan(short);
+  });
+
+  it('an older car (earlier model year) of the same price seeds a lower resale', () => {
+    const a = A();
+    const now = new Date().getFullYear();
+    const newer = seedResaleValue({ ...preset('rav4h-new'), modelYear: now }, a);
+    const older = seedResaleValue({ ...preset('rav4h-new'), modelYear: now - 4 }, a);
+    expect(older).toBeLessThan(newer);
   });
 });
 

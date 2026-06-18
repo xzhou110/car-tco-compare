@@ -43,13 +43,26 @@ function defaults(): ComparisonState {
   };
 }
 
+/** Bring one saved/shared vehicle up to the current shape. Migrates the legacy
+ *  `ageAtPurchase` field to `modelYear` (age is now derived, not stored). */
+function normalizeVehicle(raw: any, shape: Vehicle): Vehicle {
+  const v: any = { ...clone(shape), ...raw, id: raw?.id ?? newId() };
+  if (typeof raw?.modelYear !== 'number') {
+    const currentYear = new Date().getFullYear();
+    const legacyAge = typeof raw?.ageAtPurchase === 'number' ? raw.ageAtPurchase : 0;
+    v.modelYear = currentYear - legacyAge;
+  }
+  delete v.ageAtPurchase; // drop the obsolete field so it can't go stale
+  return v as Vehicle;
+}
+
 /** Overlay saved data onto current defaults so older saves still get any new fields. */
 function hydrate(raw: any): ComparisonState | null {
   if (!raw || !raw.assumptions || !Array.isArray(raw.vehicles)) return null;
   if (raw.vehicles.length < MIN_CARS || raw.vehicles.length > MAX_CARS) return null;
   const assumptions = mergeAssumptions(raw.assumptions);
   const shape = PRESETS[0];
-  const vehicles: Vehicle[] = raw.vehicles.map((v: any) => ({ ...clone(shape), ...v, id: v.id ?? newId() }));
+  const vehicles: Vehicle[] = raw.vehicles.map((v: any) => normalizeVehicle(v, shape));
   return { assumptions, vehicles };
 }
 

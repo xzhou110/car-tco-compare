@@ -1,11 +1,16 @@
 # TCO Calculation Methodology
 
-**Status:** Draft v0.2 (simplified, Edmunds-style)
-**Last updated:** 2026-06-15
+**Status:** Draft v0.3 (retention-curve depreciation)
+**Last updated:** 2026-06-18
 
-Single source of truth for the calculation engine (`prototype/js/tco.js`). The model is
-deliberately **rough and transparent** — big estimates, no false precision, every input
-user-overridable.
+Single source of truth for the production calculation engine
+([`app/src/lib/tco.ts`](../../app/src/lib/tco.ts) + [`depreciation.ts`](../../app/src/lib/depreciation.ts)).
+The model is deliberately **rough and transparent** — big estimates, no false precision, every
+input user-overridable.
+
+> v0.3: depreciation moved from a flat declining-balance rate to an age-based **value-retention
+> curve** (RAV4-anchored); the per-car "Age now" input became **Model year** (age is now derived);
+> defaults refreshed (sales tax 9%, fuel $6.00/gal, electricity $0.35/kWh, new-car APR 5%).
 
 > v0.2 simplified from v0.1 per review: dropped small one-time fees (doc/title/initial
 > reg) and separate tire inputs (tires now folded into Maintenance); removed per-year
@@ -27,13 +32,35 @@ TotalTCO = Depreciation + Financing + Fuel/Energy + Insurance
 ```
 Depreciation = PurchasePrice − ResaleValue
 ```
-`ResaleValue` is editable; if blank we seed a default from a simple declining-balance curve:
+`ResaleValue` is editable; if blank we seed it from a **value-retention curve by age**
+(`app/src/lib/depreciation.ts`) rather than a flat rate — a car drops fast early, then levels
+off, which a flat `(1−rate)^Y` curve can't capture.
+
+**The curve** (`RETENTION_BY_AGE`) is the fraction of original (age-0) value retained at each
+whole-year age, anchored to the published **Toyota RAV4 depreciation curve** (a strong-
+retention benchmark):
+
+| age (yr) | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| retention | 100% | 86% | 83% | 80% | 77% | 72% | 69% | 57% | 53% | 52% | 49% |
+
+Linear-interpolated between whole years; past age 10 it keeps declining gently to a salvage
+floor (~12%).
+
+**Resale is priced off the purchase point** — the price you paid already reflects the value
+the car lost *before* you bought it, so we only count value lost from now until you sell:
 ```
-ResaleValue = PurchasePrice · (1 − annualDepRate) ^ Y      (rounded to $100)
-annualDepRate default: 16%/yr (new), 12%/yr (used)
+ageNow   = currentYear − modelYear                 // auto-derived from the model year
+saleAge  = ageNow + Y
+depFactor = annualDepRate / 0.16                   // 0.16 = RAV4 benchmark ⇒ depFactor 1.0
+ret(age) = max(0.10, 1 − depFactor · (1 − curve(age)))   // depFactor scales the LOSS
+ResaleValue = PurchasePrice · ret(saleAge) / ret(ageNow)   (clamped [0, price], rounded $100)
 ```
-The steep first-year drop is already behind a used car, so its ongoing rate is lower.
-(Heuristic — real curves are segment-specific; a v2 data task.)
+So a **new** RAV4 (`ageNow 0`, `depFactor 1`) held 5 yr seeds resale ≈ 72% of price; a faster-
+depreciating class (higher `annualDepRate` → `depFactor > 1`) loses proportionally more. Drive
+the estimate with the **model year** and **holding period**; override `ResaleValue` per car for
+an atypical vehicle. (Heuristic — the curve shape is RAV4-anchored; segment-specific curves are
+a future data task.)
 
 ### 2. Financing — split by condition (New vs Used)
 New and used loans differ a lot, so financing is **one global toggle with two brackets**.
@@ -126,12 +153,12 @@ resale-recovered, so it is *not* added again as a yearly line.)
 |---|---|
 | Holding period `Y` | 5 years |
 | Annual miles `M` | 12,000 |
-| Sales tax | 7.0% |
+| Sales tax | 9.0% |
 | Registration (est) | $200/yr |
-| Fuel price | $3.75/gal |
-| Electricity | $0.16/kWh |
-| Depreciation rate | 16% new / 12% used per yr |
-| **Financing — New** | 10% down · 6.9% APR · 5 yr |
+| Fuel price | $6.00/gal |
+| Electricity | $0.35/kWh |
+| Depreciation | RAV4-anchored retention curve; `annualDepRate` 0.16 (new) / 0.12 (used) scales it |
+| **Financing — New** | 10% down · 5.0% APR · 5 yr |
 | **Financing — Used** | 15% down · 9.9% APR · 5 yr |
 
 > **Source discipline:** every default is a heuristic starting point, not current market

@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { resolveVehicle, regionAssumptions, type ResolveInput } from './resolveVehicle';
+import { vehicleAgeNow } from './tco';
 import { DEFAULT_ASSUMPTIONS } from '../data/presets';
 
 const rav4Used: ResolveInput = {
@@ -39,9 +40,10 @@ describe('resolveVehicle', () => {
     expect(ev.annualDepRate).toBeCloseTo(0.18); // EV new rate for suv-compact
   });
 
-  it('derives age from the model year', () => {
+  it('stores the model year, from which age now is derived', () => {
     const v = resolveVehicle({ ...rav4Used, year: new Date().getFullYear() - 3 }, 'national');
-    expect(v.ageAtPurchase).toBe(3);
+    expect(v.modelYear).toBe(new Date().getFullYear() - 3);
+    expect(vehicleAgeNow(v)).toBe(3);
   });
 
   it('falls back to the segment default mpg when the listing omits it', () => {

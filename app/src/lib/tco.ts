@@ -1,14 +1,22 @@
 // Pure TCO calculation engine. No DOM, no I/O. Mirrors docs/design/tco-model.md.
 import type { Assumptions, ByCategory, FinancingBracket, TcoResult, Vehicle } from '../types';
+import { depFactorFromRate, estimateResale } from './depreciation';
 
-const clamp = (x: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, x));
 const sum = (a: number[]) => a.reduce((p, c) => p + c, 0);
 
-/** Default resale value from a simple declining-balance curve (rounded to $100). */
+/** The car's age "now", derived from its model year (auto-calculated, not stored). */
+export function vehicleAgeNow(v: Vehicle, asOfYear: number = new Date().getFullYear()): number {
+  return Math.max(0, asOfYear - (v.modelYear || asOfYear));
+}
+
+/**
+ * Default resale value from the value-retention curve (rounded to $100).
+ * Driven by the car's age now (from model year) + the holding period; the
+ * per-vehicle annualDepRate scales the curve for faster/slower-depreciating classes.
+ */
 export function seedResaleValue(v: Vehicle, a: Assumptions): number {
-  const rate = v.annualDepRate != null ? v.annualDepRate : v.condition === 'used' ? 0.12 : 0.16;
-  const resale = v.purchasePrice * Math.pow(1 - rate, a.holdingYears);
-  return clamp(Math.round(resale / 100) * 100, 0, v.purchasePrice);
+  const resale = estimateResale(v.purchasePrice, vehicleAgeNow(v), a.holdingYears, depFactorFromRate(v.annualDepRate));
+  return Math.max(0, Math.min(v.purchasePrice, Math.round(resale / 100) * 100));
 }
 
 interface Schedule {
@@ -70,9 +78,10 @@ export function computeTco(v: Vehicle, a: Assumptions): TcoResult {
       : (totalMiles / Math.max(0.1, v.mpg)) * a.fuelPricePerGallon;
   const energyPerYear = energy / Y;
 
+  const ageNow = vehicleAgeNow(v);
   const repairByYear: number[] = [];
   for (let k = 0; k < Y; k++) {
-    const ageThatYear = v.ageAtPurchase + k;
+    const ageThatYear = ageNow + k;
     const milesThatYear = v.odometerAtPurchase + (k + 1) * M;
     const underWarranty = ageThatYear < v.warrantyYears && milesThatYear < v.warrantyMiles;
     repairByYear.push(underWarranty ? 0 : v.repairAnnual);

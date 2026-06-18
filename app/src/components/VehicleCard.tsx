@@ -60,7 +60,7 @@ export function VehicleCard({ index, vehicle: v, color, removable, presets, prof
         <summary><span>Depreciation</span><span className="chev">›</span></summary>
         <div className="grid">
           <NumField label="Resale at sale" hint="blank = auto" pre="$" step={500} value={v.resaleValue} placeholder={String(resaleSeed)} onChange={(n) => update((d) => { d.resaleValue = n; })} />
-          <NumField label="Age now" suf="yr" step={1} value={v.ageAtPurchase} onChange={(n) => update((d) => { d.ageAtPurchase = n ?? 0; })} />
+          <NumField label="Model year" hint="drives resale" step={1} value={v.modelYear} onChange={(n) => update((d) => { d.modelYear = n != null ? Math.round(n) : new Date().getFullYear(); })} />
           <NumField label="Odometer" suf="mi" step={1000} value={v.odometerAtPurchase} onChange={(n) => update((d) => { d.odometerAtPurchase = n ?? 0; })} />
           <NumField label="Incentives" hint="credit" pre="$" step={250} value={v.incentives} onChange={(n) => update((d) => { d.incentives = n ?? 0; })} />
         </div>

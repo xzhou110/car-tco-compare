@@ -50,7 +50,7 @@ export function resolveVehicle(src: ResolveInput, regionKey: string): Vehicle {
     powertrain: src.powertrain,
     mpg: isEv ? 0 : src.mpg || rate.mpg,
     miPerKWh: isEv ? rate.miPerKWh ?? 3.5 : 0,
-    ageAtPurchase: Math.max(0, currentYear - (Number(src.year) || currentYear)),
+    modelYear: Number(src.year) || currentYear, // engine derives age "now" from this
     odometerAtPurchase: Number(src.mileage) || 0,
     resaleValue: null, // engine's seedResaleValue computes it
     annualDepRate: depRate,

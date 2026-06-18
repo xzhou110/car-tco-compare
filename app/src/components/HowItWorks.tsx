@@ -15,7 +15,10 @@ export function HowItWorks() {
         <ul>
           <li>
             <strong>Depreciation</strong> — the value the car loses while you own it (this is how the purchase price is
-            counted — see the note below).
+            counted — see the note below). We estimate the resale from a <strong>value-retention curve by age</strong>{' '}
+            (based on the Toyota RAV4 curve): a car drops fast in its early years, then levels off. So the resale depends
+            on the <strong>model year</strong> (how old it is now) and your <strong>holding period</strong> (how old
+            it'll be when you sell) — type your own resale figure into a car to override it.
           </li>
           <li>
             <strong>Financing</strong> — interest you pay on a loan ($0 if you pay cash).

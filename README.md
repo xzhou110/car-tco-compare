@@ -24,16 +24,21 @@ no-build [`prototype/`](prototype/) remains as the design reference.
 ## Features
 
 - **Load a real car** — a header button opens a modal of **real listings** (price, mileage,
-  year, trim) you can filter (make/model, segment, condition, fuel type, price, region) and
-  drop into the comparison. Every imported field stays editable.
+  year, trim) you can filter (make/model, **year**, segment, condition, fuel type, max price)
+  and drop into the comparison. Every imported field stays editable. (A region selector sets
+  which regional cost assumptions apply.)
+- **Deal alerts** — sign up (double opt-in, instant confirmation email) with up to 3 multi-select
+  preferences (make / model / trim / fuel type) and get a twice-daily, TCO-ranked digest of
+  matching cars. See [`rav4-alert/`](rav4-alert/).
 - **Compare 1–6 cars** side by side — start with one, add/remove freely, each with its own name and color.
 - **Edmunds-style 7-line TCO**: depreciation, financing, fuel/energy, insurance, maintenance, repairs, taxes & fees (minus incentives).
+- **Curve-based depreciation** — resale auto-estimates from a **value-retention-by-age curve** (anchored to the Toyota RAV4 curve), driven by each car's **model year** and your holding period; override per car anytime.
 - **Shared assumptions** (holding years, annual miles, tax, fuel/electricity price, financing) for an apples-to-apples comparison — and **save your own defaults**.
 - **Per-condition financing** — separate New vs Used down-payment %, APR, and term.
 - **Presets + saved cars** — load a built-in preset or a car you saved; **delete saved cars inline**.
 - **Results-first layout** — the verdict (ranked summary with total, $/yr, ¢/mi, and the winner) sits at the top, above the inputs.
 - **Cost breakdown** — a vertical stacked column per car, plus a cumulative-cost-over-time chart. Both are **interactive**: hover a breakdown segment to see its exact dollar value and share of the car's total spend, or hover the cumulative chart to snap a crosshair to the nearest year and read every car's running total at that point.
-- **Light / dark theme**, **auto-save** to your browser, and a **shareable URL** that encodes the whole comparison.
+- **Light / dark theme**, **auto-save** to your browser, and a **Share** button that builds a compact, compressed link encoding the whole comparison (the address bar stays clean — state lives in localStorage, not the URL).
 
 ## How the data works (two sets)
 
@@ -81,7 +86,7 @@ car-tco-compare/
     │   ├── lib/tco.ts              ← pure, typed calculation engine
     │   ├── lib/resolveVehicle.ts   ← listing + segment tables → Vehicle (pure)
     │   ├── lib/listings.ts         ← load + filter the snapshot
-    │   ├── lib/*.test.ts           ← Vitest unit suites (26 tests)
+    │   ├── lib/*.test.ts           ← Vitest unit suites (42 tests)
     │   ├── data/reference.ts       ← segment×powertrain + region tables
     │   ├── data/presets.ts         ← sample vehicles + defaults
     │   ├── components/             ← ListingModal, AssumptionsBar, VehicleCard, charts
@@ -97,7 +102,7 @@ car-tco-compare/
 cd app
 npm install
 npm run dev      # start the dev server
-npm test         # run the unit tests (26)
+npm test         # run the unit tests (42)
 npm run build    # type-check + production bundle
 ```
 
