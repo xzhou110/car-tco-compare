@@ -24,7 +24,7 @@ no-build [`prototype/`](prototype/) remains as the design reference.
 ## Features
 
 - **Load a real car** — a header button opens a modal of **real listings** (price, mileage,
-  year, trim) you can filter (make/model, segment, condition, powertrain, price, region) and
+  year, trim) you can filter (make/model, segment, condition, fuel type, price, region) and
   drop into the comparison. Every imported field stays editable.
 - **Compare 1–6 cars** side by side — start with one, add/remove freely, each with its own name and color.
 - **Edmunds-style 7-line TCO**: depreciation, financing, fuel/energy, insurance, maintenance, repairs, taxes & fees (minus incentives).
