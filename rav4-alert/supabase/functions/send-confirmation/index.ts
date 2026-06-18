@@ -18,7 +18,7 @@ const SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 // Resend reject the Authorization header).
 const RESEND_API_KEY = (Deno.env.get('RESEND_API_KEY') ?? '').replace(/[^\x21-\x7E]/g, '');
 const APP_URL = Deno.env.get('APP_URL') ?? 'https://xzhou110.github.io/car-tco-compare/';
-const SENDER = Deno.env.get('CONFIRM_SENDER') ?? 'RAV4 Alerts <onboarding@resend.dev>';
+const SENDER = Deno.env.get('CONFIRM_SENDER') ?? 'Car Deal Alerts <alerts@send.xuspark.com>';
 
 const CORS: Record<string, string> = {
   'Access-Control-Allow-Origin': '*',

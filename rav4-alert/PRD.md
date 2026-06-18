@@ -52,8 +52,8 @@ Near **zip 94030, 200-mile radius**, Toyota RAV4 Hybrid.
   *not* hard-drop on missing data, or the list would be empty.
 
 ## 7. Output / email design
-- **Sender (POC):** `onboarding@resend.dev` (Resend shared domain — no domain setup).
-- **Recipient (POC):** the Resend account email (free tier limit until a domain is verified).
+- **Sender:** `Car Deal Alerts <alerts@send.xuspark.com>` (verified Resend domain — delivers to anyone).
+- **Recipient:** any subscriber (verifying the domain lifted the test-mode account-owner-only limit).
 - **Subject:** `RAV4 Hybrid alert — N matches (List 1: a, List 2: b) — <date>`
 - **Body (brief table, per list):** Listed date · Year · Vehicle (make model trim) ·
   Fuel · Miles · Price · Location (city, state) · Dealer · Accident · Usage.

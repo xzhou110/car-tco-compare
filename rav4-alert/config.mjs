@@ -5,8 +5,8 @@ export const APP_URL = process.env.APP_URL || 'https://xzhou110.github.io/car-tc
 export const SETTINGS = {
   zip: '94030',
   radius: '200',
-  sender: 'RAV4 Alerts <onboarding@resend.dev>', // Resend shared domain (POC)
-  recipient: 'pastnoefuture@gmail.com',           // Resend test mode → account owner only
+  sender: 'Car Deal Alerts <alerts@send.xuspark.com>', // verified Resend domain (delivers to anyone)
+  recipient: 'pastnoefuture@gmail.com',           // default preview recipient (any address now works)
   emailMode: 'all',  // 'all' = show every current match (NEW badged) | 'new-only'
   maxPages: 25,
 };

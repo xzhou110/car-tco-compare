@@ -74,6 +74,9 @@ npx supabase secrets set RESEND_API_KEY=re_xxx --project-ref <ref>     # SUPABAS
 It reads the confirm token with the service role, sends via Resend, and stamps
 `confirmation_sent_at` so the cron never double-sends. `verify_jwt` stays **on** (the
 browser's publishable key passes the gateway). `send-confirmations.mjs` is the fallback.
+The from-address is **`Car Deal Alerts <alerts@send.xuspark.com>`** (a verified Resend
+domain, so mail delivers to any subscriber — not just the account owner); override via the
+`CONFIRM_SENDER` secret. The cron's sender lives in `config.mjs` (`SETTINGS.sender`).
 
 ## Scripts
 
@@ -122,7 +125,8 @@ wave + midday adds), not evenly spread; GitHub cron is fixed UTC, so in PST they
 
 ## Before public launch
 
-- **Resend domain verification** — until done, mail only delivers to the account owner.
+- ✅ **Resend domain verified** — `send.xuspark.com` (DKIM + SPF + return-path MX). Emails now
+  deliver to **any** subscriber, sent from `alerts@send.xuspark.com`.
 - **Auto.dev commercial license** — before charging / serving many users.
 - **Deploy** the web app (off GitHub Pages if you want server features) and enable the cron.
 - **Production cache-refresh** to backfill `lat/lng` (radius filtering), history, and
