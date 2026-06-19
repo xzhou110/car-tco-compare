@@ -1,6 +1,6 @@
 # RUN_LOG — Deal Alerts Phase 2
 
-- **2026-06-17 — orchestrator (inline):** triage = MULTI-DOMAIN, build inline + one reviewer pass (see DECISIONS D1). Created STATE/DECISIONS/RUN_LOG.
+- **2026-06-17 — orchestrator (inline):** triage = MULTI-DOMAIN, build inline + one reviewer pass (rationale: cold agents would re-derive context the orchestrator already held; spawned only the reviewer, for independent value). Created the build logs.
 - **2026-06-17 — orchestrator (inline):** built+verified alert-cron.mjs, seed-watchlists.mjs, cache-refresh.mjs, .github/workflows/alerts.yml. VERIFIED: seeded 2 watchlists; cron dry=18 matches/17 new; real send id 58489bed (0 Auto.dev calls); 2nd run=0 new (new-diff works); cache-refresh 1-page smoke test enriched 20 rows, expire=0, cache=1863. ✅
 - **2026-06-17 — SPAWN frontend-engineer (opus):** build the subscribe-form modal in app/ (anon insert subscriber+≤3 watchlists). Input: schema.sql, ListingModal.tsx pattern, App.tsx. Output: DealAlertSignup component + supabase browser client + App wiring + typecheck.
 - **2026-06-17 — SPAWN reviewer (opus):** review new backend (alert-cron/cache-refresh/seed-cache/seed-watchlists/client.mjs + digest/tco/autodev edits). Output: review-findings.md.

@@ -1,6 +1,6 @@
 /*
  * SET 2 — Reference assumption tables (segment-based). Prototype data.
- * Mirrors docs/design/segment-model.md. Plain global script.
+ * Mirrors docs/design/ARCHITECTURE.md §6. Plain global script.
  * Globals: REFERENCE, SEGMENT_LIST, REGION_LIST.
  *
  * ALL NUMBERS ILLUSTRATIVE PLACEHOLDERS — to be sourced from Edmunds True Cost

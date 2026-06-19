@@ -1,6 +1,6 @@
 /*
  * SET 2 — resolveVehicle(): turn a listing/segment pick + region into a full Vehicle.
- * PURE function, no DOM. Mirrors docs/design/segment-model.md §6.
+ * PURE function, no DOM. Mirrors docs/design/ARCHITECTURE.md §6.
  * Globals: resolveVehicle, regionAssumptions, bodyClassToSegment, PROVENANCE.
  *
  * The returned vehicle tags each field's provenance in a parallel PROVENANCE map

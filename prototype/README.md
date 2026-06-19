@@ -45,4 +45,4 @@ python -m http.server 8000
 - No lease modeling yet (planned for the production app).
 - Up to 6 cars at once.
 
-See [`../docs/PRD.md`](../docs/PRD.md) and [`../docs/design/DESIGN.md`](../docs/design/DESIGN.md) for the full plan.
+See [`../docs/PRD.md`](../docs/PRD.md) and [`../docs/design/ARCHITECTURE.md`](../docs/design/ARCHITECTURE.md) for the full plan.

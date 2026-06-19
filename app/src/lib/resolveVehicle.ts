@@ -1,5 +1,5 @@
 // Set 2 — resolveVehicle(): turn a listing/segment pick + region into a full Vehicle.
-// PURE, no DOM. Mirrors docs/design/segment-model.md §6. Unit-tested.
+// PURE, no DOM. Mirrors docs/design/ARCHITECTURE.md §6. Unit-tested.
 import type { Assumptions, Condition, Powertrain, SegmentKey, Vehicle } from '../types';
 import { REFERENCE, type PowertrainOverride, type RateRow } from '../data/reference';
 import { newId } from '../data/presets';

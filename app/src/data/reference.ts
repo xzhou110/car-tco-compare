@@ -1,5 +1,5 @@
 // Set 2 — Reference assumption tables (segment-based). Bundled in the app.
-// Mirrors docs/design/segment-model.md. ALL NUMBERS ILLUSTRATIVE PLACEHOLDERS —
+// Mirrors docs/design/ARCHITECTURE.md §6. ALL NUMBERS ILLUSTRATIVE PLACEHOLDERS —
 // to be sourced from Edmunds True Cost to Own + AAA. `mpg`/`miPerKWh` here are
 // stand-ins used only when a listing doesn't supply its own EPA figure.
 import type { Powertrain, SegmentKey } from '../types';

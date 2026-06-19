@@ -42,7 +42,7 @@ src/
 
 The engine has **no DOM dependency**, so it's tested in isolation and could be reused
 server-side. See [`../docs/design/tco-model.md`](../docs/design/tco-model.md) for the formulas
-and [`../docs/design/ui-handoff.md`](../docs/design/ui-handoff.md) for design tokens.
+and [`../docs/design/ARCHITECTURE.md`](../docs/design/ARCHITECTURE.md) for architecture + design tokens.
 
 > All built-in numbers are illustrative heuristics — verify depreciation, incentives,
 > insurance, and APRs against live sources before relying on a result.

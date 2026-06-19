@@ -1,168 +1,152 @@
-# Product Requirements Document — Car TCO Compare
+# Product Requirements — Car TCO Compare
 
-**Status:** Draft v0.2 (for review)
-**Owner:** xzhou
-**Last updated:** 2026-06-15
+**Status:** Consolidated v1.0 · **Owner:** xzhou · **Last updated:** 2026-06-18
 
-> **v0.2 changes (from prototype review):**
-> - **Simplified to Edmunds-style 7 lines** — Depreciation, Financing, Fuel/energy, Insurance, Maintenance, Repairs, Taxes & fees. Dropped small one-time fees (doc/title/initial reg) and separate tire inputs (tires fold into Maintenance). Rough estimates, no precision chase.
-> - **Compare 2–6 cars** (was 2): start at 2, **+ Add** up to 6, each removable.
-> - **Save/load car profiles** to the browser (localStorage) by nickname.
-> - **Financing split into New vs Used brackets** (different down% / APR / term); **down payment is a % of price**, not a dollar amount.
-> - **Cumulative chart starts at the purchase price** and recovers resale at sale.
+> **The single, canonical PRD.** It consolidates the former `PRD.md` (core calculator) +
+> `PRD-data-layer.md` (real-listings data layer) + the Deal-Alerts docs (`rav4-alert/PRD.md`,
+> `PHASE2.md`, `STATE.md`, `DECISIONS.md`), which have been removed. Technical detail lives in
+> [`design/ARCHITECTURE.md`](design/ARCHITECTURE.md) (system/data/backend) and
+> [`design/tco-model.md`](design/tco-model.md) (every formula). The Deal-Alerts subproject keeps
+> its own current operational guide at [`../rav4-alert/README.md`](../rav4-alert/README.md), and its
+> open code-review items at [`../rav4-alert/review-findings.md`](../rav4-alert/review-findings.md).
 
 ---
 
-## 1. Problem & Motivation
+## 1. What it is (today, live)
 
-Most car buyers anchor on the wrong number: **sticker price** or **monthly payment**.
-The decision that actually matters is **Total Cost of Ownership (TCO)** — what the car
-costs you, net, from the day you buy it to the day you sell it.
+A **transparent, editable, side-by-side Total-Cost-of-Ownership calculator** for car buyers, live as a free static SPA on GitHub Pages (Vite + React + TS) with a pure, unit-tested engine. It has grown into **three pillars**:
 
-A car that is $8,000 cheaper up front can easily be *more* expensive to own once you
-account for depreciation, financing interest, fuel/charging, insurance, maintenance,
-out-of-warranty repairs, tires, and resale value. The two questions buyers can't easily
-answer today:
+1. **The calculator** — compare 1–6 vehicles on an Edmunds-style 7-line TCO under *your* holding period, mileage, region, and financing. Numbers are the hero; nothing is a black box; every input is editable.
+2. **The real-listing data layer** — "Load a real car" pulls live listings (Toyota RAV4/Hybrid, Toyota Highlander/Hybrid, Honda CR-V/Hybrid; 2020+; ~1,600 cars) from the **Auto.dev API**, normalizes them to a snapshot shipped with the build, and drops a real car into a comparison with price/mileage/year/efficiency prefilled.
+3. **Deal alerts** — an email backend (Supabase + Resend + GitHub Actions cron) where a visitor signs up (double opt-in, instant confirmation) with up to 3 multi-select preferences and gets a twice-daily, TCO-ranked digest of matching cars.
 
-1. **New vs. Used** — Is taking the depreciation hit on a new car worth the warranty
-   coverage and lower repair risk, versus buying used where someone else ate the
-   depreciation but you take on repair risk?
-2. **Car A vs. Car B** — Across two specific vehicles, which is genuinely cheaper to own
-   over *my* holding period and *my* annual mileage?
+A project by **XuSpark** (xuspark.com). License today: **PolyForm Noncommercial 1.0.0** (source-available; commercial rights reserved by the owner).
 
-There are scattered calculators online (Edmunds True Cost to Own, KBB 5-Year Cost to
-Own), but they are black boxes, US-market-locked to specific trims, not editable, and
-don't let you put two arbitrary vehicles side by side with **your own assumptions**.
+## 2. Problem & motivation
 
-## 2. Goal
+Buyers anchor on the wrong number — **sticker price** or **monthly payment** — when the decision that matters is **TCO**: net cost from purchase to resale (depreciation, financing interest, fuel/energy, insurance, maintenance, out-of-warranty repairs, taxes & fees, minus incentives). A car $8k cheaper up front can cost *more* to own.
 
-A transparent, editable, side-by-side TCO calculator where the user can:
+Two questions buyers can't easily answer today:
+1. **New vs. Used** — is the new-car depreciation hit worth the warranty/lower repair risk vs. used (someone else ate depreciation, you take repair risk)?
+2. **Car A vs. Car B** — over *my* holding period and *my* miles, which is genuinely cheaper to own?
 
-- Compare **1 to 6 vehicles** at once (any mix of new/used, gas/hybrid/EV) — a single car works for a standalone TCO.
-- Set **shared ownership assumptions** (holding period, annual miles, tax rate, fuel/energy prices, financing).
-- Override **every cost input** per vehicle — nothing is a hidden black box.
-- **Save cars** and reload them later (browser storage).
-- See a clear **winner (cheapest), per-car total, cost/year, and cost/mile**, plus a **cost breakdown** and a **per-year cumulative cost** view.
+Existing calculators (Edmunds TCO, KBB 5-Year Cost to Own) are black boxes, locked to specific trims, not editable, and won't put arbitrary vehicles side by side under your assumptions.
 
-### Non-goals (v1)
-
-- Live market pricing / VIN decode / Carfax integration (manual entry first; APIs later).
-- Lease vs. buy modeling (buy/finance only in v1; lease is a fast-follow).
-- Cloud accounts / multi-user sync (local-browser save only in v1).
-- More than 6 vehicles at once.
-
-## 3. Target Users & Use Cases
+## 3. Users & use cases
 
 | Persona | Need |
 |---|---|
-| **Pragmatic shopper** (primary) | "Should I buy this 3-year-old CPO or a new one?" |
-| **Two-finalists buyer** | "RAV4 Hybrid vs. CR-V Hybrid — which is cheaper to live with for 7 years?" |
-| **EV-curious buyer** | "Does the fuel savings on an EV offset the higher purchase price and depreciation?" |
-| **Long-hold owner** | "I keep cars 10 years / 150k miles — does that change the answer?" |
+| **Pragmatic shopper** (primary) | "Should I buy this 3-yr-old CPO or a new one?" → filters used compact SUVs under $30k, compares the best three |
+| **Two-finalists buyer** | "RAV4 Hybrid vs. CR-V Hybrid for 7 years — which is cheaper to live with?" → drops both real listings, compares *their* prices |
+| **EV-curious buyer** | "Does EV fuel savings offset higher price + depreciation?" |
+| **Long-hold owner** | "I keep cars 10 yr / 150k mi — does that flip the answer?" |
+| **Hands-off hunter** | "Email me when a matching deal hits the market." → Deal Alerts |
+| **Skeptic** | "Where did $1,600 insurance come from?" → sees the segment source, edits it |
 
-## 4. User Stories
+## 4. Goals & non-goals
 
-1. As a buyer, I can pick two preset vehicles and immediately see a TCO comparison, so I get value in <10 seconds.
-2. As a buyer, I can edit any number (price, MPG, insurance, resale, APR…) and watch the result update live.
-3. As a buyer, I can change the **holding period** and **annual miles** and see how the winner flips.
-4. As a buyer, I can see **where the money goes** (depreciation vs. fuel vs. maintenance…) so I understand *why* one wins.
-5. As a buyer, I can model **financing** (down payment, APR, term) or pay cash, and see interest cost separately.
-6. As a buyer, I can compare a **gas car vs. an EV/hybrid** with the right energy math (MPG vs. mi/kWh).
-7. As a buyer, I can reset to defaults or clear and start over.
+**Goals**
+- Compare **1–6 vehicles** (any mix of new/used, gas/hybrid/EV); a single car works as a standalone TCO.
+- **Shared assumptions** (holding period, annual miles, tax, fuel/electricity, financing, region) for an apples-to-apples view.
+- Override **every** cost input per vehicle — no hidden math.
+- **Load real cars** with believable, sourced, segment-based ownership-cost defaults.
+- Clear **winner / per-car total / cost-per-year / cost-per-mile**, plus a cost breakdown and a per-year cumulative view.
+- Save cars locally; share a comparison via a compact link.
+- Hands-off **deal alerts** by email.
 
-## 5. Functional Requirements
+**Non-goals (current)**
+- Live per-keystroke listing search in the hosted app (snapshot is scheduled, not per-request).
+- Lease vs. buy modeling (fast-follow).
+- Cloud accounts / multi-user sync for the calculator (local-browser save only; the alert backend has its own subscriber store).
+- Cars.com / CarGurus / Carfax / private-party data, paid unblockers.
+- More than 6 vehicles at once.
 
-### 5.1 Shared assumptions (apply to every vehicle)
-- Holding period (years) — default 5
-- Annual miles driven — default 12,000
-- Sales tax rate (%) — applied to purchase price
-- Fuel price ($/gal) and electricity price ($/kWh)
-- Financing: pay cash toggle; if financing → down payment, APR, loan term
+## 5. Functional requirements
+
+### 5.1 Shared assumptions
+Holding years (def 5) · annual miles (def 12,000) · sales tax (def 9%) · fuel $/gal (def 6.00) · electricity $/kWh (def 0.35) · registration $/yr (def 200) · financing (global toggle, **New vs Used brackets**: down %, APR, term) · region overlay (fuel/elec/tax/registration/insurance multiplier).
 
 ### 5.2 Per-vehicle inputs
-- Label / nickname, and a New / Used / CPO tag
-- Purchase price
-- Powertrain type: Gas / Hybrid / EV
-- Efficiency: MPG (gas/hybrid) **or** mi/kWh (EV)
-- Vehicle age at purchase (years) and odometer at purchase
-- Estimated resale value at end of holding period (auto-estimated, user-editable)
-- Annual insurance premium
-- Annual maintenance (base) + how fast it grows with age
-- Warranty remaining (years / miles) — suppresses repair cost while in force
-- Annual repair estimate once out of warranty
-- Tire set cost + tire life (miles)
-- One-time fees (doc, title, registration) + annual registration
-- Incentives / rebates / tax credits (reduces TCO)
+Name · condition (new/used/CPO) · purchase price · powertrain (gas/hybrid/EV) · efficiency (MPG or mi/kWh) · **model year** (age derived) · odometer at purchase · resale value (auto-seeded from the retention curve, editable) · `annualDepRate` (scales the curve) · annual insurance · annual maintenance (tires folded in) · warranty years/miles (suppress repairs while in force) · annual repairs (out of warranty) · incentives.
 
-### 5.3 Outputs
-- **Total TCO** for each vehicle over the holding period
-- **Cost per year** and **cost per mile**
-- **Winner banner** (above the cards) naming the cheapest car + its total
-- **Cost breakdown** (depreciation, financing, fuel/energy, insurance, maintenance, repairs, taxes & fees) as a **vertical stacked column per car** — taller = costs more, components stacked bottom-to-top in a fixed order/color, category legend at the bottom
-- **Cumulative cost over time** (per-year line/area), so the user sees crossover points
-- Net price drivers called out (e.g., "Depreciation is 47% of the gap")
+### 5.3 Real-listing data layer
+- "Load a real car" modal: filter by make/model, **year**, segment, condition, fuel type, max price, region → "add to compare" populates a card via `resolveVehicle()` and the existing slot, with imported fields tagged **sourced** until edited.
+- A "listings as of \<date\>" note; graceful fallback to bundled presets if the snapshot is missing.
+- `resolveVehicle(listing, region, tables) → Vehicle` is pure and unit-tested; leaves `resaleValue: null` so the engine seeds it.
 
-### 5.4 Behaviors
-- All results recompute **live** on any input change.
-- "Reset to preset" and "Load preset" actions.
-- Sensible defaults so the tool is useful before the user touches anything.
-- Input validation (no negative prices, MPG > 0, etc.) with inline hints.
+### 5.4 Outputs
+Total TCO · cost/year · cost/mile · **winner banner** (cheapest, above the cards) · **cost breakdown** (vertical stacked column per car, 7 components, interactive tooltips) · **cumulative cost over time** (per-year, recovers resale at sale, interactive crosshair). All recompute live.
 
-## 6. The TCO Model (summary)
+### 5.5 Deal alerts
+- Subscribe form (email + up to 3 named multi-select preferences: make / model / trim / fuel type; min/max price; RAV4-only "XLE and above").
+- **Double opt-in** (instant confirmation email via Supabase Edge Function → Resend, idempotent) + unsubscribe + idempotent re-subscribe.
+- Twice-daily cron: refresh the listings cache (Auto.dev → Supabase), filter per watchlist, compute TCO (a faithful mirror of the app engine), rank, diff vs. sent-state, email **new** matches only — a brief per-preference table + a detailed XLSX/CSV sheet.
+- **API calls scale with models × regions, not users** (cache filled once; each user is a DB filter).
 
-Full methodology and formulas live in [`docs/design/tco-model.md`](design/tco-model.md).
-At a glance, **Total TCO =**
+### 5.6 Honesty / liability (cross-cutting)
+- Listings are best-effort snapshots — "verify against the live listing before buying."
+- Cost assumptions are illustrative segment estimates — "verify against real quotes." Every default is a heuristic, labeled, dated, and editable. No false precision; no asserted authority.
 
-```
-  Depreciation            (purchase price − resale value)
-+ Financing interest      (interest paid during holding period)
-+ Energy                  (fuel or electricity over all miles)
-+ Insurance               (annual premium × years)
-+ Maintenance             (base, growing with vehicle age)
-+ Repairs                 (0 while under warranty; grows after)
-+ Tires                   (sets needed over miles driven)
-+ Taxes & fees            (sales tax + doc/title + annual registration)
-− Incentives              (rebates / tax credits)
-```
+## 6. The TCO model (summary)
 
-**Key insight the tool must make obvious:** new cars usually win on
-maintenance/repairs/warranty but lose on depreciation; used cars usually win on
-depreciation but lose on repair risk. The crossover depends on holding period and miles.
+`TotalTCO = Depreciation + Financing + Fuel/Energy + Insurance + Maintenance + Repairs + Taxes & fees − Incentives`. Depreciation uses an age-based **value-retention curve** (RAV4-anchored), driven by model year + holding period, scaled per car by `annualDepRate`. Financing counts only interest paid during the hold, split New/Used. Repairs are zero under warranty, then flat — the explicit new-vs-used risk premium. **Full methodology and every formula:** [`design/tco-model.md`](design/tco-model.md). The Deal-Alerts digest uses a JS mirror ([`../rav4-alert/tco.mjs`](../rav4-alert/tco.mjs)) kept in sync.
 
-## 7. UX Requirements
+## 7. Data: two sets
 
-- Single screen, no navigation needed for the core flow.
-- Two columns (Vehicle A | Vehicle B) for inputs; results span full width below.
-- Mobile-friendly (columns stack).
-- Clarity over density: group inputs into collapsible sections (Purchase, Energy, Ownership, Financing).
-- Every assumption visible and editable — reinforce "no black box."
-- Light/neutral, finance-tool aesthetic; the *numbers* are the hero.
+| | **Set 1 — Listings** | **Set 2 — Assumptions** |
+|---|---|---|
+| What | price, mileage, year, make/model/trim, VIN, segment, powertrain, mpg | depreciation/insurance/maintenance/repair **rates** + region table + incentives |
+| Source | **Auto.dev API** (free tier, 1,000 calls/mo) | curated; **currently illustrative placeholders** pending Edmunds TCO / AAA sourcing |
+| Granularity | one specific car | a segment × powertrain (+ region) |
+| Cadence | weekly snapshot (app) + twice-daily cache (alerts) | static, refreshed ~yearly |
+| Lives | `app/public/data/listings.json` (ships with build) | `app/src/data/reference.ts` (bundled) |
 
-## 8. Success Metrics
+**Join key = `segment`** (a listing self-classifies from body style + fuel type). The legacy free Autotrader scraper in `proxy/` is kept only as a fallback; Auto.dev is the live source. **Commercial redistribution of Auto.dev data requires a license** (see §10).
 
-- A user can produce a meaningful comparison in **< 30 seconds** from load.
-- User can articulate **why** one car wins after using it (breakdown is understood).
-- (Qualitative for v1) Reviewer feedback: "I'd trust this to make a real decision."
+## 8. Current status
 
-## 9. Assumptions & Open Questions
+- ✅ **Calculator** — production app live on Pages; pure typed engine + Vitest suite (42 tests).
+- ✅ **Data layer** — Set-2 tables + `resolveVehicle`, Auto.dev pull → `listings.json` (~1,600 cars, 3 models, weekly Action), browse/import UI.
+- ✅ **Deal alerts** — Supabase schema + RPCs, twice-daily cron, Resend on a **verified** domain (`alerts@send.xuspark.com`), instant double-opt-in confirmation (Edge Function), idempotent re-subscribe, digest + confirmation emails, branding. (Per [`../rav4-alert/README.md`](../rav4-alert/README.md); confirm the Supabase SQL — `schema.sql` → `phase2b.sql` → `phase3-resubscribe.sql` — has actually been applied in your project.)
+- 🔭 **Set-2 data sourcing** — tables are still illustrative placeholders (the credibility ceiling for any paid product).
+- 🔭 **Open hardening items** — see [`../rav4-alert/review-findings.md`](../rav4-alert/review-findings.md): the M1/M2/M4 + RLS must-fixes were applied; S1–S7 / N1–N6 + a latent RLS note remain open.
 
-- **A:** Manual input is acceptable for v1; users tolerate entering ~10 numbers per car. *(Validate with you.)*
-- **A:** US-centric defaults (USD, gallons, miles) are fine for v1.
-- **Q:** Should we model **opportunity cost** of the down payment / cash (cost of capital)? *(Default: optional toggle, off.)*
-- **Q:** Lease modeling priority — fast-follow or v1? *(Currently fast-follow.)*
-- **Q:** Do we want preset library curated by us, or fully blank/manual? *(v1: small curated preset library + full manual edit.)*
+## 9. Commercialization (new)
+
+> See the strategy memo for the ranked plans and step-by-steps. This section freezes the **constraints any commercial path must clear**, so they aren't rediscovered later.
+
+1. **Auto.dev licensing is the gate.** The free tier is for noncommercial use. Any path that *charges users while redistributing Auto.dev listings* (subscription, B2B with embedded inventory) needs a **commercial license** — confirm terms and price before charging. A pure-referral/affiliate model that monetizes *intent* (not data resale) largely sidesteps this.
+2. **"Illustrative placeholder" cost tables are a liability once money changes hands.** A free tool can caveat them; a paid product cannot. Source Set 2 from **Edmunds True Cost to Own / AAA Your Driving Costs / EPA / EIA** before charging for the ranking.
+3. **Traffic is the real bottleneck, not the monetization mechanic.** A Pages tool with no audience earns ~$0 from any model. The first commercial experiment must be cheap and must confront demand/traffic directly.
+4. **Relicense deliberately.** Owner holds all commercial rights (PolyForm Noncommercial). To commercialize, dual-license or fork a private commercial build; decide the posture before launch.
+5. **Liability/disclosure.** Charging for car-buying guidance raises the bar on disclaimers, data accuracy, and the "Est." discipline. Affiliate/insurance referrals carry **FTC disclosure** obligations.
+
+**Monetization candidates (ranked):** (1) affiliate/intent layer on the free tool [cheapest, fastest to validate]; (2) freemium Deal-Alerts subscription [recurring, leans on built infra]; (3) B2B white-label engine / TCO API [highest ceiling, slowest]. Treated as a **ladder**, not either/or.
 
 ## 10. Roadmap
 
 | Phase | Scope |
 |---|---|
-| **v0 (this prototype)** | No-build clickable HTML prototype: 2-up compare, full model, presets, breakdown + cumulative chart. For UX/model feedback. |
-| **v1** | Production app (Vite + React + TS): same scope, polished, validated, shareable URL state, save/load locally. |
-| **v1.x** | Lease vs. buy, opportunity cost toggle, N-vehicle compare, export to PDF/CSV. |
-| **v2** | Data assists: depreciation curves by segment, MPG/insurance lookups, optional VIN/market-price APIs (flagged as live data needing verification). |
+| **Done** | No-build prototype → production calculator → real-listing data layer → deal-alerts backend |
+| **Activate** | Run the double opt-in SQL; finish live confirm/unsubscribe verification |
+| **Commercialize v0 (test waters)** | Affiliate/intent layer + analytics + a small traffic experiment (see strategy) |
+| **Commercialize v1** | If signal: source Set-2 data, broaden inventory, Auto.dev commercial license, Stripe + freemium alerts |
+| **Later** | Lease vs. buy, opportunity-cost toggle, PDF/CSV export, B2B widget/API, segment-specific depreciation curves |
 
 ## 11. Risks
 
-- **Garbage-in/garbage-out:** bad assumptions → wrong conclusion. Mitigate with good defaults, ranges, and tooltips explaining each input.
-- **False precision:** a single TCO number implies certainty. Mitigate by showing the breakdown and encouraging users to flex holding period / miles.
-- **Depreciation is the hardest input** to estimate and the biggest TCO line. Mitigate with a transparent default curve the user can override, and (later) segment-based data.
+| Risk | Mitigation |
+|---|---|
+| Garbage-in/garbage-out; false precision | Good defaults, ranges, tooltips; show the breakdown; encourage flexing hold/miles |
+| Depreciation is the hardest, biggest line | Transparent overridable curve; segment-specific curves later |
+| Auto.dev ToS / commercial license | Stay in free tier for the free tool; license before charging; referral model sidesteps resale |
+| Snapshot/cache staleness | Show `generatedAt`; scheduled refresh; app still works if stale |
+| Narrow inventory (3 models) | Fine as a niche wedge; breadth is the gating unlock for a paid alert product |
+| No audience yet | The first commercial step is a cheap traffic + intent test, not a build |
+
+## 12. Open questions
+
+1. Snapshot/inventory breadth — keep curated popular models (like-for-like), or widen to more models/segments for a paid alert product?
+2. Region grain — states vs. ~9 census regions.
+3. Commercial license posture — dual-license vs. private commercial fork.
+4. Which monetization rung to climb first, and the traffic plan behind it.

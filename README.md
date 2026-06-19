@@ -83,14 +83,10 @@ free 1,000-calls/mo tier (RAV4-only twice daily + one ~100-call full pull weekly
 car-tco-compare/
 ├── README.md                       ← you are here
 ├── docs/
-│   ├── PRD.md                      ← product requirements (problem, scope, roadmap)
-│   ├── PRD-data-layer.md           ← v2 data layer: real listings + segment assumptions
+│   ├── PRD.md                      ← product requirements — all 3 pillars + commercialization
 │   └── design/
-│       ├── DESIGN.md               ← architecture, data model, UX, component plan
-│       ├── tco-model.md            ← exact calculation methodology (every formula)
-│       ├── data-architecture.md    ← how real data flows in (snapshot + scraper)
-│       ├── segment-model.md        ← segment×powertrain tables + resolveVehicle spec
-│       └── ui-handoff.md           ← design tokens + engineering handoff notes
+│       ├── ARCHITECTURE.md         ← system, data layer, alert backend, UX, design tokens
+│       └── tco-model.md            ← exact calculation methodology (every formula)
 ├── proxy/                          ← free Autotrader scraper (Node — run locally)
 │   ├── scrape.js                   ← shared scrape + normalize core
 │   ├── snapshot.js                 ← writes app/public/data/listings.json
@@ -140,9 +136,10 @@ start prototype\app-integrated.html   # with the "Load a real car" modal
 
 ## Read next
 
-- **What we're building & why:** [`docs/PRD.md`](docs/PRD.md) · data layer: [`docs/PRD-data-layer.md`](docs/PRD-data-layer.md)
-- **How it's built:** [`docs/design/DESIGN.md`](docs/design/DESIGN.md) · data: [`docs/design/data-architecture.md`](docs/design/data-architecture.md)
-- **How every dollar is computed:** [`docs/design/tco-model.md`](docs/design/tco-model.md) · assumptions: [`docs/design/segment-model.md`](docs/design/segment-model.md)
+- **What we're building & why:** [`docs/PRD.md`](docs/PRD.md)
+- **How it's built:** [`docs/design/ARCHITECTURE.md`](docs/design/ARCHITECTURE.md)
+- **How every dollar is computed:** [`docs/design/tco-model.md`](docs/design/tco-model.md)
+- **Deal-alerts backend:** [`rav4-alert/README.md`](rav4-alert/README.md)
 - **Run the prototype:** [`prototype/README.md`](prototype/README.md)
 
 ## License
