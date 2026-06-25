@@ -1,5 +1,5 @@
 // Rebuild the app's "Load a real car" snapshot (app/public/data/listings.json) FROM the
-// Supabase listings_cache — i.e. reuse the data the twice-daily cron already pulled, so
+// Supabase listings_cache — i.e. reuse the data the daily cron already pulled, so
 // this costs ZERO Auto.dev calls. Fully rebuilds the file each run (sold/expired cars drop
 // out because the cron's expire_stale_listings() already removed them from the cache).
 //

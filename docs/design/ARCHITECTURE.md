@@ -20,7 +20,7 @@ Two cooperating pieces, both free-tier:
   │  Vite + React + TS, client-only, no backend  │      │  Supabase + GH Actions + Resend│
   │  • pure TCO engine (tco.ts)                  │      │  • subscribers + watchlists    │
   │  • resolveVehicle() join                     │      │  • listings_cache (model×region)│
-  │  • localStorage + shareable-link state       │      │  • twice-daily cron → digest    │
+  │  • localStorage + shareable-link state       │      │  • daily cron → digest          │
   │  • fetches listings.json snapshot at runtime │◀────▶│  • double opt-in via Edge Fn    │
   └─────────────────────────────────────────────┘      └──────────────────────────────┘
             ▲ snapshot shipped in build                     ▲ Auto.dev → cache (scales w/ models×regions)
@@ -102,7 +102,7 @@ Listing     { source, url, vin, year, make, model, trim, price, mileage,
 ```
 
 - `base: './'` → the app fetches `${BASE_URL}data/listings.json`; missing/blocked snapshot → falls back to presets, core compare never breaks.
-- **Two stores, two cadences:** the app snapshot refreshes **weekly** (`refresh-listings.yml`); the alert cache refreshes **twice daily** in Supabase (`alerts.yml`). Both stay inside Auto.dev's free 1,000-calls/mo tier (RAV4-only twice daily + one ~100-call weekly full pull ≈ <600/mo).
+- **Two stores, two cadences:** the app snapshot refreshes **monthly** (`refresh-listings.yml`); the alert cache refreshes **daily** in Supabase (`alerts.yml`). Both stay well inside Auto.dev's free 1,000-calls/mo tier (RAV4-only daily + one ~100-call monthly full pull ≈ <300/mo).
 
 ## 6. Segment assumption model (Set 2)
 
@@ -118,7 +118,7 @@ Slow-changing, curated cost rates keyed by **`segment × powertrain`**, plus a *
 ## 7. Deal-alerts backend architecture
 
 ```
-                ┌─ twice-daily cron (GitHub Actions, alerts.yml) ──────────┐
+                ┌─ daily cron (GitHub Actions, alerts.yml) ────────────────┐
  Auto.dev ─pull▶ │ refresh listings_cache (tiles: model × region)          │
                 │ expire_stale_listings()  [sold-car cleanup]              │
                 │ for each active watchlist:                               │
@@ -164,8 +164,8 @@ System font stack; **tabular numerals** on all money; hero total ~27px/800; soft
 | Workflow | Trigger | Does |
 |---|---|---|
 | `deploy.yml` | push to `main` touching `app/**` (+ manual) | Build the Vite app → publish to Pages |
-| `refresh-listings.yml` | cron Mon 16:00 UTC (+ manual) | Rebuild `listings.json` (3 models, Auto.dev), commit, **self-deploy** (a `GITHUB_TOKEN` commit can't trigger `deploy.yml`) |
-| `alerts.yml` | cron 15:00 + 21:00 UTC (+ manual) | Refresh alert cache, send confirmations, send each subscriber their TCO-ranked digest |
+| `refresh-listings.yml` | cron 1st of month 16:00 UTC (+ manual) | Rebuild `listings.json` (3 models, Auto.dev), commit, **self-deploy** (a `GITHUB_TOKEN` commit can't trigger `deploy.yml`) |
+| `alerts.yml` | cron 15:00 UTC (+ manual) | Refresh alert cache, send confirmations, send each subscriber their TCO-ranked digest |
 | `pages-build-deployment` | every Pages deploy | GitHub-managed last-mile publish |
 
 ## 10. Testing strategy

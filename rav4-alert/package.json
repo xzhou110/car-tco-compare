@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
-  "description": "Twice-daily used-car listing alert (Toyota RAV4 Hybrid) — Auto.dev data source. POC stage.",
+  "description": "Daily used-car listing alert (Toyota RAV4 Hybrid) — Auto.dev data source. POC stage.",
   "scripts": {
     "query": "node query.mjs",
     "dump": "node dump.mjs",

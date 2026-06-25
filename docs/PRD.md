@@ -18,7 +18,7 @@ A **transparent, editable, side-by-side Total-Cost-of-Ownership calculator** for
 
 1. **The calculator** — compare 1–6 vehicles on an Edmunds-style 7-line TCO under *your* holding period, mileage, region, and financing. Numbers are the hero; nothing is a black box; every input is editable.
 2. **The real-listing data layer** — "Load a real car" pulls live listings (Toyota RAV4/Hybrid, Toyota Highlander/Hybrid, Honda CR-V/Hybrid; 2020+; ~1,600 cars) from the **Auto.dev API**, normalizes them to a snapshot shipped with the build, and drops a real car into a comparison with price/mileage/year/efficiency prefilled.
-3. **Deal alerts** — an email backend (Supabase + Resend + GitHub Actions cron) where a visitor signs up (double opt-in, instant confirmation) with up to 3 multi-select preferences and gets a twice-daily, TCO-ranked digest of matching cars.
+3. **Deal alerts** — an email backend (Supabase + Resend + GitHub Actions cron) where a visitor signs up (double opt-in, instant confirmation) with up to 3 multi-select preferences and gets a daily, TCO-ranked digest of matching cars.
 
 A project by **XuSpark** (xuspark.com). License today: **PolyForm Noncommercial 1.0.0** (source-available; commercial rights reserved by the owner).
 
@@ -80,7 +80,7 @@ Total TCO · cost/year · cost/mile · **winner banner** (cheapest, above the ca
 ### 5.5 Deal alerts
 - Subscribe form (email + up to 3 named multi-select preferences: make / model / trim / fuel type; min/max price; RAV4-only "XLE and above").
 - **Double opt-in** (instant confirmation email via Supabase Edge Function → Resend, idempotent) + unsubscribe + idempotent re-subscribe.
-- Twice-daily cron: refresh the listings cache (Auto.dev → Supabase), filter per watchlist, compute TCO (a faithful mirror of the app engine), rank, diff vs. sent-state, email **new** matches only — a brief per-preference table + a detailed XLSX/CSV sheet.
+- Daily cron: refresh the listings cache (Auto.dev → Supabase), filter per watchlist, compute TCO (a faithful mirror of the app engine), rank, diff vs. sent-state, email **new** matches only — a brief per-preference table + a detailed XLSX/CSV sheet.
 - **API calls scale with models × regions, not users** (cache filled once; each user is a DB filter).
 
 ### 5.6 Honesty / liability (cross-cutting)
@@ -98,7 +98,7 @@ Total TCO · cost/year · cost/mile · **winner banner** (cheapest, above the ca
 | What | price, mileage, year, make/model/trim, VIN, segment, powertrain, mpg | depreciation/insurance/maintenance/repair **rates** + region table + incentives |
 | Source | **Auto.dev API** (free tier, 1,000 calls/mo) | curated; **currently illustrative placeholders** pending Edmunds TCO / AAA sourcing |
 | Granularity | one specific car | a segment × powertrain (+ region) |
-| Cadence | weekly snapshot (app) + twice-daily cache (alerts) | static, refreshed ~yearly |
+| Cadence | monthly snapshot (app) + daily cache (alerts) | static, refreshed ~yearly |
 | Lives | `app/public/data/listings.json` (ships with build) | `app/src/data/reference.ts` (bundled) |
 
 **Join key = `segment`** (a listing self-classifies from body style + fuel type). The legacy free Autotrader scraper in `proxy/` is kept only as a fallback; Auto.dev is the live source. **Commercial redistribution of Auto.dev data requires a license** (see §10).
@@ -106,8 +106,8 @@ Total TCO · cost/year · cost/mile · **winner banner** (cheapest, above the ca
 ## 8. Current status
 
 - ✅ **Calculator** — production app live on Pages; pure typed engine + Vitest suite (42 tests).
-- ✅ **Data layer** — Set-2 tables + `resolveVehicle`, Auto.dev pull → `listings.json` (~1,600 cars, 3 models, weekly Action), browse/import UI.
-- ✅ **Deal alerts** — Supabase schema + RPCs, twice-daily cron, Resend on a **verified** domain (`alerts@send.xuspark.com`), instant double-opt-in confirmation (Edge Function), idempotent re-subscribe, digest + confirmation emails, branding. (Per [`../rav4-alert/README.md`](../rav4-alert/README.md); confirm the Supabase SQL — `schema.sql` → `phase2b.sql` → `phase3-resubscribe.sql` — has actually been applied in your project.)
+- ✅ **Data layer** — Set-2 tables + `resolveVehicle`, Auto.dev pull → `listings.json` (~1,600 cars, 3 models, monthly Action), browse/import UI.
+- ✅ **Deal alerts** — Supabase schema + RPCs, daily cron, Resend on a **verified** domain (`alerts@send.xuspark.com`), instant double-opt-in confirmation (Edge Function), idempotent re-subscribe, digest + confirmation emails, branding. (Per [`../rav4-alert/README.md`](../rav4-alert/README.md); confirm the Supabase SQL — `schema.sql` → `phase2b.sql` → `phase3-resubscribe.sql` — has actually been applied in your project.)
 - 🔭 **Set-2 data sourcing** — tables are still illustrative placeholders (the credibility ceiling for any paid product).
 - 🔭 **Open hardening items** — see [`../rav4-alert/review-findings.md`](../rav4-alert/review-findings.md): the M1/M2/M4 + RLS must-fixes were applied; S1–S7 / N1–N6 + a latent RLS note remain open.
 

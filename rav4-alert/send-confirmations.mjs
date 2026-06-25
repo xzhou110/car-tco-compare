@@ -24,7 +24,7 @@ for (const s of subs) {
   const link = `${APP_URL}#/confirm?token=${s.confirm_token}`;
   const html = `<div style="max-width:520px;margin:0 auto;font:14px/1.5 system-ui;color:#222">
     <p>Thanks for signing up for car deal alerts! 🚗</p>
-    <p>Confirm your email to start receiving your twice-daily, TCO-ranked digest:</p>
+    <p>Confirm your email to start receiving your daily, TCO-ranked digest:</p>
     <p style="margin:18px 0"><a href="${link}" style="background:#2563eb;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none">Confirm my subscription</a></p>
     <p style="font:12px system-ui;color:#888">Or paste this link: ${link}<br>If you didn't sign up, you can ignore this email.</p>
     <hr style="border:none;border-top:1px solid #eee;margin:18px 0 12px">

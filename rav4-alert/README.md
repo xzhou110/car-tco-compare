@@ -1,6 +1,6 @@
 # Deal Alerts (rav4-alert/)
 
-Backend for the **car-tco-compare** "Deal Alerts" feature: twice-daily, TCO-ranked
+Backend for the **car-tco-compare** "Deal Alerts" feature: daily, TCO-ranked
 used-car email digests. Users sign up on the web app and pick up to 3 preferences
 (watchlists); a scheduled job filters a cached pool of listings, computes 5-year
 total cost of ownership, and emails each subscriber a digest + spreadsheet.
@@ -8,7 +8,7 @@ total cost of ownership, and emails each subscriber a digest + spreadsheet.
 ## Architecture
 
 ```
-Auto.dev API ──(cache-refresh.mjs, twice daily)──► Supabase: listings_cache
+Auto.dev API ──(cache-refresh.mjs, daily)──► Supabase: listings_cache
                                                           │
 Web app signup form ──► Supabase: subscribers + watchlists│
                                                           ▼
@@ -34,7 +34,7 @@ field — the car card uses the same wording.)
 On submit it calls the `start_subscription` RPC (upsert subscriber + replace watchlists, so
 **re-signup after unsubscribe works** instead of hitting the unique-email constraint), then
 invokes the `send-confirmation` Edge Function for an **instant** double-opt-in email (the
-twice-daily `send-confirmations.mjs` cron stays as a fallback). Each watchlist's `filters`
+daily `send-confirmations.mjs` cron stays as a fallback). Each watchlist's `filters`
 jsonb may contain (arrays mean "any of"):
 `{ makes[], models[], fuels[], trims[], zip, radius, priceMin, priceMax, yearMin, milesMax }`.
 The cron still also accepts the older single-value `make`/`model`/`powertrain` keys.
@@ -84,7 +84,7 @@ domain, so mail delivers to any subscriber — not just the account owner); over
 |---------|--------------|
 | `node cache-refresh.mjs` | **Only Auto.dev caller.** Pull model×region tiles → upsert `listings_cache` (set `last_seen`) → `expire_stale_listings()`. Keep page caps small. |
 | `node seed-cache.mjs` | Dev seed of `listings_cache` from the app snapshot (no Auto.dev calls). |
-| `node build-app-listings.mjs` | Rebuild the app's "Load a real car" snapshot (`app/public/data/listings.json`) from Auto.dev — all 3 models (~100 calls). Run weekly by `refresh-listings.yml`. |
+| `node build-app-listings.mjs` | Rebuild the app's "Load a real car" snapshot (`app/public/data/listings.json`) from Auto.dev — all 3 models (~100 calls). Run monthly by `refresh-listings.yml`. |
 | `node build-applistings-from-cache.mjs` | Rebuild that snapshot from `listings_cache` instead — **0 Auto.dev calls** (reuses what the alert cron already pulled). |
 | `node seed-watchlists.mjs` | Seed a test subscriber + 2 RAV4 Hybrid watchlists. |
 | `node alert-cron.mjs [--dry]` | The digest job. `--dry` builds previews in `out/` without sending/recording. |
@@ -118,14 +118,14 @@ schedules:
 
 | Workflow | When | Refreshes |
 |---|---|---|
-| [`alerts.yml`](../.github/workflows/alerts.yml) | twice daily — **15:00 + 21:00 UTC (8am + 2pm Pacific)** | the alert cache (`cache-refresh.mjs`, **RAV4 only** to stay free) → then sends digests (`alert-cron.mjs`) |
-| [`refresh-listings.yml`](../.github/workflows/refresh-listings.yml) | weekly — **Mon 16:00 UTC (8am PT)** | the "Load a real car" snapshot (`build-app-listings.mjs`, **all 3 models**) → commits it → builds + deploys Pages |
+| [`alerts.yml`](../.github/workflows/alerts.yml) | daily — **15:00 UTC (8am Pacific)** | the alert cache (`cache-refresh.mjs`, **RAV4 only** to stay free) → then sends digests (`alert-cron.mjs`) |
+| [`refresh-listings.yml`](../.github/workflows/refresh-listings.yml) | monthly — **1st of month 16:00 UTC (8am PT)** | the "Load a real car" snapshot (`build-app-listings.mjs`, **all 3 models**) → commits it → builds + deploys Pages |
 
-The twice-daily times are clustered for when fresh dealer inventory lands (overnight feed
-wave + midday adds), not evenly spread; GitHub cron is fixed UTC, so in PST they're
-7am/1pm. The weekly job self-deploys because a `GITHUB_TOKEN` commit doesn't trigger
-`deploy.yml`. Both stay inside Auto.dev's free 1,000/mo tier (RAV4 dozens/run twice daily +
-~100 calls weekly ≈ <600/mo). Adding a workflow file to GitHub needs a token with the
+The daily run is timed for when fresh dealer inventory lands (the overnight DMS-feed
+wave); GitHub cron is fixed UTC, so in PST it's 7am. The monthly job self-deploys because a
+`GITHUB_TOKEN` commit doesn't trigger
+`deploy.yml`. Both stay well inside Auto.dev's free 1,000/mo tier (RAV4 dozens/run daily +
+~100 calls monthly ≈ <300/mo). Adding a workflow file to GitHub needs a token with the
 `workflow` scope: `gh auth refresh -h github.com -s workflow`.
 
 > The two tables above cover the **data-refresh** crons. For the full list of *all four*

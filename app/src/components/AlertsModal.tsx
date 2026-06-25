@@ -195,7 +195,7 @@ export function AlertsModal({ open, onClose }: Props) {
         return;
       }
 
-      // Send the confirmation email instantly. Non-fatal: the twice-daily cron
+      // Send the confirmation email instantly. Non-fatal: the daily cron
       // (send-confirmations.mjs) re-sends to anyone this misses.
       try {
         await supabase.functions.invoke('send-confirmation', { body: { id: subId } });
@@ -225,7 +225,7 @@ export function AlertsModal({ open, onClose }: Props) {
           <button className="lm-x" onClick={onClose} aria-label="Close" type="button">×</button>
           <div className="lm-title alerts-title">Get deal alerts</div>
           <p className="hint-line" style={{ margin: '4px 0 0' }}>
-            Get an email twice a day when matching cars hit the market. Add up to {MAX_PREFS} preferences.
+            Get an email once a day when matching cars hit the market. Add up to {MAX_PREFS} preferences.
           </p>
         </div>
 

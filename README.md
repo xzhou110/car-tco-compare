@@ -28,7 +28,7 @@ no-build [`prototype/`](prototype/) remains as the design reference.
   and drop into the comparison. Every imported field stays editable. (A region selector sets
   which regional cost assumptions apply.)
 - **Deal alerts** — sign up (double opt-in, instant confirmation email) with up to 3 multi-select
-  preferences (make / model / trim / fuel type) and get a twice-daily, TCO-ranked digest of
+  preferences (make / model / trim / fuel type) and get a daily, TCO-ranked digest of
   matching cars. See [`rav4-alert/`](rav4-alert/).
 - **Compare 1–6 cars** side by side — start with one, add/remove freely, each with its own name and color.
 - **Edmunds-style 7-line TCO**: depreciation, financing, fuel/energy, insurance, maintenance, repairs, taxes & fees (minus incentives).
@@ -48,9 +48,9 @@ The app stays a **static, free, client-only SPA** — no backend in production.
   pulls the curated models (Toyota RAV4 / Highlander, Honda CR-V — gas + hybrid, 2020+) from the
   **Auto.dev API**, normalizes them, and writes [`app/public/data/listings.json`](app/public/data/listings.json).
   Vite copies `public/` into the build, so the snapshot ships to GitHub Pages and the app fetches it
-  at runtime (lazy-loaded when you open "Load a real car"). A **weekly GitHub Action**
+  at runtime (lazy-loaded when you open "Load a real car"). A **monthly GitHub Action**
   ([`refresh-listings.yml`](.github/workflows/refresh-listings.yml)) re-runs the pull, commits the
-  snapshot, and redeploys — so the data stays fresh hands-free. (A separate twice-daily
+  snapshot, and redeploys — so the data stays fresh hands-free. (A separate daily
   [Deal Alerts cron](rav4-alert/) keeps its own RAV4 alert cache in Supabase current.)
 - **Set 2 — Assumptions (curated, stable):** segment × powertrain cost-rate tables plus a
   region table ([`app/src/data/reference.ts`](app/src/data/reference.ts)). A pure, unit-tested
@@ -67,15 +67,15 @@ Four workflows show up under the repo's **Actions** tab. Three are ours (YAML in
 | Workflow | File | Trigger | What it does |
 |---|---|---|---|
 | **Deploy app to GitHub Pages** | [`deploy.yml`](.github/workflows/deploy.yml) | push to `main` touching `app/**` (+ manual) | Builds the Vite/React app and publishes it to GitHub Pages. The main app deploy. |
-| **Refresh listings snapshot (weekly)** | [`refresh-listings.yml`](.github/workflows/refresh-listings.yml) | cron **Mon 16:00 UTC** (8am PT) (+ manual) | Rebuilds the "Load a real car" snapshot ([`listings.json`](app/public/data/listings.json)) for all 3 models from Auto.dev, commits it, **and builds + deploys Pages itself** (a bot-token commit can't trigger `deploy.yml`). |
-| **Deal Alerts** | [`alerts.yml`](.github/workflows/alerts.yml) | cron **15:00 + 21:00 UTC** (8am + 2pm PT) (+ manual) | The email backend: refreshes the RAV4 alert cache (Auto.dev → Supabase), sends double-opt-in confirmation emails, then sends each subscriber their TCO-ranked digest. See [`rav4-alert/`](rav4-alert/). |
+| **Refresh listings snapshot (monthly)** | [`refresh-listings.yml`](.github/workflows/refresh-listings.yml) | cron **1st of month 16:00 UTC** (8am PT) (+ manual) | Rebuilds the "Load a real car" snapshot ([`listings.json`](app/public/data/listings.json)) for all 3 models from Auto.dev, commits it, **and builds + deploys Pages itself** (a bot-token commit can't trigger `deploy.yml`). |
+| **Deal Alerts** | [`alerts.yml`](.github/workflows/alerts.yml) | cron **15:00 UTC** (8am PT) (+ manual) | The email backend: refreshes the RAV4 alert cache (Auto.dev → Supabase), sends double-opt-in confirmation emails, then sends each subscriber their TCO-ranked digest. See [`rav4-alert/`](rav4-alert/). |
 | **pages-build-deployment** | _(none — GitHub-managed)_ | every Pages deployment | GitHub's own "last-mile" job that actually publishes the uploaded Pages artifact. It appears automatically once Pages is enabled and runs after `deploy.yml` / `refresh-listings.yml` upload the build — you don't author or edit it. |
 
 **Why two deploy paths?** `deploy.yml` handles ordinary code pushes; `refresh-listings.yml`
 self-deploys because the snapshot commit it pushes is made with `GITHUB_TOKEN`, and
 token-made pushes deliberately **don't** trigger other workflows (loop protection). Both end
-by handing an artifact to `pages-build-deployment`. The two Auto.dev crons stay inside the
-free 1,000-calls/mo tier (RAV4-only twice daily + one ~100-call full pull weekly ≈ <600/mo).
+by handing an artifact to `pages-build-deployment`. The two Auto.dev crons stay well inside the
+free 1,000-calls/mo tier (RAV4-only daily + one ~100-call full pull monthly ≈ <300/mo).
 
 ## Repo structure
 
