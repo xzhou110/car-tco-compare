@@ -98,7 +98,7 @@ Total TCO · cost/year · cost/mile · **winner banner** (cheapest, above the ca
 | What | price, mileage, year, make/model/trim, VIN, segment, powertrain, mpg | depreciation/insurance/maintenance/repair **rates** + region table + incentives |
 | Source | **Auto.dev API** (free tier, 1,000 calls/mo) | curated; **currently illustrative placeholders** pending Edmunds TCO / AAA sourcing |
 | Granularity | one specific car | a segment × powertrain (+ region) |
-| Cadence | monthly snapshot (app) + daily cache (alerts) | static, refreshed ~yearly |
+| Cadence | annual snapshot (app) + daily cache (alerts) | static, refreshed ~yearly |
 | Lives | `app/public/data/listings.json` (ships with build) | `app/src/data/reference.ts` (bundled) |
 
 **Join key = `segment`** (a listing self-classifies from body style + fuel type). The legacy free Autotrader scraper in `proxy/` is kept only as a fallback; Auto.dev is the live source. **Commercial redistribution of Auto.dev data requires a license** (see §10).
@@ -106,7 +106,7 @@ Total TCO · cost/year · cost/mile · **winner banner** (cheapest, above the ca
 ## 8. Current status
 
 - ✅ **Calculator** — production app live on Pages; pure typed engine + Vitest suite (42 tests).
-- ✅ **Data layer** — Set-2 tables + `resolveVehicle`, Auto.dev pull → `listings.json` (~1,600 cars, 3 models, monthly Action), browse/import UI.
+- ✅ **Data layer** — Set-2 tables + `resolveVehicle`, Auto.dev pull → `listings.json` (~1,600 cars, 3 models, annual Action), browse/import UI.
 - ✅ **Deal alerts** — Supabase schema + RPCs, daily cron, Resend on a **verified** domain (`alerts@send.xuspark.com`), instant double-opt-in confirmation (Edge Function), idempotent re-subscribe, digest + confirmation emails, branding. (Per [`../rav4-alert/README.md`](../rav4-alert/README.md); confirm the Supabase SQL — `schema.sql` → `phase2b.sql` → `phase3-resubscribe.sql` — has actually been applied in your project.)
 - 🔭 **Set-2 data sourcing** — tables are still illustrative placeholders (the credibility ceiling for any paid product).
 - 🔭 **Open hardening items** — see [`../rav4-alert/review-findings.md`](../rav4-alert/review-findings.md): the M1/M2/M4 + RLS must-fixes were applied; S1–S7 / N1–N6 + a latent RLS note remain open.

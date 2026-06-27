@@ -1,16 +1,18 @@
-name: Refresh listings snapshot (monthly)
+name: Refresh listings snapshot (annual)
 
 # Keeps the app's "Load a real car" snapshot (app/public/data/listings.json) fresh for
 # all 3 models. Separate from the daily Deal Alerts cron (that refreshes only the
 # RAV4 alert cache to stay in Auto.dev's free tier). One full 3-model pull ≈100-130
-# Auto.dev calls; monthly ≈ ~100-130/mo, comfortably within the free 1,000/mo tier.
+# Auto.dev calls; annually ≈ ~100-130/yr (~10/mo amortized) — a negligible slice of the
+# free 1,000/mo tier. Use the manual "Run workflow" button for an on-demand refresh
+# between annual runs (the snapshot ages between pulls — prices drift, sold cars linger).
 #
 # A push made with GITHUB_TOKEN does NOT trigger other workflows, so this job can't rely
 # on deploy.yml firing — it commits the fresh data AND builds + deploys Pages itself.
 
 on:
   schedule:
-    - cron: '0 16 1 * *'   # 1st of month 16:00 UTC = 8am Pacific (PST 8am / PDT 9am)
+    - cron: '0 16 1 1 *'   # Jan 1 16:00 UTC = 8am Pacific (PST 8am / PDT 9am) — annual
   workflow_dispatch: {}
 
 permissions:
@@ -52,7 +54,7 @@ jobs:
           if git diff --staged --quiet; then
             echo "No change in listings.json — skipping commit."
           else
-            git commit -m "chore: monthly listings snapshot refresh [skip ci]"
+            git commit -m "chore: annual listings snapshot refresh [skip ci]"
             git push
           fi
 

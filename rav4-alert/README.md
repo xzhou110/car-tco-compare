@@ -84,7 +84,7 @@ domain, so mail delivers to any subscriber — not just the account owner); over
 |---------|--------------|
 | `node cache-refresh.mjs` | **Only Auto.dev caller.** Pull model×region tiles → upsert `listings_cache` (set `last_seen`) → `expire_stale_listings()`. Keep page caps small. |
 | `node seed-cache.mjs` | Dev seed of `listings_cache` from the app snapshot (no Auto.dev calls). |
-| `node build-app-listings.mjs` | Rebuild the app's "Load a real car" snapshot (`app/public/data/listings.json`) from Auto.dev — all 3 models (~100 calls). Run monthly by `refresh-listings.yml`. |
+| `node build-app-listings.mjs` | Rebuild the app's "Load a real car" snapshot (`app/public/data/listings.json`) from Auto.dev — all 3 models (~100 calls). Run annually (+ on demand) by `refresh-listings.yml`. |
 | `node build-applistings-from-cache.mjs` | Rebuild that snapshot from `listings_cache` instead — **0 Auto.dev calls** (reuses what the alert cron already pulled). |
 | `node seed-watchlists.mjs` | Seed a test subscriber + 2 RAV4 Hybrid watchlists. |
 | `node alert-cron.mjs [--dry]` | The digest job. `--dry` builds previews in `out/` without sending/recording. |
@@ -119,13 +119,13 @@ schedules:
 | Workflow | When | Refreshes |
 |---|---|---|
 | [`alerts.yml`](../.github/workflows/alerts.yml) | daily — **15:00 UTC (8am Pacific)** | the alert cache (`cache-refresh.mjs`, **RAV4 only** to stay free) → then sends digests (`alert-cron.mjs`) |
-| [`refresh-listings.yml`](../.github/workflows/refresh-listings.yml) | monthly — **1st of month 16:00 UTC (8am PT)** | the "Load a real car" snapshot (`build-app-listings.mjs`, **all 3 models**) → commits it → builds + deploys Pages |
+| [`refresh-listings.yml`](../.github/workflows/refresh-listings.yml) | annually — **Jan 1 16:00 UTC (8am PT)** (+ manual) | the "Load a real car" snapshot (`build-app-listings.mjs`, **all 3 models**) → commits it → builds + deploys Pages |
 
 The daily run is timed for when fresh dealer inventory lands (the overnight DMS-feed
-wave); GitHub cron is fixed UTC, so in PST it's 7am. The monthly job self-deploys because a
+wave); GitHub cron is fixed UTC, so in PST it's 7am. The annual job self-deploys because a
 `GITHUB_TOKEN` commit doesn't trigger
 `deploy.yml`. Both stay well inside Auto.dev's free 1,000/mo tier (RAV4 dozens/run daily +
-~100 calls monthly ≈ <300/mo). Adding a workflow file to GitHub needs a token with the
+~100 calls once a year ≈ <150/mo). Adding a workflow file to GitHub needs a token with the
 `workflow` scope: `gh auth refresh -h github.com -s workflow`.
 
 > The two tables above cover the **data-refresh** crons. For the full list of *all four*

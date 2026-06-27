@@ -48,7 +48,7 @@ The app stays a **static, free, client-only SPA** — no backend in production.
   pulls the curated models (Toyota RAV4 / Highlander, Honda CR-V — gas + hybrid, 2020+) from the
   **Auto.dev API**, normalizes them, and writes [`app/public/data/listings.json`](app/public/data/listings.json).
   Vite copies `public/` into the build, so the snapshot ships to GitHub Pages and the app fetches it
-  at runtime (lazy-loaded when you open "Load a real car"). A **monthly GitHub Action**
+  at runtime (lazy-loaded when you open "Load a real car"). An **annual GitHub Action**
   ([`refresh-listings.yml`](.github/workflows/refresh-listings.yml)) re-runs the pull, commits the
   snapshot, and redeploys — so the data stays fresh hands-free. (A separate daily
   [Deal Alerts cron](rav4-alert/) keeps its own RAV4 alert cache in Supabase current.)
@@ -67,7 +67,7 @@ Four workflows show up under the repo's **Actions** tab. Three are ours (YAML in
 | Workflow | File | Trigger | What it does |
 |---|---|---|---|
 | **Deploy app to GitHub Pages** | [`deploy.yml`](.github/workflows/deploy.yml) | push to `main` touching `app/**` (+ manual) | Builds the Vite/React app and publishes it to GitHub Pages. The main app deploy. |
-| **Refresh listings snapshot (monthly)** | [`refresh-listings.yml`](.github/workflows/refresh-listings.yml) | cron **1st of month 16:00 UTC** (8am PT) (+ manual) | Rebuilds the "Load a real car" snapshot ([`listings.json`](app/public/data/listings.json)) for all 3 models from Auto.dev, commits it, **and builds + deploys Pages itself** (a bot-token commit can't trigger `deploy.yml`). |
+| **Refresh listings snapshot (annual)** | [`refresh-listings.yml`](.github/workflows/refresh-listings.yml) | cron **Jan 1 16:00 UTC** (8am PT) (+ manual) | Rebuilds the "Load a real car" snapshot ([`listings.json`](app/public/data/listings.json)) for all 3 models from Auto.dev, commits it, **and builds + deploys Pages itself** (a bot-token commit can't trigger `deploy.yml`). Run it manually anytime for an on-demand refresh. |
 | **Deal Alerts** | [`alerts.yml`](.github/workflows/alerts.yml) | cron **15:00 UTC** (8am PT) (+ manual) | The email backend: refreshes the RAV4 alert cache (Auto.dev → Supabase), sends double-opt-in confirmation emails, then sends each subscriber their TCO-ranked digest. See [`rav4-alert/`](rav4-alert/). |
 | **pages-build-deployment** | _(none — GitHub-managed)_ | every Pages deployment | GitHub's own "last-mile" job that actually publishes the uploaded Pages artifact. It appears automatically once Pages is enabled and runs after `deploy.yml` / `refresh-listings.yml` upload the build — you don't author or edit it. |
 
@@ -75,7 +75,7 @@ Four workflows show up under the repo's **Actions** tab. Three are ours (YAML in
 self-deploys because the snapshot commit it pushes is made with `GITHUB_TOKEN`, and
 token-made pushes deliberately **don't** trigger other workflows (loop protection). Both end
 by handing an artifact to `pages-build-deployment`. The two Auto.dev crons stay well inside the
-free 1,000-calls/mo tier (RAV4-only daily + one ~100-call full pull monthly ≈ <300/mo).
+free 1,000-calls/mo tier (RAV4-only daily + one ~100-call full pull once a year ≈ <150/mo).
 
 ## Repo structure
 
