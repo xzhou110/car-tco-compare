@@ -4,7 +4,7 @@ summary: Public Total-Cost-of-Ownership car comparator (up to 6 cars, real Auto.
 status: live
 live: https://xzhou110.github.io/car-tco-compare/
 repo: https://github.com/xzhou110/car-tco-compare
-updated: 2026-08-15
+updated: 2026-09-24
 ---
 
 # car-tco-compare — TCO comparator + Deal Alerts
