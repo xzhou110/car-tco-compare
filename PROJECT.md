@@ -24,7 +24,7 @@ vendored into [`garage`](../../garage/PROJECT.md).
 |---|---|
 | **Kind** | web app (public static SPA) + backend (cron email service) |
 | **Stack** | Vite + React + TypeScript (app/, 42 Vitest tests) · Node ESM scripts (rav4-alert/) · Supabase (Postgres, RPCs, Edge Function) · Resend · GitHub Actions |
-| **Local path** | `D:\Useful\AI\claude_projects\github\car-tco-compare` ⚠ legacy nesting under `github/` — the only project not at the workspace root |
+| **Local path** | `D:\Meaningful\AI\claude_projects\github\car-tco-compare` ⚠ legacy nesting under `github/` — the only project not at the workspace root |
 | **Run** | `cd app; npm run dev` (launch config `car-tco-app`, port 5191) · prototype: launch config `car-tco-prototype` (port 8123) or open `prototype/index.html` |
 | **Deploy** | `deploy.yml` on push to `main` touching `app/**` → GitHub Pages; `refresh-listings.yml` (annual + manual) rebuilds the snapshot **and self-deploys** (bot-token commits can't trigger `deploy.yml`) |
 | **Data / backends** | Auto.dev API (free 1,000 calls/mo — `rav4-alert/cache-refresh.mjs` is the ONLY caller) · Supabase project (free tier; env `SUPABASE_PUBLISHABLE_KEY` browser / `SUPABASE_SECRET_KEY` server) · Resend, verified domain `send.xuspark.com` · segment×powertrain reference tables bundled in `app/src/data/reference.ts`. **$0/month today.** |
