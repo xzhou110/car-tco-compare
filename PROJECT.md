@@ -17,7 +17,7 @@ snapshot** (RAV4 / Highlander / CR-V, 2020+). The same repo hosts **Deal Alerts*
 opt-in, instant confirmation), get a TCO-ranked email digest of matching cars. Product thesis: the
 free calculator is the funnel, paid alerts come later. Branded as a **XuSpark** project.
 **Live**; the alerts backend runs as a POC on free tiers; the comparator's pure engine is also
-vendored into [`garage`](../garage/PROJECT.md).
+vendored into [`car-shopping`](../car-shopping/PROJECT.md).
 
 ## 2. Key facts
 | | |
@@ -28,7 +28,7 @@ vendored into [`garage`](../garage/PROJECT.md).
 | **Run** | `cd app; npm run dev` (launch config `car-tco-app`, port 5191) · prototype: launch config `car-tco-prototype` (port 8123) or open `prototype/index.html` |
 | **Deploy** | `deploy.yml` on push to `main` touching `app/**` → GitHub Pages; `refresh-listings.yml` (annual + manual) rebuilds the snapshot **and self-deploys** (bot-token commits can't trigger `deploy.yml`) |
 | **Data / backends** | Auto.dev API (free 1,000 calls/mo — `rav4-alert/cache-refresh.mjs` is the ONLY caller) · Supabase project (free tier; env `SUPABASE_PUBLISHABLE_KEY` browser / `SUPABASE_SECRET_KEY` server) · Resend, verified domain `send.xuspark.com` · segment×powertrain reference tables bundled in `app/src/data/reference.ts`. **$0/month today.** |
-| **Related** | [`garage`](../garage/PROJECT.md) vendors `lib/tco` from here · [`/build` plugin](../claude-marketplace/PROJECT.md) (Deal Alerts Phase 2 was built with it) · skills: `supabase-email-alerts` (generalized from this backend), `web-data-snapshot`, `ship-web-app` |
+| **Related** | [`car-shopping`](../car-shopping/PROJECT.md) vendors `lib/tco` from here · [`/build` plugin](../claude-marketplace/PROJECT.md) (Deal Alerts Phase 2 was built with it) · skills: `supabase-email-alerts` (generalized from this backend), `web-data-snapshot`, `ship-web-app` |
 | **Started · last major change** | 2026-06-15 · 2026-06-27 (listings refresh monthly → annual to cut API calls) |
 
 ## 3. Key things to know
@@ -39,7 +39,7 @@ vendored into [`garage`](../garage/PROJECT.md).
 - **Scraping era is over:** `proxy/` (Autotrader `__NEXT_DATA__` scrape) is a fallback only — datacenter IPs (Actions, Workers) get blocked; the durable lesson lives in the `web-data-snapshot` skill. Auto.dev replaced it.
 - **Three workflows, two deploy paths** — see the table in README §Automation. Crons stay well inside the free API tier (RAV4-only daily cache refresh + one ~100-call annual pull). Never add a second Auto.dev caller without recomputing the budget.
 - **Windows control-plane traps** (Supabase/Resend secrets): a PowerShell pipe into `gh secret set` injects a BOM → use `--body`; details in the `supabase-email-alerts` skill and global CLAUDE.md.
-- Changes to `app/src/lib/tco.ts` do **not** propagate to garage's vendored copy — re-sync by hand and note it in both repos.
+- Changes to `app/src/lib/tco.ts` do **not** propagate to car-shopping's vendored copy — re-sync by hand and note it in both repos.
 - Repo is **public** (MIT-style LICENSE present). Env values / project ids never go in docs.
 
 ## 4. Details
@@ -77,7 +77,7 @@ new-only for quieter digests · 200-mi radius is wide · whether SE/XSE count as
 ### Change highlights
 - 2026-06-27 — big listings refresh moved monthly → annual (API budget).
 - 2026-06 — Deal Alerts Phase 2 (double opt-in with instant confirmation, per-preference digest tables, xlsx attachment, re-subscribe RPC), Resend domain verified, twice-daily → daily cron.
-- 2026-06 — "Load a real car" modal + Auto.dev-sourced snapshot replaces the Autotrader scrape; garage vendors the engine.
+- 2026-06 — "Load a real car" modal + Auto.dev-sourced snapshot replaces the Autotrader scrape; car-shopping vendors the engine.
 - 2026-06-15 — repo created; prototype → Vite/React/TS app; curve-based depreciation, share links, charts.
 
 ## 5. Pointers
