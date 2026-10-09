@@ -76,6 +76,8 @@ new-only for quieter digests · 200-mi radius is wide · whether SE/XSE count as
 `deploy.yml` uses Node-20-era action versions (bump). Repo-local status: `rav4-alert/RUN_LOG.md`.
 
 ### Change highlights
+- 2026-10-09 — Owner-requested XuSeak rebrand: website/account pages, digest and both confirmation email templates, linked documentation and workspace index. Pages deployment succeeded; instant-confirmation function deployed as version 6 with JWT verification preserved. Resend lists only `send.xuspark.com` as verified, so that sender is the remaining migration item.
+- Brand audit method (2026-10-09): search tracked files in all 13 registered personal repositories with `git grep -l -i -E 'xu[ -]?spark'`, excluding private/local/employer paths; inspect active UI, email templates, documentation and deployment consumers. Preserve dated history and stable identifiers. Verification: app type-check/build, 42 existing tests, offline `buildHtml` digest render, live main/confirm/unsubscribe bylines and destinations, local/live bundle filename match, and an empty function POST returning 400 without sending email. Real email delivery was not exercised. Future email-domain migration must verify the new domain in Resend before updating both `SETTINGS.sender` and the Edge Function's sender/override.
 - 2026-06-27 — big listings refresh moved monthly → annual (API budget).
 - 2026-06 — Deal Alerts Phase 2 (double opt-in with instant confirmation, per-preference digest tables, xlsx attachment, re-subscribe RPC), Resend domain verified, twice-daily → daily cron.
 - 2026-06 — "Load a real car" modal + Auto.dev-sourced snapshot replaces the Autotrader scrape; car-shopping vendors the engine.
