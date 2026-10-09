@@ -277,11 +277,11 @@ input[type='number']::-webkit-inner-spin-button, input[type='number']::-webkit-o
 .foot-brand a { color: var(--accent); font-weight: 600; text-decoration: none; }
 .foot-brand a:hover { color: var(--accent-d); text-decoration: underline; }
 
-/* "by XuSpark" maker byline under the header tagline */
+/* "by XuSeak" maker byline under the header tagline */
 .brand-by { display: inline-block; margin-top: 6px; font-size: 12.5px; font-weight: 600; letter-spacing: 0.01em; color: var(--accent); text-decoration: none; }
 .brand-by:hover { color: var(--accent-d); text-decoration: underline; }
 
-/* "by XuSpark" byline on the confirm / unsubscribe account pages */
+/* "by XuSeak" byline on the confirm / unsubscribe account pages */
 .account-by { display: block; margin-top: 14px; font-size: 12px; font-weight: 600; color: var(--accent); text-decoration: none; }
 .account-by:hover { color: var(--accent-d); text-decoration: underline; }
 

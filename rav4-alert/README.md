@@ -103,7 +103,9 @@ the **value-retention depreciation curve** and **model-year-derived age** (kept 
 `app/src/lib/depreciation.ts` + `tco.ts`), so the digest's ranking matches the app.
 
 **Branding:** every email (digest + double-opt-in confirmation) carries a *"a project by
-**[XuSpark](https://xuspark.com)**"* byline, matching the web app's header/footer attribution.
+**[XuSeak](https://ai.xuseak.com/)**"* byline, matching the web app's header/footer attribution.
+The verified sender remains `alerts@send.xuspark.com` until a replacement XuSeak sending
+domain is verified in Resend; a display-brand change alone does not authorize mail from a new domain.
 
 **Unsubscribe:** every digest has a one-click **Unsubscribe** link in the footer →
 `#/unsubscribe?token=…` in the app → the `unsubscribe_all` RPC timestamps `unsubscribed_at`

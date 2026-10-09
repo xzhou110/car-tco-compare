@@ -1,10 +1,10 @@
 ---
 name: car-tco-compare
-summary: Public Total-Cost-of-Ownership car comparator (up to 6 cars, real Auto.dev listings) plus the "Deal Alerts" email backend (Supabase + Resend + Actions cron); the XuSpark side-project funnel
+summary: Public Total-Cost-of-Ownership car comparator (up to 6 cars, real Auto.dev listings) plus the "Deal Alerts" email backend (Supabase + Resend + Actions cron); a XuSeak project
 status: live
 live: https://xzhou110.github.io/car-tco-compare/
 repo: https://github.com/xzhou110/car-tco-compare
-updated: 2026-10-06
+updated: 2026-10-09
 ---
 
 # car-tco-compare — TCO comparator + Deal Alerts
@@ -15,7 +15,7 @@ fuel/energy, insurance, maintenance, repairs, taxes & fees) for up to 6 new/used
 holding period and mileage — with a "Load a real car" modal fed by an **Auto.dev listings
 snapshot** (RAV4 / Highlander / CR-V, 2020+). The same repo hosts **Deal Alerts**: sign up (double
 opt-in, instant confirmation), get a TCO-ranked email digest of matching cars. Product thesis: the
-free calculator is the funnel, paid alerts come later. Branded as a **XuSpark** project.
+free calculator is the funnel, paid alerts come later. Branded as a **XuSeak** project.
 **Live**; the alerts backend runs as a POC on free tiers; the comparator's pure engine is also
 vendored into [`car-shopping`](../car-shopping/PROJECT.md).
 
@@ -32,6 +32,7 @@ vendored into [`car-shopping`](../car-shopping/PROJECT.md).
 | **Started · last major change** | 2026-06-15 · 2026-06-27 (listings refresh monthly → annual to cut API calls) |
 
 ## 3. Key things to know
+- **Brand:** XuSeak; bylines link to `https://ai.xuseak.com/`. The verified Resend sender remains `alerts@send.xuspark.com` until a new sending domain is verified. Website deployment and the `send-confirmation` Supabase Edge Function are separate releases; the daily email scripts follow `main` automatically.
 - **All cost rates are illustrative placeholders** (segment-level, labelled "Est." in-app). No commercial "cheapest to own" claim until Edmunds/AAA-grade data replaces them. Listings are a best-effort snapshot — verify before buying (the README's disclaimer is deliberate; liability matters).
 - **Auto.dev facts:** 20 records/page on the starter tier (`limit` ignored — paginate `page`; a call = a page); filters make/model/year/miles/price/zip/distance but **no trim filter** (filter client-side); `history` (accidents/owners) is populated for ~2% of 2020+ cars → display, don't filter. **Commercial license required before charging** — the #1 launch blocker.
 - **Tile cache architecture:** the cron pulls (model × region) tiles into `listings_cache`; per-user alerts are pure DB filters, so API cost is decoupled from subscriber count. Unsubscribed rows are kept forever (`unsubscribed_at`), re-subscribe is an idempotent RPC.

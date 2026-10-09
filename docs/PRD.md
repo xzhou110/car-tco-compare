@@ -20,7 +20,7 @@ A **transparent, editable, side-by-side Total-Cost-of-Ownership calculator** for
 2. **The real-listing data layer** — "Load a real car" pulls live listings (Toyota RAV4/Hybrid, Toyota Highlander/Hybrid, Honda CR-V/Hybrid; 2020+; ~1,600 cars) from the **Auto.dev API**, normalizes them to a snapshot shipped with the build, and drops a real car into a comparison with price/mileage/year/efficiency prefilled.
 3. **Deal alerts** — an email backend (Supabase + Resend + GitHub Actions cron) where a visitor signs up (double opt-in, instant confirmation) with up to 3 multi-select preferences and gets a daily, TCO-ranked digest of matching cars.
 
-A project by **XuSpark** (xuspark.com). License today: **PolyForm Noncommercial 1.0.0** (source-available; commercial rights reserved by the owner).
+A project by **XuSeak** (ai.xuseak.com). License today: **PolyForm Noncommercial 1.0.0** (source-available; commercial rights reserved by the owner).
 
 ## 2. Problem & motivation
 

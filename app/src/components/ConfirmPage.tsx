@@ -45,7 +45,7 @@ export function ConfirmPage({ token }: Props) {
           <p className="account-msg">Something went wrong. Please try again in a moment.</p>
         )}
         <a className="btn account-home" href="#/">Back to Car TCO Compare</a>
-        <a className="account-by" href="https://xuspark.com" target="_blank" rel="noopener noreferrer">a project by XuSpark&nbsp;↗</a>
+        <a className="account-by" href="https://ai.xuseak.com/" target="_blank" rel="noopener noreferrer">a project by XuSeak&nbsp;↗</a>
       </div>
     </div>
   );
