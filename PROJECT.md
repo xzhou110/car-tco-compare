@@ -4,7 +4,7 @@ summary: Public Total-Cost-of-Ownership car comparator (up to 6 cars, real Auto.
 status: live
 live: https://xzhou110.github.io/car-tco-compare/
 repo: https://github.com/xzhou110/car-tco-compare
-updated: 2026-10-15
+updated: 2026-10-16
 ---
 
 # car-tco-compare — TCO comparator + Deal Alerts
@@ -116,6 +116,7 @@ should count as "XLE and above" (today they do) · `deploy.yml` uses Node-20-era
 (bump). Repo-local status: `rav4-alert/RUN_LOG.md`.
 
 ### Change highlights
+- 2026-10-16 — Build-commit stamp: the built page carries `<meta name="build-commit">` with the deployed commit (GitHub Actions' `GITHUB_SHA`; `local` for a local build), so a deploy is proven live by that id, not by a `?t=` query the Pages CDN ignores (app/index.html, app/vite.config.ts (process reached through globalThis: this tsconfig type-checks the config without Node types)).
 - 2026-10-09 — Owner-requested XuSeak rebrand: website/account pages, digest and both confirmation email templates, linked documentation and workspace index. Pages deployment succeeded; instant-confirmation function deployed as version 6 with JWT verification preserved. Resend lists only `send.xuspark.com` as verified, so that sender is the remaining migration item.
 - Brand audit method (2026-10-09): search tracked files in all 13 registered personal repositories with `git grep -l -i -E 'xu[ -]?spark'`, excluding private/local/employer paths; inspect active UI, email templates, documentation and deployment consumers. Preserve dated history and stable identifiers. Verification: app type-check/build, 42 existing tests, offline `buildHtml` digest render, live main/confirm/unsubscribe bylines and destinations, local/live bundle filename match, and an empty function POST returning 400 without sending email. Real email delivery was not exercised. Future email-domain migration must verify the new domain in Resend before updating both `SETTINGS.sender` and the Edge Function's sender/override.
 - 2026-06-27 — big listings refresh moved monthly → annual (API budget).
