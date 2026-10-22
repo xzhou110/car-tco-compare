@@ -1,8 +1,13 @@
 {
   "name": "car-tco-compare-root",
   "private": true,
-  "description": "Forwarder only: the app lives in app/ (the Deal Alerts scripts in rav4-alert/ have their own package.json). The machine's global pre-push hook runs `npm run check` where the root package.json defines it (engineering standard, principle 8).",
+  "description": "Forwarder only: the app lives in app/ (the Deal Alerts scripts in rav4-alert/ have their own package.json). Every script runs the same-named script in app/, so the root answers the engineering standard's command surface (principle 6) and the machine's global pre-push hook finds `check` (principle 8).",
   "scripts": {
+    "dev": "npm --prefix app run dev",
+    "test": "npm --prefix app run test",
+    "lint": "npm --prefix app run lint",
+    "typecheck": "npm --prefix app run typecheck",
+    "build": "npm --prefix app run build",
     "check": "npm --prefix app run check"
   }
 }
