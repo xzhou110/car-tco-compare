@@ -5,6 +5,7 @@ status: live
 live: https://xzhou110.github.io/car-tco-compare/
 repo: https://github.com/xzhou110/car-tco-compare
 updated: 2026-10-21
+category: products
 ---
 
 # car-tco-compare — TCO comparator + Deal Alerts
