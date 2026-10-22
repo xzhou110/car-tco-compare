@@ -101,7 +101,7 @@ adapters yet), `App.tsx` + `main.tsx` = shell.
 
 ### How to work on it
 App: `cd app; npm install; npm run dev`, then `npm run check` (lint, typecheck, tests, build) before
-any push: the validation for every app change, run by Actions before deploying (ADR-001). A push to
+any push: the validation for every app change, run by the pre-push hook and by Actions before deploying (ADR-001). A push to
 `main` deploys only if `app/**` changed; confirm the run and the live `build-commit` stamp. Backend: run scripts from `rav4-alert/` with env vars set (never commit them);
 `preview-email.mjs` / `lifecycle-test.mjs` before touching the cron (`alert-cron.mjs --dry` and
 `cache-refresh.mjs --dry` write previews to `out/` without sending or writing); workflow secrets via
