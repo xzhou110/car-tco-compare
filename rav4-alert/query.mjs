@@ -5,6 +5,7 @@
 // Run:  npm run query     (needs AUTODEV_API_KEY in the environment)
 
 import { AutoDev } from '@auto.dev/sdk';
+import { MAX_MODEL_YEAR } from './config.mjs';
 
 const KEY = process.env.AUTODEV_API_KEY;
 if (!KEY) {
@@ -28,9 +29,9 @@ const baseParams = {
 
 const LISTS = [
   { label: 'List 1 — RAV4 Hybrid, any trim', xlePlusOnly: false,
-    params: { ...baseParams, 'vehicle.year': '2020-2026', miles: '0-60000', 'retailListing.price': '0-30000' } },
+    params: { ...baseParams, 'vehicle.year': `2020-${MAX_MODEL_YEAR}`, miles: '0-60000', 'retailListing.price': '0-30000' } },
   { label: 'List 2 — RAV4 Hybrid, XLE and above', xlePlusOnly: true,
-    params: { ...baseParams, 'vehicle.year': '2022-2026', miles: '0-60000', 'retailListing.price': '0-35000' } },
+    params: { ...baseParams, 'vehicle.year': `2022-${MAX_MODEL_YEAR}`, miles: '0-60000', 'retailListing.price': '0-35000' } },
 ];
 
 const money = (n) => (typeof n === 'number' ? '$' + n.toLocaleString('en-US') : '—');

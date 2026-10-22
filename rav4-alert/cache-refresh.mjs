@@ -11,6 +11,7 @@
 
 import { paginate } from './autodev.mjs';
 import { supabase } from './supabase/client.mjs';
+import { MAX_MODEL_YEAR } from './config.mjs';
 
 const argv = process.argv;
 const arg = (k, d) => { const i = argv.indexOf(k); return i >= 0 ? argv[i + 1] : d; };
@@ -48,7 +49,7 @@ const rows = [];
 const seen = new Set();
 for (const t of tiles) {
   const recs = await paginate(
-    { 'vehicle.make': t.make, 'vehicle.model': t.model, 'vehicle.year': `${MIN_YEAR}-2026` },
+    { 'vehicle.make': t.make, 'vehicle.model': t.model, 'vehicle.year': `${MIN_YEAR}-${MAX_MODEL_YEAR}` },
     { zip: ZIP, distance: RADIUS, maxPages: MAX_PAGES },
   );
   let kept = 0;
@@ -68,6 +69,8 @@ for (let i = 0; i < rows.length; i += 200) {
   if (error) { console.error('❌ upsert:', error.message); process.exit(1); }
 }
 const { data: expired, error: eErr } = await supabase.rpc('expire_stale_listings', { grace_hours: 36 });
-if (eErr) console.warn('⚠️ expire rpc:', eErr.message); else console.log('expired stale rows:', expired);
+// Sold cars would linger in digests without the sweep, so a failed sweep fails the step
+// (alerts.yml keeps going and turns the run red at the end).
+if (eErr) { console.error('❌ expire rpc:', eErr.message); process.exitCode = 1; } else console.log('expired stale rows:', expired);
 const { count } = await supabase.from('listings_cache').select('*', { count: 'exact', head: true });
 console.log(`✅ listings_cache now ${count} rows.`);

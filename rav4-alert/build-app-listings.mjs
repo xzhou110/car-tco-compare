@@ -8,6 +8,7 @@
 
 import { writeFileSync, copyFileSync, existsSync, readFileSync } from 'node:fs';
 import { paginate } from './autodev.mjs';
+import { MAX_MODEL_YEAR } from './config.mjs';
 
 const ZIP = '94030', RADIUS = '200', MIN_YEAR = 2020;
 
@@ -63,7 +64,7 @@ const byVin = new Map();
 const queryLog = [];
 for (const m of MODELS) {
   const recs = await paginate(
-    { 'vehicle.make': m.make, 'vehicle.model': m.model, 'vehicle.year': `${MIN_YEAR}-2026` },
+    { 'vehicle.make': m.make, 'vehicle.model': m.model, 'vehicle.year': `${MIN_YEAR}-${MAX_MODEL_YEAR}` },
     { zip: ZIP, distance: RADIUS },
   );
   let kept = 0;

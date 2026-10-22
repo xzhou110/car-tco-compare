@@ -26,6 +26,7 @@ jobs:
       - run: npm install --no-audit --no-fund
 
       - name: Refresh listings cache (Auto.dev → Supabase)
+        id: refresh
         run: node cache-refresh.mjs
         continue-on-error: true  # quota/transient refresh failure must not block digests
         env:
@@ -34,6 +35,7 @@ jobs:
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
 
       - name: Send confirmation emails (double opt-in)
+        id: confirm
         run: node send-confirmations.mjs
         continue-on-error: true  # a confirmation hiccup must not block digests to confirmed users
         env:
@@ -47,3 +49,15 @@ jobs:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+
+      # continue-on-error above lets the digests go out, but it also hides a failed refresh or
+      # confirmation step behind a green run; `outcome` is the result before continue-on-error.
+      - name: Fail the run if the refresh or confirmation step failed
+        if: ${{ !cancelled() && (steps.refresh.outcome == 'failure' || steps.confirm.outcome == 'failure') }}
+        env:
+          REFRESH_OUTCOME: ${{ steps.refresh.outcome }}
+          CONFIRM_OUTCOME: ${{ steps.confirm.outcome }}
+        run: |
+          if [ "$REFRESH_OUTCOME" = "failure" ]; then echo "::error::Refresh listings cache (cache-refresh.mjs) failed; digests still ran."; fi
+          if [ "$CONFIRM_OUTCOME" = "failure" ]; then echo "::error::Send confirmation emails (send-confirmations.mjs) failed; digests still ran."; fi
+          exit 1

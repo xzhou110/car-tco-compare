@@ -90,15 +90,30 @@ async function matchWatchlist(filters) {
 const RESEND_KEY = (process.env.RESEND_API_KEY || '').replace(/[^\x21-\x7E]/g, '');
 const resend = DRY ? null : new Resend(RESEND_KEY);
 
+// The repository is public, so its Actions logs are too: a subscriber is named by the first
+// 8 characters of their id, never their address, and provider error text is scrubbed of the
+// address (Resend or Supabase may echo it) and of any other address, and logged as message
+// text only.
+const label = (sub) => String(sub.id).slice(0, 8);
+const errText = (e) => (typeof e === 'string' ? e : e?.message || e?.name || 'unknown error');
+const ANY_EMAIL = /[^\s@<>()"']+@[^\s@<>()"']+\.[A-Za-z]{2,}/g;
+const scrub = (text, email) => (email
+  ? String(text).replace(new RegExp(String(email).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), '<subscriber>')
+  : String(text)).replace(ANY_EMAIL, '<email>');
+
 const { data: subs, error: subErr } = await supabase.from('subscribers').select('*')
   .eq('confirmed', true).is('unsubscribed_at', null);
 if (subErr) { console.error('❌ subscribers:', subErr.message); process.exit(1); }
 console.log(`${subs.length} confirmed subscriber(s).`);
 
-for (const sub of subs) {
-  const { data: wls } = await supabase.from('watchlists').select('*')
+// One subscriber's digest. Throws on any failure (watchlists query, match, send, record)
+// so the loop below counts it and goes on to the next subscriber.
+async function sendDigest(sub) {
+  const who = label(sub);
+  const { data: wls, error: wlErr } = await supabase.from('watchlists').select('*')
     .eq('subscriber_id', sub.id).eq('active', true).order('created_at');
-  if (!wls?.length) { console.log(`  ${sub.email}: no active watchlists, skip`); continue; }
+  if (wlErr) throw new Error(`watchlists: ${wlErr.message}`); // an error is not "no watchlists"
+  if (!wls?.length) { console.log(`  ${who}: no active watchlists, skip`); return; }
 
   // First pass: matches + which VINs are NEW (not yet emailed for that watchlist).
   const perWl = [];
@@ -123,30 +138,44 @@ for (const sub of subs) {
   const unsubscribeUrl = sub.unsubscribe_token ? `${APP_URL}#/unsubscribe?token=${sub.unsubscribe_token}` : '';
   const html = buildHtml([topTcoSection(allCars, 10), ...sections], { intro, unsubscribeUrl });
   const xlsx = await buildWorkbook(perList);
-  const slug = sub.email.replace(/[^a-z0-9]/gi, '_');
-  writeFileSync(here(`./out/cron_${slug}.html`), html, 'utf8');
-  writeFileSync(here(`./out/cron_${slug}.xlsx`), xlsx); // for inspection (also attached on send)
+  writeFileSync(here(`./out/cron_${who}.html`), html, 'utf8');
+  writeFileSync(here(`./out/cron_${who}.xlsx`), xlsx); // for inspection (also attached on send)
 
   const today = new Date().toISOString().slice(0, 10);
   const subject = `Your car deal alert — ${totalMatches} match${totalMatches === 1 ? '' : 'es'}`
     + (totalNew ? ` · ${totalNew} new` : '') + ` — ${today}`;
-  console.log(`  ${sub.email}: ${totalMatches} matches across ${wls.length} watchlist(s), ${totalNew} new`);
+  console.log(`  ${who}: ${totalMatches} matches across ${wls.length} watchlist(s), ${totalNew} new`);
 
-  if (DRY) { console.log('   [dry] not sending / not recording'); continue; }
+  if (DRY) { console.log('   [dry] not sending / not recording'); return; }
 
   const { data, error } = await resend.emails.send({
     from: SETTINGS.sender, to: sub.email, subject, html,
     attachments: [{ filename: `deal-alerts-${today}.xlsx`, content: xlsx }],
   });
-  if (error) { console.error('   ❌ Resend:', error); continue; }
+  if (error) throw new Error(`Resend: ${errText(error)}`); // nothing recorded: the mail did not go
 
   // Record everything we just showed (one batched write AFTER a confirmed send).
   const sentRows = perWl.flatMap(({ wl, kept }) => kept.map((c) => ({ watchlist_id: wl.id, vin: c.vin })));
+  let upFailed = 0;
   for (let i = 0; i < sentRows.length; i += 500) {
     const { error: upErr } = await supabase.from('sent_state').upsert(sentRows.slice(i, i + 500), { onConflict: 'watchlist_id,vin' });
-    if (upErr) console.error('   ⚠️ sent_state upsert:', upErr.message);
+    if (upErr) { console.error('   ⚠️ sent_state upsert:', scrub(upErr.message, sub.email)); upFailed++; }
   }
+  // Mail went out but its NEW badges will repeat next time, so this still counts as a failure.
+  if (upFailed) throw new Error(`sent (id ${data?.id}), but ${upFailed} sent_state batch(es) were not recorded`);
   console.log(`   ✅ sent (id ${data?.id}); recorded ${sentRows.length} sent rows.`);
 }
+
+// Every subscriber gets a turn even when an earlier one fails; any failure turns the run red.
+let failed = 0;
+for (const sub of subs) {
+  try {
+    await sendDigest(sub);
+  } catch (e) {
+    failed++;
+    console.error(`  ❌ ${label(sub)}:`, scrub(errText(e), sub.email));
+  }
+}
+if (failed) { console.error(`${failed} of ${subs.length} subscriber(s) failed`); process.exitCode = 1; }
 
 console.log('Done.');

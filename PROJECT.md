@@ -4,7 +4,7 @@ summary: Public Total-Cost-of-Ownership car comparator (up to 6 cars, real Auto.
 status: live
 live: https://xzhou110.github.io/car-tco-compare/
 repo: https://github.com/xzhou110/car-tco-compare
-updated: 2026-10-21
+updated: 2026-10-22
 category: products
 ---
 
@@ -24,7 +24,7 @@ vendored into [`car-shopping`](../car-shopping/PROJECT.md).
 | | |
 |---|---|
 | **Kind** | web app (public static SPA) + backend (cron email service) |
-| **Stack** | Vite + React + TypeScript (app/, 42 Vitest tests, ESLint boundary rules) · Node ESM scripts (rav4-alert/) · Supabase (Postgres, RPCs, Edge Function) · Resend · GitHub Actions |
+| **Stack** | Vite + React + TypeScript (app/, 43 Vitest tests, ESLint boundary rules) · Node ESM scripts (rav4-alert/) · Supabase (Postgres, RPCs, Edge Function) · Resend · GitHub Actions |
 | **Local path** | `D:\Meaningful\AI\car-tco-compare` |
 | **Run** | `cd app; npm run dev` (launch config `car-tco-app`, port 5191) · `npm run check` (lint + typecheck + tests + build; the validation) · prototype: launch config `car-tco-prototype` (port 8123) or open `prototype/index.html` |
 | **Deploy** | `deploy.yml` on push to `main` touching `app/**`: `check` → `build` → GitHub Pages; `refresh-listings.yml` (annual + manual) runs `check`, rebuilds the snapshot **and self-deploys** (bot-token commits can't trigger `deploy.yml`); `check.yml` gates other branches and PRs (ADR-001) |
@@ -56,7 +56,7 @@ signup is `AlertsModal.tsx` (up to 3 watchlists, multi-select Make/Model/Trim/Fu
 same snapshot) → `start_subscription` RPC → the `send-confirmation` Edge Function for the instant
 double-opt-in mail. `rav4-alert/` is a set of Node scripts; `alerts.yml` runs them daily in order:
 `cache-refresh.mjs` (Auto.dev → Supabase `listings_cache`, `continue-on-error`) → `send-confirmations.mjs`
-(fallback confirmations, `continue-on-error`) → `alert-cron.mjs` (per confirmed, not-unsubscribed
+(fallback confirmations, `continue-on-error`; a last step turns the run red if either failed) → `alert-cron.mjs` (per confirmed, not-unsubscribed
 subscriber: match each active watchlist against the cache, 5-yr TCO via `tco.mjs`, a Top-10-by-TCO
 table then one table per watchlist, NEW badges from `sent_state`, one xlsx tab per watchlist, sent via
 Resend). `build-app-listings.mjs` builds the app snapshot; `preview-email.mjs` / `lifecycle-test.mjs`
@@ -125,6 +125,7 @@ Engineering-standard debt (ADR-001): step 3 — `lib/listings.ts` (`fetch`) and 
 in `refresh-listings.yml` is parse-validated only until its next run.
 
 ### Change highlights
+- 2026-10-22 — Deal Alerts hardening (ADR-002): the public Actions logs and the `out/` files name subscribers by an 8-character id, never their address; one subscriber's failure no longer stops the others, and any failure (including the refresh or confirmation step) turns the run red; the Auto.dev year range ends at the calendar year + 1 (`MAX_MODEL_YEAR` in `config.mjs`), not 2026.
 - 2026-10-21 — Command surface and CI gate (ADR-001 in the new `DECISIONS.md`): ESLint, `npm run lint` / `typecheck` / `check`, a `check` job both deploy workflows need, `check.yml` for other branches; three debts marked. No behavior change.
 - 2026-10-16 — Build-commit stamp: the built page carries `<meta name="build-commit">` with the deployed commit (GitHub Actions' `GITHUB_SHA`; `local` for a local build), so a deploy is proven live by that id, not by a `?t=` query the Pages CDN ignores (app/index.html, app/vite.config.ts).
 - 2026-10-09 — Owner-requested XuSeak rebrand: website/account pages, digest and both confirmation email templates, linked documentation and workspace index. Pages deployment succeeded; instant-confirmation function deployed as version 6 with JWT verification preserved. Resend lists only `send.xuspark.com` as verified, so that sender is the remaining migration item.
@@ -136,7 +137,7 @@ in `refresh-listings.yml` is parse-validated only until its next run.
 
 ## 5. Pointers
 - [README.md](README.md) — public product face: features, data model, automation table, repo structure, quick start.
-- [DECISIONS.md](DECISIONS.md) — ADR log from 2026-10-21 (ADR-001 command surface and CI gate).
+- [DECISIONS.md](DECISIONS.md) — ADR log from 2026-10-21 (ADR-001 command surface and CI gate; ADR-002 Deal Alerts logs, red runs, model-year bound).
 - [docs/PRD.md](docs/PRD.md) · [docs/design/ARCHITECTURE.md](docs/design/ARCHITECTURE.md) · [docs/design/tco-model.md](docs/design/tco-model.md) (every formula).
 - [rav4-alert/README.md](rav4-alert/README.md) · [rav4-alert/RUN_LOG.md](rav4-alert/RUN_LOG.md) · [rav4-alert/review-findings.md](rav4-alert/review-findings.md) — the alerts backend.
 - [prototype/README.md](prototype/README.md) — the no-build reference UI.

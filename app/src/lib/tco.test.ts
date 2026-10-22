@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { computeTco, seedResaleValue } from './tco';
+import { computeTco, seedResaleValue, vehicleAgeNow } from './tco';
 import { DEFAULT_ASSUMPTIONS, PRESETS } from '../data/presets';
 import type { Assumptions, Vehicle } from '../types';
 
@@ -122,6 +122,16 @@ describe('seedResaleValue (retention curve)', () => {
     const newer = seedResaleValue({ ...preset('rav4h-new'), modelYear: now }, a);
     const older = seedResaleValue({ ...preset('rav4h-new'), modelYear: now - 4 }, a);
     expect(older).toBeLessThan(newer);
+  });
+
+  it('a next-model-year car (on sale the fall before its year) is age 0 and costs the same as this year\'s', () => {
+    const a = A();
+    const now = new Date().getFullYear();
+    const thisYear = { ...preset('rav4h-new'), modelYear: now };
+    const nextYear = { ...preset('rav4h-new'), modelYear: now + 1 };
+    expect(vehicleAgeNow(nextYear)).toBe(0); // never negative
+    expect(seedResaleValue(nextYear, a)).toBe(seedResaleValue(thisYear, a));
+    expect(computeTco(nextYear, a).total).toBeCloseTo(computeTco(thisYear, a).total, 6);
   });
 });
 
