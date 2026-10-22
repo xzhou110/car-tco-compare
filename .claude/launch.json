@@ -1,0 +1,29 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "car-tco-prototype",
+      "runtimeExecutable": "C:/Program Files/nodejs/node.exe",
+      "runtimeArgs": [
+        "D:\\Meaningful\\AI\\car-tco-compare\\.claude\\static-server.js",
+        "8123",
+        "D:\\Meaningful\\AI\\car-tco-compare\\prototype"
+      ],
+      "port": 8123
+    },
+    {
+      "name": "car-tco-app",
+      "runtimeExecutable": "C:/Program Files/nodejs/node.exe",
+      "runtimeArgs": [
+        "D:\\Meaningful\\AI\\car-tco-compare\\app\\node_modules\\vite\\bin\\vite.js",
+        "D:\\Meaningful\\AI\\car-tco-compare\\app",
+        "--port",
+        "5191",
+        "--strictPort",
+        "--host",
+        "127.0.0.1"
+      ],
+      "port": 5191
+    }
+  ]
+}

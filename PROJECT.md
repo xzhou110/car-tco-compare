@@ -73,7 +73,7 @@ rav4-alert/     Deal Alerts backend scripts + supabase/ (SQL, config.toml, funct
 proxy/          legacy scraper (fallback)        prototype/   no-build clickable references
 docs/           PRD.md · design/ARCHITECTURE.md · design/tco-model.md
 .github/workflows/  deploy.yml · refresh-listings.yml · alerts.yml
-.claude/        launch.json + static-server.js (local preview helpers; gitignored, local only)
+.claude/        launch.json (the project's launch entries, read by Claude Code's preview and the X Command Center) + static-server.js (the prototype's static server); committed since 2026-10-22
 ```
 Skeleton aliases (engineering standard): `lib/` = engine (pure, lint-enforced; `listings.ts` and
 `supabaseClient.ts` are marked step-3 offenders), `components/` = ui, `state/` = the storage hook (no
