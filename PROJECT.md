@@ -23,10 +23,10 @@ vendored into [`car-shopping`](../car-shopping/PROJECT.md).
 | | |
 |---|---|
 | **Kind** | web app (public static SPA) + backend (cron email service) |
-| **Stack** | Vite + React + TypeScript (app/, 42 Vitest tests, ESLint with the standard's boundary and size rules in `app/eslint.config.js`) · Node ESM scripts (rav4-alert/) · Supabase (Postgres, RPCs, Edge Function) · Resend · GitHub Actions |
+| **Stack** | Vite + React + TypeScript (app/, 42 Vitest tests, ESLint boundary rules) · Node ESM scripts (rav4-alert/) · Supabase (Postgres, RPCs, Edge Function) · Resend · GitHub Actions |
 | **Local path** | `D:\Meaningful\AI\car-tco-compare` |
-| **Run** | `cd app; npm run dev` (launch config `car-tco-app`, port 5191) · `npm run check` (= lint, typecheck, tests, build; the validation for any app change) · `npm test` · `npm run lint` · `npm run build` · prototype: launch config `car-tco-prototype` (port 8123) or open `prototype/index.html` |
-| **Deploy** | `deploy.yml` on push to `main` touching `app/**`: `check` job (`npm run check`) → `build` → GitHub Pages; `refresh-listings.yml` (annual + manual) runs the same `check` job, then rebuilds the snapshot **and self-deploys** (bot-token commits can't trigger `deploy.yml`); `check.yml` runs the gate on every other branch and pull request (ADR-001) |
+| **Run** | `cd app; npm run dev` (launch config `car-tco-app`, port 5191) · `npm run check` (lint + typecheck + tests + build; the validation) · prototype: launch config `car-tco-prototype` (port 8123) or open `prototype/index.html` |
+| **Deploy** | `deploy.yml` on push to `main` touching `app/**`: `check` → `build` → GitHub Pages; `refresh-listings.yml` (annual + manual) runs `check`, rebuilds the snapshot **and self-deploys** (bot-token commits can't trigger `deploy.yml`); `check.yml` gates other branches and PRs (ADR-001) |
 | **Data / backends** | Auto.dev API (free 1,000 calls/mo — `rav4-alert/cache-refresh.mjs` is the only scheduled daily caller; `build-app-listings.mjs` once a year; `run.mjs` / `query.mjs` / `dump.mjs` only by hand) · Supabase project (free tier; browser env `VITE_SUPABASE_URL` + `VITE_SUPABASE_PUBLISHABLE_KEY`, server env `SUPABASE_URL` + `SUPABASE_SECRET_KEY`) · Resend, verified domain `send.xuspark.com` · segment×powertrain reference tables bundled in `app/src/data/reference.ts`. **$0/month today.** |
 | **Related** | [`car-shopping`](../car-shopping/PROJECT.md) vendors `lib/tco` from here · [`/build` plugin](../claude-marketplace/PROJECT.md) (Deal Alerts Phase 2 was built with it) · skills: `supabase-email-alerts` (generalized from this backend), `web-data-snapshot`, `ship-web-app` |
 | **Started · last major change** | 2026-06-15 · 2026-06-27 (listings refresh monthly → annual to cut API calls) |
@@ -74,10 +74,9 @@ docs/           PRD.md · design/ARCHITECTURE.md · design/tco-model.md
 .github/workflows/  deploy.yml · refresh-listings.yml · alerts.yml
 .claude/        launch.json + static-server.js (local preview helpers; gitignored, local only)
 ```
-Skeleton aliases for the engineering standard (`D:/Meaningful/AI/agent-skills/rules/engineering-principles.md`),
-inside `app/src/`: `lib/` = engine (pure; the lint forbids framework, I/O and upward imports there, with
-`listings.ts` and `supabaseClient.ts` marked as step-3 offenders), `components/` = ui, `state/` = the hook that
-owns localStorage, the share link and profiles (no adapters folder yet), `App.tsx` + `main.tsx` = the app shell.
+Skeleton aliases (engineering standard): `lib/` = engine (pure, lint-enforced; `listings.ts` and
+`supabaseClient.ts` are marked step-3 offenders), `components/` = ui, `state/` = the storage hook (no
+adapters yet), `App.tsx` + `main.tsx` = shell.
 
 ### Data layer (where the numbers come from)
 - **Reference tables** — `app/src/data/reference.ts` exports `REFERENCE` (`asOf`, `source`, `rates`, `regions`, `incentives`). `rates` has ten segment keys (`car-economy` … `minivan`), each a `RateRow` (stand-in `mpg`, `depRateNew` / `depRateUsed`, `insurance`, `maintenance`, `repair`, warranty years/miles) with optional `byPowertrain` overrides for hybrid/EV; `regions` has national, CA, TX, NY, FL (fuel, electricity, sales tax, registration, insurance multiplier); `incentives` is per powertrain × new/used (only EV non-zero). Deliberately segment-level, not per-trim — rough, transparent, editable (`docs/design/ARCHITECTURE.md` §6). `lib/resolveVehicle.ts` joins listing → segment → rates, applies the region multiplier and leaves `resaleValue: null` for the engine's retention curve (`lib/depreciation.ts`).
@@ -101,11 +100,9 @@ owns localStorage, the share link and profiles (no adapters folder yet), `App.ts
 - Resend sending domain `send.xuspark.com`: DKIM, SPF and return-path MX records were added at SiteGround (the domain's DNS host, 2026-06). Migrating to a XuSeak domain means verifying the new domain in Resend first, then updating `SETTINGS.sender` and the function's default / `CONFIRM_SENDER`.
 
 ### How to work on it
-App: `cd app; npm install; npm run dev` while working, then `npm run check` (lint, typecheck, tests,
-build) before any push: it is the validation for every app change and the same command Actions runs
-before anything deploys (ADR-001); a push to `main` deploys only if `app/**` changed, and then only once
-the `check` job is green; confirm the run and that the live page's `<meta name="build-commit">` equals
-the pushed commit. Backend: run scripts from `rav4-alert/` with env vars set (never commit them);
+App: `cd app; npm install; npm run dev`, then `npm run check` (lint, typecheck, tests, build) before
+any push: the validation for every app change, run by Actions before deploying (ADR-001). A push to
+`main` deploys only if `app/**` changed; confirm the run and the live `build-commit` stamp. Backend: run scripts from `rav4-alert/` with env vars set (never commit them);
 `preview-email.mjs` / `lifecycle-test.mjs` before touching the cron (`alert-cron.mjs --dry` and
 `cache-refresh.mjs --dry` write previews to `out/` without sending or writing); workflow secrets via
 `gh secret set NAME --body ...`. Snapshot refresh: run `refresh-listings.yml` manually (or
@@ -121,17 +118,14 @@ with NEW badges; implement `new-only` or delete the setting, `review-findings.md
 filtering needs a full ZIP-centroid table (`geo.mjs` stub) · 200-mi radius is wide · whether SE/XSE
 should count as "XLE and above" (today they do) · `deploy.yml` uses Node-20-era action versions
 (bump). Repo-local status: `rav4-alert/RUN_LOG.md`.
-Engineering-standard debt (audit 2026-10-21, ADR-001): purity, retrofit step 3 — `app/src/lib/listings.ts`
-calls `fetch` and `app/src/lib/supabaseClient.ts` creates the Supabase client from inside the pure folder;
-both move to an adapters folder (callers: `App.tsx`, `AlertsModal.tsx`, `ConfirmPage.tsx`, `UnsubscribePage.tsx`);
-`app/src/state/useComparison.ts` types saved data as `any` five times in its hydration path (replace with
-`unknown` plus one sanitizer at the edge); each carries a one-line lint marker naming the entry. Size, step 4:
-`AlertsModal.tsx` 337 lines, split at its next touch. The Node version is not pinned (CI 22, machine 24).
-The gate in `refresh-listings.yml` is validated by parsing only until the next manual or annual run.
+Engineering-standard debt (ADR-001): step 3 — `lib/listings.ts` (`fetch`) and `lib/supabaseClient.ts`
+(Supabase client) move to adapters; `state/useComparison.ts` hydrates saved data as `any` (replace with
+`unknown` + one sanitizer); each file carries a lint marker. Step 4: `AlertsModal.tsx` 337 lines. The gate
+in `refresh-listings.yml` is parse-validated only until its next run.
 
 ### Change highlights
-- 2026-10-21 — Command surface and CI gate (ADR-001, the first entry of the new `DECISIONS.md`): ESLint with the standard's boundary and size rules, `npm run lint`, `npm run typecheck` and `npm run check`, a `check` job that both deploy workflows' deploying jobs need, and `check.yml` for other branches and pull requests; three known debts marked in their files. No behavior or UI change.
-- 2026-10-16 — Build-commit stamp: the built page carries `<meta name="build-commit">` with the deployed commit (GitHub Actions' `GITHUB_SHA`; `local` for a local build), so a deploy is proven live by that id, not by a `?t=` query the Pages CDN ignores (app/index.html, app/vite.config.ts (process reached through globalThis: this tsconfig type-checks the config without Node types)).
+- 2026-10-21 — Command surface and CI gate (ADR-001 in the new `DECISIONS.md`): ESLint, `npm run lint` / `typecheck` / `check`, a `check` job both deploy workflows need, `check.yml` for other branches; three debts marked. No behavior change.
+- 2026-10-16 — Build-commit stamp: the built page carries `<meta name="build-commit">` with the deployed commit (GitHub Actions' `GITHUB_SHA`; `local` for a local build), so a deploy is proven live by that id, not by a `?t=` query the Pages CDN ignores (app/index.html, app/vite.config.ts).
 - 2026-10-09 — Owner-requested XuSeak rebrand: website/account pages, digest and both confirmation email templates, linked documentation and workspace index. Pages deployment succeeded; instant-confirmation function deployed as version 6 with JWT verification preserved. Resend lists only `send.xuspark.com` as verified, so that sender is the remaining migration item.
 - Brand audit method (2026-10-09): search tracked files in all 13 registered personal repositories with `git grep -l -i -E 'xu[ -]?spark'`, excluding private/local/employer paths; inspect active UI, email templates, documentation and deployment consumers. Preserve dated history and stable identifiers. Verification: app type-check/build, 42 existing tests, offline `buildHtml` digest render, live main/confirm/unsubscribe bylines and destinations, local/live bundle filename match, and an empty function POST returning 400 without sending email. Real email delivery was not exercised. Future email-domain migration must verify the new domain in Resend before updating both `SETTINGS.sender` and the Edge Function's sender/override.
 - 2026-06-27 — big listings refresh moved monthly → annual (API budget).
@@ -141,7 +135,7 @@ The gate in `refresh-listings.yml` is validated by parsing only until the next m
 
 ## 5. Pointers
 - [README.md](README.md) — public product face: features, data model, automation table, repo structure, quick start.
-- [DECISIONS.md](DECISIONS.md) — ADR log, started 2026-10-21 (ADR-001 command surface and CI gate); earlier decisions stay in the design docs it points to.
+- [DECISIONS.md](DECISIONS.md) — ADR log from 2026-10-21 (ADR-001 command surface and CI gate).
 - [docs/PRD.md](docs/PRD.md) · [docs/design/ARCHITECTURE.md](docs/design/ARCHITECTURE.md) · [docs/design/tco-model.md](docs/design/tco-model.md) (every formula).
 - [rav4-alert/README.md](rav4-alert/README.md) · [rav4-alert/RUN_LOG.md](rav4-alert/RUN_LOG.md) · [rav4-alert/review-findings.md](rav4-alert/review-findings.md) — the alerts backend.
 - [prototype/README.md](prototype/README.md) — the no-build reference UI.
