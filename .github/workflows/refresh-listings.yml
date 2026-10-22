@@ -9,6 +9,10 @@ name: Refresh listings snapshot (annual)
 #
 # A push made with GITHUB_TOKEN does NOT trigger other workflows, so this job can't rely
 # on deploy.yml firing — it commits the fresh data AND builds + deploys Pages itself.
+#
+# Since 2026-10-21 the gate runs first (the check job: npm run check in app/, principle 8 of
+# D:/Meaningful/AI/agent-skills/rules/engineering-principles.md) and refresh-and-deploy needs it,
+# so this deploy path cannot ship red either.
 
 on:
   schedule:
@@ -25,7 +29,26 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - run: npm ci
+      - run: npm run check
+        env:
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
+
   refresh-and-deploy:
+    needs: check
     runs-on: ubuntu-latest
     environment:
       name: github-pages

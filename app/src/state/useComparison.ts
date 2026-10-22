@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- debt (DECISIONS.md ADR-001 of 2026-10-21): the hydration path (mergeAssumptions, normalizeVehicle, hydrate) types untrusted saved data as any; replace with unknown plus one sanitizer at the edge (principle 3). */
 // State hook: holds the comparison, persists to localStorage + the URL hash (shareable),
 // manages named saved-car profiles, and exposes mutation actions.
 import { useEffect, useState } from 'react';

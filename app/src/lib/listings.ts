@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals -- purity debt (retrofit step 3, DECISIONS.md ADR-001 of 2026-10-21): loadListingsSnapshot calls fetch from the pure folder; it moves to an adapter and only filterListings stays here. */
 // Set 1 — load the static listings snapshot the deployed app ships with, and
 // filter it. loadListingsSnapshot fetches the JSON Vite copied from public/;
 // filterListings is pure + unit-tested.

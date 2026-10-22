@@ -16,7 +16,29 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # The gate (principle 8, D:/Meaningful/AI/agent-skills/rules/engineering-principles.md): lint, typecheck, tests and
+  # build must pass before anything is deployed. Other branches and pull requests run the same job in check.yml;
+  # refresh-listings.yml, the other deploy path, runs it too.
+  check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - run: npm ci
+      - run: npm run check
+        env:
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
+
   build:
+    needs: check
     runs-on: ubuntu-latest
     defaults:
       run:

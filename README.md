@@ -111,11 +111,12 @@ car-tco-compare/
 
 ## Quick start
 
-**Production app** (needs Node 18+):
+**Production app** (needs Node 20.19 or newer; CI runs Node 22):
 ```powershell
 cd app
 npm install
 npm run dev      # start the dev server
+npm run check    # lint + type-check + unit tests + production bundle: the validation before any push (CI runs it before deploying)
 npm test         # run the unit tests (42)
 npm run build    # type-check + production bundle
 ```
