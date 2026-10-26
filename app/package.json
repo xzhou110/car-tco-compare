@@ -7,9 +7,9 @@
   "license": "SEE LICENSE IN ../LICENSE",
   "author": "xzhou110",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --port 5191 --strictPort",
     "build": "tsc --noEmit && vite build",
-    "preview": "vite preview",
+    "preview": "vite preview --port 4191 --strictPort",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "vitest run",
