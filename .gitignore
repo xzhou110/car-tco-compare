@@ -11,7 +11,7 @@ dist/
 # editor / OS / local tooling
 .vscode/
 .idea/
-.claude/settings.local.json
+.claude/
 .DS_Store
 Thumbs.db
 
