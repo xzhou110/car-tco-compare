@@ -44,7 +44,7 @@ vendored into [`car-shopping`](../car-shopping/PROJECT.md).
 - **Three workflows, two deploy paths** — see the table in README §Automation. Crons stay well inside the free API tier (RAV4-only daily cache refresh + one ~100–130-call annual pull). Never schedule another Auto.dev caller without recomputing the budget; the hand-run `run.mjs` / `query.mjs` / `dump.mjs` spend calls too.
 - **Windows control-plane traps** (Supabase/Resend secrets): a PowerShell pipe into `gh secret set` injects a BOM → use `--body`; details in the `supabase-email-alerts` skill and global CLAUDE.md.
 - **Three copies of the TCO engine:** `app/src/lib/tco.ts` (+ `depreciation.ts`, `data/reference.ts`) is vendored into car-shopping **and** hand-ported as `rav4-alert/tco.mjs` so the digest's ranking matches the app. Neither copy updates itself — after an engine or rate change re-sync both by hand and note it in each place.
-- **Secrets and ids live outside this file.** Every key is a GitHub Actions secret or variable, a Supabase function secret or a local env var — §4 *Configuration and secrets* names each one's home; the Supabase project ref appears only as a code default (`rav4-alert/supabase/client.mjs`, `rav4-alert/supabase/config.toml`, `app/src/lib/supabaseClient.ts`). Repo is **public** (MIT-style LICENSE present). Env values / project ids never go in docs.
+- **Secrets and ids live outside this file.** Every key is a GitHub Actions secret or variable, a Supabase function secret or a local env var — §4 *Configuration and secrets* names each one's home; the Supabase project ref appears only in `rav4-alert/supabase/config.toml` (the CLI's `project_id`); since 2026-11-12 the scripts and the app read the project URL, and the scripts the test address, from the environment only and stop with a clear message when one is missing. Repo is **public** (MIT-style LICENSE present). Env values / project ids never go in docs.
 
 ## 4. Details
 ### How it works
@@ -90,12 +90,12 @@ adapters yet), `App.tsx` + `main.tsx` = shell.
 | Name | Lives in | Used by |
 |---|---|---|
 | `AUTODEV_API_KEY` | GitHub Actions repo secret · Windows User env var locally | `cache-refresh.mjs`, `build-app-listings.mjs`, `run.mjs` / `query.mjs` / `dump.mjs` |
-| `SUPABASE_URL`, `SUPABASE_SECRET_KEY` (legacy alias `SUPABASE_SERVICE_ROLE_KEY`) | repo secrets · local env | every server script via `rav4-alert/supabase/client.mjs` (the URL falls back to the project URL hard-coded there) |
+| `SUPABASE_URL`, `SUPABASE_SECRET_KEY` (legacy alias `SUPABASE_SERVICE_ROLE_KEY`) | repo secrets · local env | every server script via `rav4-alert/supabase/client.mjs` (both required; no hard-coded fallback) |
 | `RESEND_API_KEY` | repo secret **and** a Supabase function secret (`npx supabase secrets set … --project-ref <ref>`) | `alert-cron.mjs`, `send-confirmations.mjs`, `run.mjs`, the Edge Function (both strip a stray BOM) |
 | `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` | GitHub Actions repository **variables** (not secrets — the publishable key is browser-safe, RLS protects data) · `app/.env.local` locally (gitignored) | the SPA (`app/src/lib/supabaseClient.ts`), injected at build time by `deploy.yml` and `refresh-listings.yml` |
 | `CONFIRM_SENDER` | optional Supabase function secret | overrides the confirmation sender; the digest sender is `SETTINGS.sender` in `rav4-alert/config.mjs` |
 | `SUPABASE_ACCESS_TOKEN` | local only | `npx supabase functions deploy send-confirmation --project-ref <ref>` (the function's own `SUPABASE_URL` / service-role key are injected by Supabase) |
-| `APP_URL`, `TEST_EMAIL` | local env, optional | live-URL override for confirm/unsubscribe links (`config.mjs`); `lifecycle-test.mjs` recipient (sends real mail) |
+| `APP_URL`, `TEST_EMAIL` | local env | `APP_URL` (optional): live-URL override for confirm/unsubscribe links (`config.mjs`); `TEST_EMAIL` (required by `lifecycle-test.mjs`, `seed-watchlists.mjs` and a sending `run.mjs`, no default): the test recipient (sends real mail) |
 
 - Schema changes are applied by pasting SQL into the Supabase SQL editor, in order `schema.sql` → `phase2b.sql` → `phase3-resubscribe.sql` (no migration tool); the Edge Function is a separate `functions deploy`.
 - Resend sending domain `send.xuspark.com`: DKIM, SPF and return-path MX records were added at SiteGround (the domain's DNS host, 2026-06). Migrating to a XuSeak domain means verifying the new domain in Resend first, then updating `SETTINGS.sender` and the function's default / `CONFIRM_SENDER`.
@@ -141,4 +141,4 @@ in `refresh-listings.yml` is parse-validated only until its next run.
 - [docs/PRD.md](docs/PRD.md) · [docs/design/ARCHITECTURE.md](docs/design/ARCHITECTURE.md) · [docs/design/tco-model.md](docs/design/tco-model.md) (every formula).
 - [rav4-alert/README.md](rav4-alert/README.md) · [rav4-alert/RUN_LOG.md](rav4-alert/RUN_LOG.md) · [rav4-alert/review-findings.md](rav4-alert/review-findings.md) — the alerts backend.
 - [prototype/README.md](prototype/README.md) — the no-build reference UI.
-- Operational configuration: §4 *Configuration and secrets* names every env var's home; values and the project ref stay in GitHub, Supabase, local env and code defaults — never in this public file. Skills: `supabase-email-alerts`, `web-data-snapshot`.
+- Operational configuration: §4 *Configuration and secrets* names every env var's home; values and the project ref stay in GitHub, Supabase, local env and `config.toml` — never in this public file. Skills: `supabase-email-alerts`, `web-data-snapshot`.

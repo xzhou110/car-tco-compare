@@ -10,7 +10,7 @@ export const SETTINGS = {
   zip: '94030',
   radius: '200',
   sender: 'Car Deal Alerts <alerts@send.xuspark.com>', // verified Resend domain (delivers to anyone)
-  recipient: 'pastnoefuture@gmail.com',           // default preview recipient (any address now works)
+  recipient: process.env.TEST_EMAIL, // run.mjs preview recipient: from the environment only (public repo); run.mjs stops if unset
   emailMode: 'all',  // 'all' = show every current match (NEW badged) | 'new-only'
   maxPages: 25,
 };

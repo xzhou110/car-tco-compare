@@ -1,11 +1,14 @@
 // Seed a test subscriber + their two RAV4 Hybrid watchlists, so alert-cron has
 // something to run against. Idempotent: re-runnable (clears the user's watchlists first).
 //
-// Run:  node seed-watchlists.mjs   (needs SUPABASE_SECRET_KEY)
+// Run:  node seed-watchlists.mjs   (needs TEST_EMAIL, SUPABASE_URL and SUPABASE_SECRET_KEY)
 
-import { supabase } from './supabase/client.mjs';
-
-const EMAIL = 'pastnoefuture@gmail.com';
+const EMAIL = process.env.TEST_EMAIL; // from the environment only: this repository is public
+if (!EMAIL) {
+  console.error('seed-watchlists: set TEST_EMAIL (the test subscriber address) in this shell first. Nothing was written.');
+  process.exit(2);
+}
+const { supabase } = await import('./supabase/client.mjs');
 
 // upsert subscriber (confirmed so the cron picks them up)
 let { data: sub } = await supabase.from('subscribers').select('*').eq('email', EMAIL).maybeSingle();

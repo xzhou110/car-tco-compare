@@ -257,7 +257,7 @@ Overall: **clean for a server-side service-role tool.** Specific checks:
   error object) — verify the Resend/Supabase error objects don't embed the API key on auth failures; they
   generally don't, but logging the whole `error` object (line 101) is slightly riskier than logging
   `error.message`. **Low-confidence flag:** prefer `console.error('Resend:', error.message)`.
-- **client.mjs default URL hardcodes the project ref** (`grlkuouatrehmrutulhj.supabase.co`, line 5). That's
+- **client.mjs default URL hardcodes the project ref** (line 5; fixed 2026-11-12: the URL now comes from the environment only). That's
   not a secret (project URL is public), but hard-coding it means a missing `SUPABASE_URL` env silently points
   at the real prod project — fine here, mildly surprising. Low.
 - **RLS — PASS, with one note.** Schema enables RLS on all tables and grants anon **INSERT only** on

@@ -11,11 +11,18 @@
 // Run:  node lifecycle-test.mjs phase1   (clean slate, signup, instant email, confirm)
 //       node lifecycle-test.mjs phase2   (unsubscribe, re-signup, instant email)
 
-import { supabase } from './supabase/client.mjs';
+// Both values come from the environment only (this repository is public): TEST_EMAIL is the
+// recipient, SUPABASE_URL the project the test runs against. Checked before the client loads.
+const EMAIL = process.env.TEST_EMAIL;
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const missing = [!EMAIL && 'TEST_EMAIL', !SUPABASE_URL && 'SUPABASE_URL'].filter(Boolean);
+if (missing.length) {
+  console.error(`lifecycle-test: set ${missing.join(' and ')} in this shell first (TEST_EMAIL = a Resend-deliverable address you own; SUPABASE_URL = the project URL). Nothing was sent.`);
+  process.exit(2);
+}
+const { supabase } = await import('./supabase/client.mjs');
 
 const PHASE = process.argv[2] || 'phase1';
-const EMAIL = process.env.TEST_EMAIL || 'pastnoefuture@gmail.com';
-const SUPABASE_URL = process.env.SUPABASE_URL || 'https://grlkuouatrehmrutulhj.supabase.co';
 const SERVICE = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 // Multi-select filters (makes/models/fuels arrays), matching the new AlertsModal output.

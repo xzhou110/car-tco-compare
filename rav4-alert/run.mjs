@@ -1,5 +1,5 @@
 // Orchestrator: fetch both lists → filter → render → email via Resend → persist state.
-// Run:  npm run send        (needs AUTODEV_API_KEY and RESEND_API_KEY in env)
+// Run:  npm run send        (needs AUTODEV_API_KEY, RESEND_API_KEY and TEST_EMAIL in env)
 //       npm run dry         (build email + workbook, write preview, DO NOT send)
 
 import { mkdirSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
@@ -15,6 +15,7 @@ const STATE = here('./state/seen.json');
 
 if (!process.env.AUTODEV_API_KEY) { console.error('❌ AUTODEV_API_KEY not set.'); process.exit(1); }
 if (!DRY && !process.env.RESEND_API_KEY) { console.error('❌ RESEND_API_KEY not set.'); process.exit(1); }
+if (!DRY && !SETTINGS.recipient) { console.error('❌ TEST_EMAIL not set (the address this digest goes to).'); process.exit(1); }
 
 // load "seen" VIN state
 let seen = new Set();
