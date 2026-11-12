@@ -38,7 +38,7 @@ export function ConfirmPage({ token }: Props) {
         {status === 'pending' ? (
           <p className="account-msg">Confirming your subscription…</p>
         ) : status === 'ok' ? (
-          <p className="account-msg account-ok">✓ You&apos;re confirmed — your alerts are on.</p>
+          <p className="account-msg account-ok">✓ You&apos;re confirmed. Deal alerts are paused for now, so no alert emails will be sent.</p>
         ) : status === 'invalid' ? (
           <p className="account-msg">This link is invalid or already used.</p>
         ) : (

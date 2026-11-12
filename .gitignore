@@ -19,6 +19,8 @@ Thumbs.db
 *.log
 npm-debug.log*
 
-# local build backups written by the listings scripts (the canonical data is
-# listings.json) — keep them on disk but never commit/ship them to Pages
+# local backups written by the listings scripts (listings.json itself was removed on
+# 2026-11-12, DECISIONS.md ADR-003) — keep them on disk but never commit them. Vite copies
+# all of public/ into dist/, so a local build carries them; the deploy builds from a clean
+# checkout and never sees them.
 app/public/data/*.bak.json

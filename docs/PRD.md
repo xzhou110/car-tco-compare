@@ -14,6 +14,8 @@
 
 ## 1. What it is (today, live)
 
+> **2026-11-12, paused:** pillars 2 and 3 below are switched off: "Load a real car", the listings snapshot and the Deal Alerts signup left the site, and the daily alerts schedule was removed, because Auto.dev's terms do not allow showing its data publicly. See [DECISIONS.md ADR-003](../DECISIONS.md).
+
 A **transparent, editable, side-by-side Total-Cost-of-Ownership calculator** for car buyers, live as a free static SPA on GitHub Pages (Vite + React + TS) with a pure, unit-tested engine. It has grown into **three pillars**:
 
 1. **The calculator** — compare 1–6 vehicles on an Edmunds-style 7-line TCO under *your* holding period, mileage, region, and financing. Numbers are the hero; nothing is a black box; every input is editable.
@@ -70,6 +72,8 @@ Holding years (def 5) · annual miles (def 12,000) · sales tax (def 9%) · fuel
 Name · condition (new/used/CPO) · purchase price · powertrain (gas/hybrid/EV) · efficiency (MPG or mi/kWh) · **model year** (age derived) · odometer at purchase · resale value (auto-seeded from the retention curve, editable) · `annualDepRate` (scales the curve) · annual insurance · annual maintenance (tires folded in) · warranty years/miles (suppress repairs while in force) · annual repairs (out of warranty) · incentives.
 
 ### 5.3 Real-listing data layer
+
+> **2026-11-12, paused:** "Load a real car" is no longer offered and `listings.json` is no longer in the repository. See [DECISIONS.md ADR-003](../DECISIONS.md).
 - "Load a real car" modal: filter by make/model, **year**, segment, condition, fuel type, max price, region → "add to compare" populates a card via `resolveVehicle()` and the existing slot, with imported fields tagged **sourced** until edited.
 - A "listings as of \<date\>" note; graceful fallback to bundled presets if the snapshot is missing.
 - `resolveVehicle(listing, region, tables) → Vehicle` is pure and unit-tested; leaves `resaleValue: null` so the engine seeds it.
@@ -78,6 +82,8 @@ Name · condition (new/used/CPO) · purchase price · powertrain (gas/hybrid/EV)
 Total TCO · cost/year · cost/mile · **winner banner** (cheapest, above the cards) · **cost breakdown** (vertical stacked column per car, 7 components, interactive tooltips) · **cumulative cost over time** (per-year, recovers resale at sale, interactive crosshair). All recompute live.
 
 ### 5.5 Deal alerts
+
+> **2026-11-12, paused:** the signup is hidden and `alerts.yml` runs only by hand; the confirm and unsubscribe links still work. See [DECISIONS.md ADR-003](../DECISIONS.md).
 - Subscribe form (email + up to 3 named multi-select preferences: make / model / trim / fuel type; min/max price; RAV4-only "XLE and above").
 - **Double opt-in** (instant confirmation email via Supabase Edge Function → Resend, idempotent) + unsubscribe + idempotent re-subscribe.
 - Daily cron: refresh the listings cache (Auto.dev → Supabase), filter per watchlist, compute TCO (a faithful mirror of the app engine), rank, diff vs. sent-state, email **new** matches only — a brief per-preference table + a detailed XLSX/CSV sheet.
@@ -93,6 +99,8 @@ Total TCO · cost/year · cost/mile · **winner banner** (cheapest, above the ca
 
 ## 7. Data: two sets
 
+> **2026-11-12, paused:** Set 1 (Auto.dev listings) no longer ships with the app; the comparator runs on Set 2 and the cars a user enters. See [DECISIONS.md ADR-003](../DECISIONS.md).
+
 | | **Set 1 — Listings** | **Set 2 — Assumptions** |
 |---|---|---|
 | What | price, mileage, year, make/model/trim, VIN, segment, powertrain, mpg | depreciation/insurance/maintenance/repair **rates** + region table + incentives |
@@ -104,6 +112,8 @@ Total TCO · cost/year · cost/mile · **winner banner** (cheapest, above the ca
 **Join key = `segment`** (a listing self-classifies from body style + fuel type). The legacy free Autotrader scraper in `proxy/` is kept only as a fallback; Auto.dev is the live source. **Commercial redistribution of Auto.dev data requires a license** (see §10).
 
 ## 8. Current status
+
+> **2026-11-12, paused:** the data layer and Deal Alerts are paused; the calculator is the live product. See [DECISIONS.md ADR-003](../DECISIONS.md).
 
 - ✅ **Calculator** — production app live on Pages; pure typed engine + Vitest suite (42 tests).
 - ✅ **Data layer** — Set-2 tables + `resolveVehicle`, Auto.dev pull → `listings.json` (~1,600 cars, 3 models, annual Action), browse/import UI.

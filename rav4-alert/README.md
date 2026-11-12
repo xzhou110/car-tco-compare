@@ -114,6 +114,8 @@ re-subscribe any time from the form — `start_subscription` revives it).
 
 ## Scheduling — two cadences, two data stores
 
+> **2026-11-12, paused:** neither schedule below runs: `refresh-listings.yml` was deleted, `alerts.yml` runs only by hand, and the app no longer shows the signup or "Load a real car". See [DECISIONS.md ADR-003](../DECISIONS.md).
+
 The **alert cache** (`listings_cache`, what digests match against) and the app's
 **"Load a real car" snapshot** (`listings.json`) are separate and refresh on different
 schedules:

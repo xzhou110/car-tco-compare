@@ -1,10 +1,10 @@
 ---
 name: car-tco-compare
-summary: Public Total-Cost-of-Ownership car comparator (up to 6 cars, real Auto.dev listings) plus the "Deal Alerts" email backend (Supabase + Resend + Actions cron); a XuSeak project
+summary: Public Total-Cost-of-Ownership car comparator (up to 6 cars, entered by hand or from presets); its Auto.dev listings and the Deal Alerts email backend are paused since 2026-11-12 (Auto.dev's terms); a XuSeak project
 status: live
 live: https://xzhou110.github.io/car-tco-compare/
 repo: https://github.com/xzhou110/car-tco-compare
-updated: 2026-10-22
+updated: 2026-11-12
 category: products
 ---
 
@@ -13,12 +13,14 @@ category: products
 ## 1. Summary
 A public, free, static web app that compares **total cost of ownership** (depreciation, financing,
 fuel/energy, insurance, maintenance, repairs, taxes & fees) for up to 6 new/used cars under *your*
-holding period and mileage — with a "Load a real car" modal fed by an **Auto.dev listings
-snapshot** (RAV4 / Highlander / CR-V, 2020+). The same repo hosts **Deal Alerts**: sign up (double
-opt-in, instant confirmation), get a TCO-ranked email digest of matching cars. Product thesis: the
-free calculator is the funnel, paid alerts come later. Branded as a **XuSeak** project.
-**Live**; the alerts backend runs as a POC on free tiers; the comparator's pure engine is also
-vendored into [`car-shopping`](../car-shopping/PROJECT.md).
+holding period and mileage, with cars entered by hand or loaded from presets. The same repo holds
+**Deal Alerts** (sign up with double opt-in, get a TCO-ranked email digest of matching cars) and a
+"Load a real car" modal fed by an **Auto.dev listings snapshot** (RAV4 / Highlander / CR-V, 2020+).
+**Both are paused since 2026-11-12** ([DECISIONS.md](DECISIONS.md) ADR-003): Auto.dev's terms bar
+showing its data to the public, so the site no longer offers them, the snapshot left the repository
+and no scheduled job runs; the code stays for a licensed return. Product thesis: the free calculator
+is the funnel, paid alerts come later. Branded as a **XuSeak** project. **Live** (the comparator);
+its pure engine is also vendored into [`car-shopping`](../car-shopping/PROJECT.md).
 
 ## 2. Key facts
 | | |
@@ -27,27 +29,30 @@ vendored into [`car-shopping`](../car-shopping/PROJECT.md).
 | **Stack** | Vite + React + TypeScript (app/, 43 Vitest tests, ESLint boundary rules) · Node ESM scripts (rav4-alert/) · Supabase (Postgres, RPCs, Edge Function) · Resend · GitHub Actions |
 | **Local path** | `D:\Meaningful\AI\car-tco-compare` |
 | **Run** | `cd app; npm run dev` (launch config `car-tco-app`, port 5191) · `npm run check` (lint + typecheck + tests + build; the validation) · prototype: launch config `car-tco-prototype` (port 8123) or open `prototype/index.html` |
-| **Deploy** | `deploy.yml` on push to `main` touching `app/**`: `check` → `build` → GitHub Pages; `refresh-listings.yml` (annual + manual) runs `check`, rebuilds the snapshot **and self-deploys** (bot-token commits can't trigger `deploy.yml`); `check.yml` gates other branches and PRs (ADR-001) |
-| **Data / backends** | Auto.dev API (free 1,000 calls/mo — `rav4-alert/cache-refresh.mjs` is the only scheduled daily caller; `build-app-listings.mjs` once a year; `run.mjs` / `query.mjs` / `dump.mjs` only by hand) · Supabase project (free tier; browser env `VITE_SUPABASE_URL` + `VITE_SUPABASE_PUBLISHABLE_KEY`, server env `SUPABASE_URL` + `SUPABASE_SECRET_KEY`) · Resend, verified domain `send.xuspark.com` · segment×powertrain reference tables bundled in `app/src/data/reference.ts`. **$0/month today.** |
+| **Deploy** | `deploy.yml` on push to `main` touching `app/**`: `check` → `build` → GitHub Pages, the only deploy path since `refresh-listings.yml` was deleted on 2026-11-12 (ADR-003); `check.yml` gates other branches and PRs (ADR-001) |
+| **Data / backends** | Auto.dev API (free 1,000 calls/mo; since 2026-11-12 no scheduled caller: `alerts.yml`, which runs `rav4-alert/cache-refresh.mjs`, is manual only, and `build-app-listings.mjs`, `run.mjs` / `query.mjs` / `dump.mjs` run only by hand) · Supabase project (free tier; browser env `VITE_SUPABASE_URL` + `VITE_SUPABASE_PUBLISHABLE_KEY`, server env `SUPABASE_URL` + `SUPABASE_SECRET_KEY`) · Resend, verified domain `send.xuspark.com` · segment×powertrain reference tables bundled in `app/src/data/reference.ts`. **$0/month today.** |
 | **Related** | [`car-shopping`](../car-shopping/PROJECT.md) vendors `lib/tco` from here · [`/build` plugin](../claude-marketplace/PROJECT.md) (Deal Alerts Phase 2 was built with it) · skills: `supabase-email-alerts` (generalized from this backend), `web-data-snapshot`, `ship-web-app` |
-| **Started · last major change** | 2026-06-15 · 2026-06-27 (listings refresh monthly → annual to cut API calls) |
+| **Started · last major change** | 2026-06-15 · 2026-11-12 (Auto.dev listings and Deal Alerts paused, ADR-003) |
 
 ## 3. Key things to know
 - **Brand:** XuSeak; bylines link to `https://ai.xuseak.com/`. The verified Resend sender remains `alerts@send.xuspark.com` until a new sending domain is verified. Website deployment and the `send-confirmation` Supabase Edge Function are separate releases; the daily email scripts follow `main` automatically.
 - **All cost rates are illustrative placeholders** (segment-level; `app/src/data/reference.ts` says so in its header and `source` field; in-app the footer note reads "cost assumptions are illustrative" and How It Works carries a rough-estimates warning — there is no "Est." badge). No commercial "cheapest to own" claim until Edmunds/AAA-grade data replaces them. Listings are a best-effort snapshot — verify before buying (the README's disclaimer is deliberate; liability matters).
+- **Auto.dev's terms bar public use (2026-11-12, ADR-003):** sections 4.2 (no redistribution to third parties), 4.3 (internal business use, no derivative databases) and 4.4 (the Free plan is not for production systems serving end users) rule out the public listings and the alert emails. Nothing Auto.dev-sourced goes back on the site, into the repository or into an email before a written licence from Auto.dev or a plan whose terms allow it; ADR-003 lists what to restore.
 - **Auto.dev API facts:** 20 records/page on the starter tier (`limit` ignored — paginate `page`; a call = a page; `rav4-alert/autodev.mjs` retries 429s with a short backoff and dedupes by VIN); filters make/model/year/miles/price/zip/distance but **no trim filter** (filter client-side). **Commercial license required before charging** — the #1 launch blocker.
 - **Auto.dev data quirks:** gas and hybrid are separate *model names* ("RAV4" vs "RAV4 Hybrid") and the raw `fuel` field mislabels hybrids as gasoline, so every script derives `powertrain` from the model name; `history` (accidents/owners) is populated for only a tiny share of 2020+ cars (~0.4% per the `digest.mjs` comment; an earlier count said ~2%) → display it, never filter on it, and let the reader verify via the `carfaxUrl` link.
 - **Tile cache architecture:** the daily cron pulls (model × region) tiles into `listings_cache` (POC: Toyota RAV4 gas + hybrid only, hard-coded in `cache-refresh.mjs`), stamps `last_seen` and calls `expire_stale_listings(36)` so sold cars drop out; per-user alerts are pure DB filters, so API cost is decoupled from subscriber count (page PostgREST's 1,000-row cap with `.range()`, as `alert-cron.mjs` does). Unsubscribed rows are kept forever (`unsubscribed_at`), re-subscribe is an idempotent RPC.
 - **Personal POC values are hard-coded in the backend** — the owner's ZIP, the 200-mi radius and a personal preview/test address sit in `rav4-alert/config.mjs`, `cache-refresh.mjs`, `build-app-listings.mjs`, `geo.mjs` and `seed-watchlists.mjs`. Never copy them into docs. Radius filtering is a stub: `geo.mjs` knows that one ZIP centroid and `withinRadius()` returns everything for any other ZIP — load a full US ZIP→lat/lng table and parametrize the tiles before serving other areas.
-- **Two data layers in the app:** volatile listings snapshot (`app/public/data/listings.json`, fetched at runtime) vs. bundled assumptions (reference tables + per-user overrides). `lib/resolveVehicle.ts` joins listing → segment → rates → engine `Vehicle`.
+- **Two data layers in the app:** volatile listings snapshot (`app/public/data/listings.json`, fetched at runtime; removed and unused since 2026-11-12, ADR-003) vs. bundled assumptions (reference tables + per-user overrides). `lib/resolveVehicle.ts` joins listing → segment → rates → engine `Vehicle`.
 - **Scraping era is over:** `proxy/` (Autotrader `__NEXT_DATA__` scrape) is a fallback only — datacenter IPs (Actions, Workers) get blocked; the durable lesson lives in the `web-data-snapshot` skill. Auto.dev replaced it.
-- **Three workflows, two deploy paths** — see the table in README §Automation. Crons stay well inside the free API tier (RAV4-only daily cache refresh + one ~100–130-call annual pull). Never schedule another Auto.dev caller without recomputing the budget; the hand-run `run.mjs` / `query.mjs` / `dump.mjs` spend calls too.
+- **Three workflows, one deploy path, no schedule (since 2026-11-12)** — `deploy.yml`, `check.yml` and the manual-only `alerts.yml`; see the table in README §Automation. Before any Auto.dev caller is scheduled again, the licence condition above must hold and the budget must be recomputed (the old daily RAV4 refresh plus one ~100–130-call annual pull stayed under the free tier); the hand-run `run.mjs` / `query.mjs` / `dump.mjs` spend calls too.
 - **Windows control-plane traps** (Supabase/Resend secrets): a PowerShell pipe into `gh secret set` injects a BOM → use `--body`; details in the `supabase-email-alerts` skill and global CLAUDE.md.
 - **Three copies of the TCO engine:** `app/src/lib/tco.ts` (+ `depreciation.ts`, `data/reference.ts`) is vendored into car-shopping **and** hand-ported as `rav4-alert/tco.mjs` so the digest's ranking matches the app. Neither copy updates itself — after an engine or rate change re-sync both by hand and note it in each place.
 - **Secrets and ids live outside this file.** Every key is a GitHub Actions secret or variable, a Supabase function secret or a local env var — §4 *Configuration and secrets* names each one's home; the Supabase project ref appears only in `rav4-alert/supabase/config.toml` (the CLI's `project_id`); since 2026-11-12 the scripts and the app read the project URL, and the scripts the test address, from the environment only and stop with a clear message when one is missing. Repo is **public** (MIT-style LICENSE present). Env values / project ids never go in docs.
 
 ## 4. Details
 ### How it works
+> **2026-11-12, paused (ADR-003):** `App.tsx` no longer renders "Load a real car", the Deal Alerts signup or their modals; `alerts.yml` runs only by hand and `refresh-listings.yml` is gone. The confirm and unsubscribe routes still work. The paragraph below describes the code as it stays in the repository.
+
 `app/` is a static SPA: a pure typed engine (`lib/tco.ts`) + `resolveVehicle` + a listings loader,
 state in `state/useComparison.ts` (localStorage + compressed share link), charts and a results-first
 layout. "Load a real car" is a `<dialog>` (`ListingModal.tsx`) with cascading Make → Model selects
@@ -72,7 +77,7 @@ app/            production SPA (src/lib/tco.ts · resolveVehicle.ts · listings.
 rav4-alert/     Deal Alerts backend scripts + supabase/ (SQL, config.toml, functions/) + its own README/RUN_LOG/review-findings
 proxy/          legacy scraper (fallback)        prototype/   no-build clickable references
 docs/           PRD.md · design/ARCHITECTURE.md · design/tco-model.md
-.github/workflows/  deploy.yml · refresh-listings.yml · alerts.yml
+.github/workflows/  deploy.yml · check.yml · alerts.yml (manual only since 2026-11-12)
 .claude/        launch.json (the project's launch entries, read by Claude Code's preview and the X Command Center) + static-server.js (the prototype's static server); committed since 2026-10-22
 ```
 Skeleton aliases (engineering standard): `lib/` = engine (pure, lint-enforced; `listings.ts` and
@@ -81,8 +86,8 @@ adapters yet), `App.tsx` + `main.tsx` = shell.
 
 ### Data layer (where the numbers come from)
 - **Reference tables** — `app/src/data/reference.ts` exports `REFERENCE` (`asOf`, `source`, `rates`, `regions`, `incentives`). `rates` has ten segment keys (`car-economy` … `minivan`), each a `RateRow` (stand-in `mpg`, `depRateNew` / `depRateUsed`, `insurance`, `maintenance`, `repair`, warranty years/miles) with optional `byPowertrain` overrides for hybrid/EV; `regions` has national, CA, TX, NY, FL (fuel, electricity, sales tax, registration, insurance multiplier); `incentives` is per powertrain × new/used (only EV non-zero). Deliberately segment-level, not per-trim — rough, transparent, editable (`docs/design/ARCHITECTURE.md` §6). `lib/resolveVehicle.ts` joins listing → segment → rates, applies the region multiplier and leaves `resaleValue: null` for the engine's retention curve (`lib/depreciation.ts`).
-- **Listings snapshot** — `app/public/data/listings.json` (~1 MB, tracked, shipped with the Pages build, fetched at runtime with `cache: 'no-store'`). Built by `rav4-alert/build-app-listings.mjs`: six Auto.dev model queries (RAV4 / Highlander / CR-V × gas / hybrid, 2020+, near the POC ZIP / 200 mi), normalized to the app's `Listing` shape with the segment assigned per model and each VIN's `firstSeen` carried forward across rebuilds (days on market). The previous file is backed up beside it as `*.bak.json` (gitignored). `build-applistings-from-cache.mjs` rebuilds it from `listings_cache` for 0 API calls.
-- **Alert cache** — Supabase `listings_cache`: `vin` (PK / upsert key), make, model, trim, year, price, mileage, condition, powertrain (derived from the model name), segment, lat/lng (from Auto.dev's `location`), city, state, dealer, vdp, carfax_url, `history` jsonb, `raw`, `first_seen` (kept on conflict) / `last_seen`. Fed only by `cache-refresh.mjs` (`--dry`, `--models "Make:Model:segment"`, `--max-pages N`, default 25 pages per tile); `seed-cache.mjs` fills it from the app snapshot without API calls (lossy: no lat/lng, history, carfax).
+- **Listings snapshot** (paused 2026-11-12, ADR-003: the file was removed from the repository and the app no longer fetches it; this describes how to rebuild it after a licence) — `app/public/data/listings.json` (~1 MB, was tracked, shipped with the Pages build, fetched at runtime with `cache: 'no-store'`). Built by `rav4-alert/build-app-listings.mjs`: six Auto.dev model queries (RAV4 / Highlander / CR-V × gas / hybrid, 2020+, near the POC ZIP / 200 mi), normalized to the app's `Listing` shape with the segment assigned per model and each VIN's `firstSeen` carried forward across rebuilds (days on market). The previous file is backed up beside it as `*.bak.json` (gitignored). `build-applistings-from-cache.mjs` rebuilds it from `listings_cache` for 0 API calls.
+- **Alert cache** (no longer refreshed since 2026-11-12; it still holds the Auto.dev rows written before, 1,139 that day, which only the owner's database sign-in can clear) — Supabase `listings_cache`: `vin` (PK / upsert key), make, model, trim, year, price, mileage, condition, powertrain (derived from the model name), segment, lat/lng (from Auto.dev's `location`), city, state, dealer, vdp, carfax_url, `history` jsonb, `raw`, `first_seen` (kept on conflict) / `last_seen`. Fed only by `cache-refresh.mjs` (`--dry`, `--models "Make:Model:segment"`, `--max-pages N`, default 25 pages per tile); `seed-cache.mjs` fills it from the app snapshot without API calls (lossy: no lat/lng, history, carfax).
 - **Watchlist `filters` jsonb** — `{ makes[], models[], fuels[], trims[], zip, radius, priceMin, priceMax, yearMin, milesMax }` (arrays mean any-of; `alert-cron.mjs` filters make/model/fuel/price/year/miles in SQL, trims in JS). Legacy single-value `make` / `model` / `powertrain` and `xlePlusOnly` are still honoured; `isXlePlus` in `digest.mjs` treats any trim not starting with "LE" as XLE-and-above, so SE/XSE count today.
 - **Digest TCO** — `rav4-alert/tco.mjs` mirrors the app engine, its depreciation curve and `REFERENCE` by hand (region CA, listings treated as used) — see the sync rule in §3.
 
@@ -92,7 +97,7 @@ adapters yet), `App.tsx` + `main.tsx` = shell.
 | `AUTODEV_API_KEY` | GitHub Actions repo secret · Windows User env var locally | `cache-refresh.mjs`, `build-app-listings.mjs`, `run.mjs` / `query.mjs` / `dump.mjs` |
 | `SUPABASE_URL`, `SUPABASE_SECRET_KEY` (legacy alias `SUPABASE_SERVICE_ROLE_KEY`) | repo secrets · local env | every server script via `rav4-alert/supabase/client.mjs` (both required; no hard-coded fallback) |
 | `RESEND_API_KEY` | repo secret **and** a Supabase function secret (`npx supabase secrets set … --project-ref <ref>`) | `alert-cron.mjs`, `send-confirmations.mjs`, `run.mjs`, the Edge Function (both strip a stray BOM) |
-| `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` | GitHub Actions repository **variables** (not secrets — the publishable key is browser-safe, RLS protects data) · `app/.env.local` locally (gitignored) | the SPA (`app/src/lib/supabaseClient.ts`), injected at build time by `deploy.yml` and `refresh-listings.yml` |
+| `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` | GitHub Actions repository **variables** (not secrets — the publishable key is browser-safe, RLS protects data) · `app/.env.local` locally (gitignored) | the SPA (`app/src/lib/supabaseClient.ts`, still used by the confirm and unsubscribe pages), injected at build time by `deploy.yml` and `check.yml` |
 | `CONFIRM_SENDER` | optional Supabase function secret | overrides the confirmation sender; the digest sender is `SETTINGS.sender` in `rav4-alert/config.mjs` |
 | `SUPABASE_ACCESS_TOKEN` | local only | `npx supabase functions deploy send-confirmation --project-ref <ref>` (the function's own `SUPABASE_URL` / service-role key are injected by Supabase) |
 | `APP_URL`, `TEST_EMAIL` | local env | `APP_URL` (optional): live-URL override for confirm/unsubscribe links (`config.mjs`); `TEST_EMAIL` (required by `lifecycle-test.mjs`, `seed-watchlists.mjs` and a sending `run.mjs`, no default): the test recipient (sends real mail) |
@@ -106,14 +111,18 @@ any push: the validation for every app change, run by the pre-push hook and by A
 `main` deploys only if `app/**` changed; confirm the run and the live `build-commit` stamp. Backend: run scripts from `rav4-alert/` with env vars set (never commit them);
 `preview-email.mjs` / `lifecycle-test.mjs` before touching the cron (`alert-cron.mjs --dry` and
 `cache-refresh.mjs --dry` write previews to `out/` without sending or writing); workflow secrets via
-`gh secret set NAME --body ...`. Snapshot refresh: run `refresh-listings.yml` manually (or
-`build-applistings-from-cache.mjs` for a 0-API-call rebuild from the cache). Diagnostics:
+`gh secret set NAME --body ...`. Snapshot refresh: paused (ADR-003); do not rebuild or commit
+`listings.json` before the licence condition holds. Diagnostics:
 `verify-rpc.mjs`, `check-sub.mjs`, `check-applistings.mjs`, `check-xlsx.mjs` / `verify-xlsx.mjs`
 (no API calls); `query.mjs` / `dump.mjs` probe Auto.dev and do spend calls.
 
 ### Current state & open items
-Comparator live; alerts POC live (daily 15:00 UTC digest). Open / blockers before monetizing:
-Auto.dev commercial license · Stripe paywall · real cost data (Edmunds/AAA) · quieter digests
+Comparator live. "Load a real car" and Deal Alerts paused since 2026-11-12 (ADR-003; no confirmed
+subscriber was affected). Open for the owner: clear the Auto.dev rows in Supabase `listings_cache`
+(needs the owner's database sign-in); decide whether to rewrite Git history to drop the old
+`listings.json` snapshots from this public repository (a force-push); a licence or plan from
+Auto.dev before anything returns. Open / blockers before monetizing:
+Auto.dev licence for public display · Stripe paywall · real cost data (Edmunds/AAA) · quieter digests
 (`SETTINGS.emailMode` in `rav4-alert/config.mjs` is dead — `alert-cron.mjs` always sends every match
 with NEW badges; implement `new-only` or delete the setting, `review-findings.md` S7) · radius
 filtering needs a full ZIP-centroid table (`geo.mjs` stub) · 200-mi radius is wide · whether SE/XSE
@@ -121,10 +130,10 @@ should count as "XLE and above" (today they do) · `deploy.yml` uses Node-20-era
 (bump). Repo-local status: `rav4-alert/RUN_LOG.md`.
 Engineering-standard debt (ADR-001): step 3 — `lib/listings.ts` (`fetch`) and `lib/supabaseClient.ts`
 (Supabase client) move to adapters; `state/useComparison.ts` hydrates saved data as `any` (replace with
-`unknown` + one sanitizer); each file carries a lint marker. Step 4: `AlertsModal.tsx` 337 lines. The gate
-in `refresh-listings.yml` is parse-validated only until its next run.
+`unknown` + one sanitizer); each file carries a lint marker. Step 4: `AlertsModal.tsx` 337 lines (unused while paused).
 
 ### Change highlights
+- 2026-11-12 — Auto.dev data off the public site (ADR-003, the owner's "Stop Both"): "Load a real car" and the Deal Alerts signup removed from the app's shell, `listings.json` removed from the repository, `refresh-listings.yml` deleted, `alerts.yml` manual only; the confirm page says alerts are paused. Components, helpers, tests and `rav4-alert/` kept unused for a licensed return.
 - 2026-10-22 — Deal Alerts hardening (ADR-002): the public Actions logs and the `out/` files name subscribers by an 8-character id, never their address; one subscriber's failure no longer stops the others, and any failure (including the refresh or confirmation step) turns the run red; the Auto.dev year range ends at the calendar year + 1 (`MAX_MODEL_YEAR` in `config.mjs`), not 2026.
 - 2026-10-21 — Command surface and CI gate (ADR-001 in the new `DECISIONS.md`): ESLint, `npm run lint` / `typecheck` / `check`, a `check` job both deploy workflows need, `check.yml` for other branches; three debts marked. No behavior change.
 - 2026-10-16 — Build-commit stamp: the built page carries `<meta name="build-commit">` with the deployed commit (GitHub Actions' `GITHUB_SHA`; `local` for a local build), so a deploy is proven live by that id, not by a `?t=` query the Pages CDN ignores (app/index.html, app/vite.config.ts).
@@ -137,7 +146,7 @@ in `refresh-listings.yml` is parse-validated only until its next run.
 
 ## 5. Pointers
 - [README.md](README.md) — public product face: features, data model, automation table, repo structure, quick start.
-- [DECISIONS.md](DECISIONS.md) — ADR log from 2026-10-21 (ADR-001 command surface and CI gate; ADR-002 Deal Alerts logs, red runs, model-year bound).
+- [DECISIONS.md](DECISIONS.md) — ADR log from 2026-10-21 (ADR-001 command surface and CI gate; ADR-002 Deal Alerts logs, red runs, model-year bound; ADR-003 Auto.dev listings and Deal Alerts paused).
 - [docs/PRD.md](docs/PRD.md) · [docs/design/ARCHITECTURE.md](docs/design/ARCHITECTURE.md) · [docs/design/tco-model.md](docs/design/tco-model.md) (every formula).
 - [rav4-alert/README.md](rav4-alert/README.md) · [rav4-alert/RUN_LOG.md](rav4-alert/RUN_LOG.md) · [rav4-alert/review-findings.md](rav4-alert/review-findings.md) — the alerts backend.
 - [prototype/README.md](prototype/README.md) — the no-build reference UI.

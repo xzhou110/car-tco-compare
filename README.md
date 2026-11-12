@@ -9,27 +9,24 @@ period and mileage, and see the real cost of ownership — not just the sticker 
 
 Runs in your browser — no install, no sign-up. A project by **[XuSeak](https://ai.xuseak.com/)**.
 
-> ⚠️ **Listings** (price, mileage, year) are a *best-effort* snapshot scraped from
-> public listings — verify against the live listing before buying. **Cost assumptions**
-> (insurance, maintenance, repairs, depreciation) are *illustrative segment estimates* you
-> can edit; verify against real quotes before relying on a result.
+> ⚠️ **Cost assumptions** (insurance, maintenance, repairs, depreciation) are *illustrative
+> segment estimates* you can edit; verify against real quotes before relying on a result.
 
 ## Status
 
 **Production app live on GitHub Pages** (Vite + React + TypeScript) in [`app/`](app/), with a
-typed, unit-tested engine. A **real-listing data layer** ships with it: you can **load real
-cars** (Toyota RAV4, Toyota Highlander, Honda CR-V; 2020+) straight into the comparison. The
+typed, unit-tested engine. You enter the cars yourself or start from a built-in preset. The
 no-build [`prototype/`](prototype/) remains as the design reference.
+
+**Paused since 2026-11-12:** "Load a real car" (Auto.dev listings) and **Deal Alerts** (the email
+digest). Auto.dev's terms do not allow showing its data to the public, so the app no longer
+offers either, the listings snapshot left the repository, and no scheduled job calls Auto.dev.
+The code stays in place so both can return if Auto.dev licenses that use; the decision, the
+terms and the restore steps are in [`DECISIONS.md`](DECISIONS.md) (ADR-003). Links in alert
+emails already sent (confirm, unsubscribe) still work.
 
 ## Features
 
-- **Load a real car** — a header button opens a modal of **real listings** (price, mileage,
-  year, trim) you can filter (make/model, **year**, segment, condition, fuel type, max price)
-  and drop into the comparison. Every imported field stays editable. (A region selector sets
-  which regional cost assumptions apply.)
-- **Deal alerts** — sign up (double opt-in, instant confirmation email) with up to 3 multi-select
-  preferences (make / model / trim / fuel type) and get a daily, TCO-ranked digest of
-  matching cars. See [`rav4-alert/`](rav4-alert/).
 - **Compare 1–6 cars** side by side — start with one, add/remove freely, each with its own name and color.
 - **Edmunds-style 7-line TCO**: depreciation, financing, fuel/energy, insurance, maintenance, repairs, taxes & fees (minus incentives).
 - **Curve-based depreciation** — resale auto-estimates from a **value-retention-by-age curve** (anchored to the Toyota RAV4 curve), driven by each car's **model year** and your holding period; override per car anytime.
@@ -44,14 +41,17 @@ no-build [`prototype/`](prototype/) remains as the design reference.
 
 The app stays a **static, free, client-only SPA** — no backend in production.
 
-- **Set 1 — Listings (real, auto-refreshed):** [`build-app-listings.mjs`](rav4-alert/build-app-listings.mjs)
+> **2026-11-12, paused:** Set 1 below no longer ships: `listings.json` and
+> `refresh-listings.yml` were removed and the app no longer offers "Load a real car"
+> ([`DECISIONS.md`](DECISIONS.md), ADR-003). The text below describes how it worked, for a restore.
+
+- **Set 1 — Listings (paused):** [`build-app-listings.mjs`](rav4-alert/build-app-listings.mjs)
   pulls the curated models (Toyota RAV4 / Highlander, Honda CR-V — gas + hybrid, 2020+) from the
-  **Auto.dev API**, normalizes them, and writes [`app/public/data/listings.json`](app/public/data/listings.json).
-  Vite copies `public/` into the build, so the snapshot ships to GitHub Pages and the app fetches it
-  at runtime (lazy-loaded when you open "Load a real car"). An **annual GitHub Action**
-  ([`refresh-listings.yml`](.github/workflows/refresh-listings.yml)) re-runs the pull, commits the
-  snapshot, and redeploys — so the data stays fresh hands-free. (A separate daily
-  [Deal Alerts cron](rav4-alert/) keeps its own RAV4 alert cache in Supabase current.)
+  **Auto.dev API**, normalizes them, and writes `app/public/data/listings.json`.
+  Vite copies `public/` into the build, so the snapshot shipped to GitHub Pages and the app fetched it
+  at runtime (lazy-loaded when you opened "Load a real car"). An annual GitHub Action
+  (`refresh-listings.yml`, removed 2026-11-12) re-ran the pull, committed the snapshot and
+  redeployed. (The [Deal Alerts](rav4-alert/) cron kept its own RAV4 alert cache in Supabase.)
 - **Set 2 — Assumptions (curated, stable):** segment × powertrain cost-rate tables plus a
   region table ([`app/src/data/reference.ts`](app/src/data/reference.ts)). A pure, unit-tested
   [`resolveVehicle()`](app/src/lib/resolveVehicle.ts) joins a listing to its segment estimates
@@ -62,20 +62,16 @@ The app stays a **static, free, client-only SPA** — no backend in production.
 ## Automation (GitHub Actions)
 
 Four workflows show up under the repo's **Actions** tab. Three are ours (YAML in
-[`.github/workflows/`](.github/workflows/)); the fourth is GitHub-managed.
+[`.github/workflows/`](.github/workflows/)); the fourth is GitHub-managed. **No scheduled job
+runs since 2026-11-12** ([`DECISIONS.md`](DECISIONS.md), ADR-003): the annual
+`refresh-listings.yml` was deleted and `alerts.yml` lost its daily schedule.
 
 | Workflow | File | Trigger | What it does |
 |---|---|---|---|
-| **Deploy app to GitHub Pages** | [`deploy.yml`](.github/workflows/deploy.yml) | push to `main` touching `app/**` (+ manual) | Builds the Vite/React app and publishes it to GitHub Pages. The main app deploy. |
-| **Refresh listings snapshot (annual)** | [`refresh-listings.yml`](.github/workflows/refresh-listings.yml) | cron **Jan 1 16:00 UTC** (8am PT) (+ manual) | Rebuilds the "Load a real car" snapshot ([`listings.json`](app/public/data/listings.json)) for all 3 models from Auto.dev, commits it, **and builds + deploys Pages itself** (a bot-token commit can't trigger `deploy.yml`). Run it manually anytime for an on-demand refresh. |
-| **Deal Alerts** | [`alerts.yml`](.github/workflows/alerts.yml) | cron **15:00 UTC** (8am PT) (+ manual) | The email backend: refreshes the RAV4 alert cache (Auto.dev → Supabase), sends double-opt-in confirmation emails, then sends each subscriber their TCO-ranked digest. A failed refresh or confirmation step never blocks the digests, but it turns the run red; logs name subscribers by a short id, never by address. See [`rav4-alert/`](rav4-alert/). |
-| **pages-build-deployment** | _(none — GitHub-managed)_ | every Pages deployment | GitHub's own "last-mile" job that actually publishes the uploaded Pages artifact. It appears automatically once Pages is enabled and runs after `deploy.yml` / `refresh-listings.yml` upload the build — you don't author or edit it. |
-
-**Why two deploy paths?** `deploy.yml` handles ordinary code pushes; `refresh-listings.yml`
-self-deploys because the snapshot commit it pushes is made with `GITHUB_TOKEN`, and
-token-made pushes deliberately **don't** trigger other workflows (loop protection). Both end
-by handing an artifact to `pages-build-deployment`. The two Auto.dev crons stay well inside the
-free 1,000-calls/mo tier (RAV4-only daily + one ~100-call full pull once a year ≈ <150/mo).
+| **Deploy app to GitHub Pages** | [`deploy.yml`](.github/workflows/deploy.yml) | push to `main` touching `app/**` (+ manual) | Runs the gate (`npm run check`), builds the Vite/React app and publishes it to GitHub Pages. The only deploy path. |
+| **check** | [`check.yml`](.github/workflows/check.yml) | push to any other branch, pull requests | The same gate for work that is not on `main`. |
+| **Deal Alerts** (paused) | [`alerts.yml`](.github/workflows/alerts.yml) | manual only (the daily 15:00 UTC schedule was removed on 2026-11-12) | The email backend: refreshes the RAV4 alert cache (Auto.dev → Supabase), sends double-opt-in confirmation emails, then sends each subscriber their TCO-ranked digest. A failed refresh or confirmation step never blocks the digests, but it turns the run red; logs name subscribers by a short id, never by address. See [`rav4-alert/`](rav4-alert/). |
+| **pages-build-deployment** | _(none — GitHub-managed)_ | every Pages deployment | GitHub's own "last-mile" job that actually publishes the uploaded Pages artifact. It appears automatically once Pages is enabled and runs after `deploy.yml` uploads the build — you don't author or edit it. |
 
 ## Repo structure
 
@@ -89,21 +85,20 @@ car-tco-compare/
 │       └── tco-model.md            ← exact calculation methodology (every formula)
 ├── proxy/                          ← free Autotrader scraper (Node — run locally)
 │   ├── scrape.js                   ← shared scrape + normalize core
-│   ├── snapshot.js                 ← writes app/public/data/listings.json
+│   ├── snapshot.js                 ← wrote app/public/data/listings.json (removed 2026-11-12)
 │   └── server.js                   ← optional local live-search proxy (dev only)
 ├── prototype/                      ← no-build clickable references (vanilla HTML/CSS/JS)
 │   ├── index.html                  ← the original TCO tool
 │   └── app-integrated.html         ← "Load a real car" integration prototype
 └── app/                            ← PRODUCTION app (Vite + React + TS)
-    ├── public/data/listings.json   ← real-listing snapshot (ships to Pages)
     ├── src/
     │   ├── lib/tco.ts              ← pure, typed calculation engine
     │   ├── lib/resolveVehicle.ts   ← listing + segment tables → Vehicle (pure)
-    │   ├── lib/listings.ts         ← load + filter the snapshot
-    │   ├── lib/*.test.ts           ← Vitest unit suites (42 tests)
+    │   ├── lib/listings.ts         ← load + filter the snapshot (unused while paused)
+    │   ├── lib/*.test.ts           ← Vitest unit suites (43 tests)
     │   ├── data/reference.ts       ← segment×powertrain + region tables
     │   ├── data/presets.ts         ← sample vehicles + defaults
-    │   ├── components/             ← ListingModal, AssumptionsBar, VehicleCard, charts
+    │   ├── components/             ← AssumptionsBar, VehicleCard, charts (ListingModal, AlertsModal unused while paused)
     │   ├── state/useComparison.ts  ← state + localStorage + URL-share
     │   └── App.tsx
     └── package.json
@@ -117,17 +112,13 @@ cd app
 npm install
 npm run dev      # start the dev server
 npm run check    # lint + type-check + unit tests + production bundle: the validation before any push (CI runs it before deploying)
-npm test         # run the unit tests (42)
+npm test         # run the unit tests (43)
 npm run build    # type-check + production bundle
 ```
 
-**Refresh the real-listing snapshot** (run from the repo root, on your own machine):
-```powershell
-node proxy/snapshot.js                          # regenerate app/public/data/listings.json
-git add app/public/data/listings.json
-git commit -m "Refresh listings snapshot"
-git push                                         # the deploy Action republishes Pages
-```
+The real-listing snapshot is paused (see Status): do not regenerate or commit
+`app/public/data/listings.json` until Auto.dev licenses public display (ADR-003 in
+[`DECISIONS.md`](DECISIONS.md)).
 
 **Prototype** (no build — just open it):
 ```powershell

@@ -1,11 +1,14 @@
 name: Deal Alerts
 
-# Once daily, timed for when fresh dealer inventory lands:
-#   15:00 UTC = 8am Pacific  — catches the overnight DMS-feed wave (most new listings appear overnight)
-# GitHub cron is fixed UTC (no DST), so in PST this shifts to 7am — still morning.
+# PAUSED since 2026-11-12 (DECISIONS.md ADR-003): Auto.dev's terms (sections 4.2 to 4.4) do not
+# allow emailing its listings to the public, so the owner stopped Deal Alerts and removed the
+# daily schedule. The workflow stays runnable by hand (Run workflow) for the owner's own checks.
+# Before the schedule returns there must be a written licence from Auto.dev, or a plan whose terms
+# allow showing its data to end users; then restore the schedule below and the signup in the app.
+# The former schedule, once daily at 15:00 UTC (8am Pacific; GitHub cron is fixed UTC, no DST):
+#   schedule:
+#     - cron: '0 15 * * *'
 on:
-  schedule:
-    - cron: '0 15 * * *'
   workflow_dispatch: {}
 
 concurrency:

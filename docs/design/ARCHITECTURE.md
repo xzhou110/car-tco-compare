@@ -12,6 +12,8 @@
 
 ## 1. System overview
 
+> **2026-11-12, paused:** the SPA no longer fetches `listings.json` (removed) and the Deal Alerts backend no longer runs on a schedule. See [DECISIONS.md ADR-003](../../DECISIONS.md).
+
 Two cooperating pieces, both free-tier:
 
 ```
@@ -91,6 +93,8 @@ Listing     { source, url, vin, year, make, model, trim, price, mileage,
 
 ## 5. Data-layer architecture (Set 1 — listings)
 
+> **2026-11-12, paused:** this pipeline is off: `listings.json` and `refresh-listings.yml` were removed and the app no longer offers "Load a real car". See [DECISIONS.md ADR-003](../../DECISIONS.md).
+
 **The decision that shaped everything (historical):** free scraping of retail sites works from a *residential* IP and is blocked from datacenter IPs — so a cloud Action can't scrape. The answer was a **static snapshot** generated locally, committed, and shipped in the build. **Today the live source is the Auto.dev API** (clean, licensable, no IP games); the `proxy/` Autotrader scraper is kept only as a fallback, and the snapshot model still holds:
 
 ```
@@ -116,6 +120,8 @@ Slow-changing, curated cost rates keyed by **`segment × powertrain`**, plus a *
 > ⚠️ **All Set-2 numbers are currently illustrative placeholders** (`source: 'Illustrative placeholders (Edmunds TCO + AAA pending)'`). Each table carries `source` + `asOf`; one global "assumptions as of \<date\>" line is shown. **Sourcing these is the prerequisite for any paid product** (see PRD §9).
 
 ## 7. Deal-alerts backend architecture
+
+> **2026-11-12, paused:** the daily cron is off (`alerts.yml` runs only by hand) and the app no longer shows the signup. See [DECISIONS.md ADR-003](../../DECISIONS.md).
 
 ```
                 ┌─ daily cron (GitHub Actions, alerts.yml) ────────────────┐
@@ -160,6 +166,8 @@ System font stack; **tabular numerals** on all money; hero total ~27px/800; soft
 **Accessibility:** text ≥4.5:1; visible focus ring on every control; ≥44px touch targets; charts not color-only (text legend + values); `prefers-reduced-motion` honored.
 
 ## 9. Automation (GitHub Actions)
+
+> **2026-11-12, paused:** `refresh-listings.yml` was deleted and `alerts.yml` lost its schedule (manual only); `deploy.yml` is the one deploy path and `check.yml` gates other branches. See [DECISIONS.md ADR-003](../../DECISIONS.md).
 
 | Workflow | Trigger | Does |
 |---|---|---|

@@ -17,8 +17,8 @@ concurrency:
 
 jobs:
   # The gate (principle 8, D:/Meaningful/AI/agent-skills/rules/engineering-principles.md): lint, typecheck, tests and
-  # build must pass before anything is deployed. Other branches and pull requests run the same job in check.yml;
-  # refresh-listings.yml, the other deploy path, runs it too.
+  # build must pass before anything is deployed. Other branches and pull requests run the same job in check.yml.
+  # This is the only deploy path since refresh-listings.yml was removed on 2026-11-12 (DECISIONS.md ADR-003).
   check:
     runs-on: ubuntu-latest
     defaults:
